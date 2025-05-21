@@ -24,17 +24,38 @@ repositories {
 }
 
 dependencies {
+// jpa DB와 엔티티 자동 매핑
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	// security JWT SESSION 등 보안
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// spring boot REST API
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
+	// 개발 편의성 (자동 리빌드 등)
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// lombok
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// validation 유효성검증(@Valid, NotNull, Email 등)
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Mysql (DB 드라이버)
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// webSocket 양방향 실시간 통신(클라이언트-DB)
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// JWT 의존성 주입
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {
