@@ -2,10 +2,11 @@ package org.project.second.like.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.project.second.common.enums.PostType;
+import org.project.second.common.domain.BaseEntity;
+import org.project.second.community.domain.Community;
+import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
-
-import java.time.LocalDateTime;
+import org.project.second.recipe.domain.Recipe;
 
 @Entity
 @Getter
@@ -14,10 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Table(name = "likes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"member_id", "post_id", "post_type"})
+        @UniqueConstraint(columnNames = {"member_id", "community_id"}),
+        @UniqueConstraint(columnNames = {"member_id", "groupBuy_id"}),
+        @UniqueConstraint(columnNames = {"member_id", "recipe_id"})
 })
 
-public class Like {
+public class Like extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,8 +29,15 @@ public class Like {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    private Long postId;
-    private PostType postType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id", nullable = true)
+    private Community community;
 
-    private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "groupBuy_id", nullable = true)
+    private GroupBuy groupBuy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = true)
+    private Recipe recipe;
 }

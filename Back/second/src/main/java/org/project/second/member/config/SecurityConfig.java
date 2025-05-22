@@ -2,6 +2,7 @@ package org.project.second.member.config;
 
 import lombok.RequiredArgsConstructor;
 import org.project.second.member.service.CustomUserDetailsService;
+import org.project.second.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,7 @@ public class SecurityConfig {
 
     private static final Logger logger = Logger.getLogger(SecurityConfig.class.getName());
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,10 +40,10 @@ public class SecurityConfig {
                         .requestMatchers( "/api/signup", "/api/login", "/api/logout").permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .exceptionHandling(ex -> ex
+//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+//                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(customUserDetailsService); // 유저 조회 인터페이스 설정
         return http.build();
     }

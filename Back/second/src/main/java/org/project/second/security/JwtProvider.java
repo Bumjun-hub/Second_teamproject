@@ -1,4 +1,4 @@
-package org.project.second.member.service;
+package org.project.second.security;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,14 +14,14 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-public class JwtTokenProvider {
+public class JwtProvider {
     private final Key accessKey; // 액세스 토큰 서명용 키
     private final Key refreshKey; // 리프레시 토큰 서명용 키
     private final long accessTokenValidity = 15 * 60 * 1000; // 15분 * 60초 * 1000 밀리세컨
     private final long refreshTokenValidity = 7 * 24 * 60 * 60 * 1000; // 7일
 
     // 생성자 : application.yml에서 시크릿 키 주입
-    public JwtTokenProvider(
+    public JwtProvider(
             @Value("${jwt.access.secret}") String accessSecret,
             @Value("${jwt.refresh.secret}") String refreshSecret) {
         this.accessKey = Keys.hmacShaKeyFor(accessSecret.getBytes()); // 액세스 토큰용 키
@@ -60,14 +60,14 @@ public class JwtTokenProvider {
     public void setTokensInCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         Cookie accessCookie = new Cookie("access_token", accessToken);
         accessCookie.setHttpOnly(true); // 자바스크립트 접근 방지
-        accessCookie.setSecure(true); // HTTPS에서만 전송
+        accessCookie.setSecure(false); // HTTPS에서만 전송
         accessCookie.setPath("/"); // 전체 경로에서 유효
         accessCookie.setMaxAge((int) (accessTokenValidity / 1000)); // 쿠키 만료 시간
         response.addCookie(accessCookie);
 
         Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false); // 실제 사용할떄는 true : https로만 가능 / http 불가
         refreshCookie.setPath("/api/refresh"); // 리프레시 엔드포인트에서만 사용
         refreshCookie.setMaxAge((int) (refreshTokenValidity / 1000));
         response.addCookie(refreshCookie);

@@ -2,10 +2,11 @@ package org.project.second.member.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.project.second.common.domain.BaseEntity;
+import org.project.second.common.role.Role;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -13,11 +14,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // PK
+
+    @Column(nullable = false, unique = true)
+    private String username; // 유저이름
 
     @Column(nullable = false, unique = true)
     private String email; // 이메일
@@ -25,16 +28,14 @@ public class Member {
     @Column(nullable = false)
     private String password; // 비밀번호
 
-    @Column(nullable = false)
-    private String username; // 유저이름
-
-    @Column(nullable = false)
     private String address; // 주소
 
-    @Column(nullable = false)
     private String phone; // 휴대폰번호
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 }

@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.project.second.member.dto.LoginRequest;
 import org.project.second.member.dto.SignupRequest;
-import org.project.second.member.service.JwtTokenProvider;
+import org.project.second.security.JwtProvider;
 import org.project.second.member.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class MemberController {
     private final MemberService memberService;
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;  // JWT 생성 및 검증 유틸
+    private final JwtProvider jwtProvider;  // JWT 생성 및 검증 유틸
 
     //Valid : null 값 유효성 체크 자동
     @PostMapping("/signup")
