@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/homit
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+    servlet:
+      multipart: # ?? ??? ?? ?? ??.
+        max-file-size: 20MB # ?? ?? ??
+        max-request-size: 20MB # ?? ?? ??
+
+jwt:
+  access:
+    secret: mfGjOmlApVz+z16KQSGu+KkvHKKO2jpi29hqDlVHM2I=
+  refresh:
+    secret: aB3cD9eF1gH7iJ2kL4mN6oP8qR0sT5uV9wXzY1=
