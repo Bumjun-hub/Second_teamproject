@@ -5,11 +5,11 @@ import Section from "../components/Section";
 const MainPage = () => {
     return (
         <>
-        <Header />
-        <Section>
-            <h2>본문</h2>
-        </Section>
-        <Footer/>
+            <Header />
+            <Section>
+                <h2>본문</h2>
+            </Section>
+            <Footer />
         </>
     )
 
