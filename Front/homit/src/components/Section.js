@@ -1,10 +1,13 @@
 import React from "react";
 import "./Section.css";
 
-const Section = () => {
+
+const Section = ({children}) => {
     return (
         <section className="section">
-            <p>본문 내용</p>
+            {children}
+
+
         </section>
     );
 };
