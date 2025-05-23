@@ -5,8 +5,8 @@ import Section from "../components/Section";
 const LoginPage= () => {
     return (
         <>
-        <Header />
-        <Section/>
+        
+        <Section> 로그인 </Section>
         
         </>
     )
