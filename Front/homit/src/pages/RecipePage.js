@@ -2,14 +2,14 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Section from "../components/Section";
 
-const GroupBuyPage= () => {
+const RecipePage = () => {
     return (
         <>
-        
-        <Section>공동구매</Section>
-        
+        <Section>
+            레시피 페이지
+        </Section>
         </>
     )
 
 }
-export default GroupBuyPage;
+export default RecipePage;

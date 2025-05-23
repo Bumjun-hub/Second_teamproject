@@ -1,0 +1,28 @@
+.Header {
+  width: 100%;
+  height: 80px;
+  background-color: #2668A7;
+  border: 1px solid;
+  display: flex;
+  justify-content: space-between;  /* 좌우 정렬 */
+  align-items: center;              /* 수직 중앙 정렬 */
+  padding: 0 40px;                  /* 좌우 여백 */
+  box-sizing: border-box;
+}
+
+.header-left {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+}
+
+.header-right a {
+  color: white;
+  text-decoration: none;
+  margin-left: 30px;
+  font-size: 16px;
+}
+
+.header-right a:hover {
+  text-decoration: underline;
+}
