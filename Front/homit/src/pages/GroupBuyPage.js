@@ -5,9 +5,9 @@ import Section from "../components/Section";
 const GroupBuyPage= () => {
     return (
         <>
-        <Header />
-        <Section/>
-        <Footer/>
+        
+        <Section>공동구매</Section>
+        
         </>
     )
 

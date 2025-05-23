@@ -5,9 +5,9 @@ import Section from "../components/Section";
 const RecipePage = () => {
     return (
         <>
-        <Header />
-        <Section/>
-        <Footer/>
+        <Section>
+            레시피 페이지
+        </Section>
         </>
     )
 
