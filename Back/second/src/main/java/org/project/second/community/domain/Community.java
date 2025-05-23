@@ -9,6 +9,8 @@ import org.project.second.common.enums.CommunityCategory;
 import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -48,4 +50,11 @@ public class Community extends BaseEntity {
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
 }
