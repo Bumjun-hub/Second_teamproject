@@ -41,9 +41,9 @@ public class SecurityConfig {
                         .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refreshToken").permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                )
+//                .exceptionHandling(ex -> ex
+//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+//                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(customUserDetailsService); // 유저 조회 인터페이스 설정
         return http.build();
