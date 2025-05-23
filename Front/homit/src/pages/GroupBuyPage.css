@@ -1,0 +1,36 @@
+.Pageinfo {
+    width: 100%;
+    text-align: left;
+    opacity: 70%;
+    
+    border: 1px solid;
+}
+
+.Groupbuylist {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border: 1px solid;
+}
+
+.Groupbuylist-inner {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 100px;
+    width: 100%;
+    border: 1px;
+    max-width: 1600px;
+    border: 1px solid;
+    
+    
+}
+
+.GroupbuyItem {
+    width: 300px;
+    height: 300px;
+    border: 1px solid;
+    
+    
+}
