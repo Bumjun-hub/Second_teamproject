@@ -6,7 +6,9 @@ const MainPage = () => {
     return (
         <>
         <Header />
-        <Section/>
+        <Section>
+            <h2>본문</h2>
+        </Section>
         <Footer/>
         </>
     )
