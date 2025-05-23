@@ -2,7 +2,7 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Section from "../components/Section";
 
-const BoardPage = () => {
+const RecipePage = () => {
     return (
         <>
         <Header />
@@ -12,4 +12,4 @@ const BoardPage = () => {
     )
 
 }
-export default BoardPage;
+export default RecipePage;
