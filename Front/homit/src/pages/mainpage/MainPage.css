@@ -1,0 +1,223 @@
+/* MainPage.css */
+.main-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* Header 공간 확보 */
+.header-space {
+  height: 80px; /* Header 높이에 맞게 조정 */
+}
+
+/* 메인 홍보 이미지 섹션 */
+.hero-section {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 20px;
+  max-width: calc(100% - 40px);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px;
+  color: white;
+}
+
+.hero-overlay h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.hero-overlay p {
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+/* 메뉴 섹션 */
+.menu-section {
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* 메뉴 카드 스타일 */
+.menu-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px 25px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-icon {
+  margin-bottom: 20px;
+}
+
+.icon-board {
+  font-size: 3rem;
+  color: #ff9500;
+}
+
+.icon-recipe {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.icon-group {
+  font-size: 3rem;
+  color: #4a90e2;
+}
+
+.icon-hot {
+  font-size: 2.5rem;
+  color: #f1c40f;
+  display: flex;
+  gap: 10px;
+}
+
+.menu-card h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 5px 0;
+  color: #333;
+}
+
+.menu-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 5px 0;
+  color: #666;
+}
+
+.menu-card p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+/* 특별한 카드 스타일 */
+.menu-card:nth-child(1) {
+  border-left: 4px solid #ff9500;
+}
+
+.menu-card:nth-child(2) {
+  border-left: 4px solid #4caf50;
+}
+
+.menu-card:nth-child(3) {
+  border-left: 4px solid #4a90e2;
+  position: relative;
+}
+
+.menu-card:nth-child(4) {
+  border-left: 4px solid #f1c40f;
+}
+
+.cart-icon {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .hero-image-container {
+    height: 200px;
+    margin: 0 10px;
+    max-width: calc(100% - 20px);
+  }
+  
+  .hero-overlay {
+    padding: 20px;
+  }
+  
+  .hero-overlay h1 {
+    font-size: 1.8rem;
+  }
+  
+  .hero-overlay p {
+    font-size: 1rem;
+  }
+  
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 10px 0;
+  }
+  
+  .menu-section {
+    padding: 10px;
+  }
+  
+  .menu-card {
+    padding: 25px 20px;
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-space {
+    height: 60px;
+  }
+  
+  .hero-image-container {
+    height: 150px;
+    border-radius: 8px;
+  }
+  
+  .menu-card h2 {
+    font-size: 1.3rem;
+  }
+}
