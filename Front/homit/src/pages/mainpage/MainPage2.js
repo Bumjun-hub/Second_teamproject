@@ -5,7 +5,7 @@ import './MainPage.css';
 const MainPage = () => {
   return (
     <div className="main-page">
-      {/* Header 영역은 비워둠 */}
+
       <div className="header-space"></div>
       
       {/* 메인 홍보 이미지 섹션 */}

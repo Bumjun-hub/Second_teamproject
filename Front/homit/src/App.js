@@ -1,7 +1,7 @@
-// import MainPage from './pages/mainpage/MainPage2';
+import MainPage from './pages/mainpage/MainPage2';
 
 import './App.css';
-import MainPage from './pages/MainPage';
+
 import { Route, Router, Routes} from 'react-router-dom';
 import GroupBuyPage from './pages/GroupBuyPage';
 import BoardPage from './pages/BoardPage';

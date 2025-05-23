@@ -7,6 +7,7 @@ const BoardPage = () => {
         <>
         <Header />
         <Section/>
+        <h2>게시판</h2>
         <Footer/>
         </>
     )
