@@ -8,7 +8,7 @@ import org.project.second.common.enums.CommunityCategory;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDto {
+public class CommunityDto {
     private CommunityCategory category;
     private String title;
     private String content;
