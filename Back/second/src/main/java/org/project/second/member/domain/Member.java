@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.role.Role;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-
 
 @Entity
 @Getter
