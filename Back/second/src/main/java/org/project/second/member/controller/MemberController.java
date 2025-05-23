@@ -62,7 +62,4 @@ public class MemberController {
                     .body(Map.of("message", "이메일 또는 비밀번호가 잘못 되었습니다."));
         }
     }
-
-
-
 }
