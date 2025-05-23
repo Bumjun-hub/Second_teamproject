@@ -5,9 +5,9 @@ import Section from "../components/Section";
 const HotItemPage = () => {
     return (
         <>
-        <Header />
-        <Section/>
-        <Footer/>
+                <Section>
+                    인기상품 페이지
+                </Section>
         </>
     )
 

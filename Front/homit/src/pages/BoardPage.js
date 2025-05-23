@@ -5,9 +5,9 @@ import Section from "../components/Section";
 const BoardPage = () => {
     return (
         <>
-        <Header />
-        <Section/>
-        <Footer/>
+        
+        <Section>게시판</Section>
+        
         </>
     )
 
