@@ -5,6 +5,7 @@ import Section from "../components/Section";
 const MainPage = () => {
     return (
         <>
+
             
             <Section>
                 <h2>본문</h2>
