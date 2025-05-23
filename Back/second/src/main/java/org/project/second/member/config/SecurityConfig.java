@@ -34,10 +34,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/api/signup", "/api/login", "/api/logout").permitAll()
+                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refreshToken").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .exceptionHandling(ex -> ex
