@@ -1,34 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Section from "../components/Section";
 import './GroupBuyPage.css';
-// 8 아이템마다 페이지 나누기
-const ITEMS_PER_PAGE = 8;
+import { useLocation, useNavigate } from "react-router-dom";
+import { dummyGroupBuyData } from '../data/dummyGroupBuyData';
+
+
+
+
 
 const GroupBuyPage = () => {
-
+    const [data, setData] = useState(dummyGroupBuyData);
+    const location = useLocation();
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
 
 
-    // 더미데이터 추후에 테이블에 있는 글 목록 불러오기
-    const dummyData = [
-        { id: 1, name: "무선 청소기", price: "35,000원" },
-        { id: 2, name: "유기농 쌀", price: "22,000원" },
-        { id: 3, name: "계란 30구", price: "7,500원" },
-        { id: 4, name: "생수 2L x 6", price: "4,200원" },
-        { id: 5, name: "주방세제 세트", price: "9,800원" },
-        { id: 6, name: "주방세제 세트", price: "9,800원" },
-        { id: 7, name: "주방세제 세트", price: "9,800원" },
-        { id: 8, name: "주방세제 세트", price: "9,800원" },
-        { id: 9, name: "주방세제 세트", price: "9,800원" },
-        { id: 10, name: "주방세제 세트", price: "9,800원" },
-        { id: 11, name: "주방세제 세트", price: "9,800원" }
+
+    // 글쓰기 페이지에서 온 데이터 받기
+
+    useEffect(() => {
 
 
-    ];
+        if (location.state?.newItem) {
+            setData(prev => [...prev, location.state.newItem]);
+            // 상태 초기화 ( 한번만 처리되게)
+            navigate('/groupbuy', { replace: true, state: null });
+        }
+    }, [location.state]);
 
-    const totalPages = Math.ceil(dummyData.length / ITEMS_PER_PAGE);
+
+    // 8 아이템마다 페이지 나누기
+    const ITEMS_PER_PAGE = 8;
+    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = dummyData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentItems = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
         <>
@@ -38,13 +43,23 @@ const GroupBuyPage = () => {
                     <div className="Groupbuylist-inner">
                         <div className="Pageinfo">
                             <h2>다양한 물건을 싸게 공동구매하세요!</h2>
+                            <button
+                                onClick={() => navigate('/groupbuy/write')}
+                                className="write-button"
+                                style={{ marginTop: '10px' }}
+                            >
+                                글쓰기
+                            </button>
                         </div>
 
                         {currentItems.map((item) => (
                             <div key={item.id} className="GroupbuyItem">
+                                <img src={item.image} alt={item.name} className="item-image" />
                                 <h3>{item.name}</h3>
                                 <p>{item.price}</p>
-                                <button className="apply-button">공동구매 신청</button>
+                                {/* 버튼 클릭시 아이템 값 전체 넘겨주기 */}
+                                <button className="apply-button" onClick={() => navigate(`/groupbuy/info/${item.id}`)}>공동구매 신청</button>
+
                             </div>
                         ))}
                     </div>
