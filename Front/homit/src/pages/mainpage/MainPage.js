@@ -26,7 +26,7 @@ const MainPage = () => {
                             </div>
                             <h2>게시판</h2>
                             <h2>바로가기</h2>
-                            <p>다양한 주제의<br/>게시글을 확인해보세요.</p>
+                            <p>다양한 주제의<br/>게시글을 확인해보세요</p>
                             </Link>
                             
                             <Link to="/recipe" className="menu-card">
@@ -34,7 +34,7 @@ const MainPage = () => {
                                 <div className="icon-recipe">🥕🥬🍯</div>
                             </div>
                             <h2>오늘 뭐 먹지?</h2>
-                            <p>생각고 한 재료로 만들 수 있는<br/>요리 추천</p>
+                            <p>냉장고 속 재료로 만들 수 있는<br/>요리 추천</p>
                             </Link>
 
                             <Link to="/groupbuy" className="menu-card">
@@ -43,7 +43,7 @@ const MainPage = () => {
                             </div>
                             <h2>같이 사면</h2>
                             <h2>싸다</h2>
-                            <p>지금 모집 중인 공동 구매에<br/>참여해보세요.</p>
+                            <p>지금 모집 중인 공동구매 상품<br/>참여해보세요</p>
                             </Link>
 
                             <Link to="/popular" className="menu-card">
@@ -52,7 +52,7 @@ const MainPage = () => {
                             </div>
                             <h2>인기상품</h2>
                             <h2>바로가기</h2>
-                            <p>많은 사람들이 인기 있는<br/>상품을 확인해보세요.</p>
+                            <p>많은 사람에게 인기 있는<br/>상품을 확인해보세요</p>
                             </Link>
                         </div>
                     </div>
@@ -101,10 +101,10 @@ const MainPage = () => {
                     </div>
                 </div>
 
-                {/* 저주 본 상품 섹션 */}
+                {/* 자자주 본 상품 섹션 */}
                 <div className="section-container">
                     <div className="section-header">
-                        <h2 className="section-title">저주 본 상품</h2>
+                        <h2 className="section-title">자주 본 상품</h2>
                     </div>
                     <div className="product-grid">
                         {[1, 2, 3, 4].map(i => (
