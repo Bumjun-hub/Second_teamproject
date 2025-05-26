@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
+import '../memberpage/MemberPage.css';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -71,15 +72,15 @@ const LoginPage = () => {
     return (
         <div className="login-container">
             <div className="login-box">
-                <div className="login-header">
-                    <h2 className="login-title">로그인</h2>
+                <div className="signup-header">
+                    <h2 className="page-title">로그인</h2>
                     <div className="brand">
                         <h1 className="brand-name">HOMIT</h1>
                         <p className="brand-subtitle">다시 와서 반가워요!</p>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="login-form">
+                <form onSubmit={handleSubmit} className="signup-form">
                     <div className="input-group">
                         <label htmlFor="email" className="input-label">이메일 주소</label>
                         <input
@@ -116,7 +117,7 @@ const LoginPage = () => {
 
                     <button 
                         type="submit" 
-                        className={`login-button ${loading ? 'loading' : ''}`}
+                        className={'signup-button'}
                         disabled={loading}
                     >
                         {loading ? '로그인 중...' : '로그인'}

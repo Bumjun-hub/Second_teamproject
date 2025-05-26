@@ -124,7 +124,7 @@ const MemberPage = () => {
         };
     }, []);
 
-    // 주소 검색 함수 추가
+    // 주소 검색
     const findAddress = () => {
         new window.daum.Postcode({
             oncomplete: function(data) {
