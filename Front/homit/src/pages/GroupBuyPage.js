@@ -21,7 +21,7 @@ const GroupBuyPage = () => {
         { id: 8, name: "주방세제 세트", price: "9,800원" },
         { id: 9, name: "주방세제 세트", price: "9,800원" },
         { id: 10, name: "주방세제 세트", price: "9,800원" },
-        { id: 10, name: "주방세제 세트", price: "9,800원" }
+        { id: 11, name: "주방세제 세트", price: "9,800원" }
 
 
     ];
@@ -34,38 +34,17 @@ const GroupBuyPage = () => {
         <>
 
             <Section>
-                <div className="Pageinfo">
-                        <h2>다양한 물건을 싸게 공동구매하세요!</h2>
-                </div>
-
-                {/* <div className="Groupbuylist">
-                    <div className="Groupbuylist-inner">
-                        <div className="GroupbuyItem">
-                            <h2>아이템 영역</h2>
-                        </div>
-                        <div className="GroupbuyItem">
-                            <h2>아이템 영역</h2>
-                        </div>
-
-                        <div className="GroupbuyItem">
-                            <h2>아이템 영역</h2>
-                        </div>
-
-                        <div className="GroupbuyItem">
-                            <h2>아이템 영역</h2>
-                        </div>
-                        <div className="GroupbuyItem">
-                            <h2>아이템 영역</h2>
-                        </div>
-                    </div>
-                </div> */}
-
                 <div className="Groupbuylist">
                     <div className="Groupbuylist-inner">
+                        <div className="Pageinfo">
+                            <h2>다양한 물건을 싸게 공동구매하세요!</h2>
+                        </div>
+
                         {currentItems.map((item) => (
                             <div key={item.id} className="GroupbuyItem">
                                 <h3>{item.name}</h3>
                                 <p>{item.price}</p>
+                                <button className="apply-button">공동구매 신청</button>
                             </div>
                         ))}
                     </div>
