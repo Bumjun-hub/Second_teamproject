@@ -58,63 +58,62 @@ const MainPage = () => {
                     </div>
                 </div>
                 {/* 공구 인플루언서 섹션 */}
-                    <div className="section-container">
-                        <div className="section-header">
-                            <h2 className="section-title">공구 인플루언서를 만나보세요 🔥</h2>
-                        </div>
-                        <div className="influencer-grid">
-                            {[1, 2, 3, 4, 5].map(i => (
-                                <div key={i} className="influencer-card">
-                                    <div className="influencer-avatar">
-                                        <div className="avatar-circle">👤</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                <div className="section-container">
+                    <div className="section-header2">
+                        <h2 className="section-title">공구 인플루언서를 만나보세요</h2>
                     </div>
+                    <div className="influencer-grid">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="influencer-card">
+                                <div className="influencer-avatar">
+                                    <div className="avatar-circle"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                    {/* 오늘의 상품 섹션 */}
-                    <div className="section-container">
-                        <div className="section-header">
-                            <h2 className="section-title">오늘의 상품 🔥</h2>
-                        </div>
-                        <div className="product-grid">
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="product-card">
-                                    <div className="product-image"></div>
-                                </div>
-                            ))}
-                        </div>
+                {/* 오늘의 상품 섹션 */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2 className="section-title">오늘의 상품 🔥</h2>
                     </div>
+                    <div className="product-grid">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="product-card">
+                                <div className="product-image"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                    {/* 공동구매 마감임박 섹션 */}
-                    <div className="section-container">
-                        <div className="section-header">
-                            <h2 className="section-title">공동구매 마감임박 ⏰</h2>
-                        </div>
-                        <div className="product-grid">
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="product-card">
-                                    <div className="product-image"></div>
-                                </div>
-                            ))}
-                        </div>
+                {/* 공동구매 마감임박 섹션 */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2 className="section-title">공동구매 마감임박 ⏰</h2>
                     </div>
+                    <div className="product-grid">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="product-card">
+                                <div className="product-image"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                    {/* 저주 본 상품 섹션 */}
-                    <div className="section-container">
-                        <div className="section-header">
-                            <h2 className="section-title">저주 본 상품</h2>
-                        </div>
-                        <div className="product-grid">
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="product-card">
-                                    <div className="product-image"></div>
-                                </div>
-                            ))}
-                        </div>
+                {/* 저주 본 상품 섹션 */}
+                <div className="section-container">
+                    <div className="section-header">
+                        <h2 className="section-title">저주 본 상품</h2>
                     </div>
-                
+                    <div className="product-grid">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="product-card">
+                                <div className="product-image"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
         </Section>
         
     )
