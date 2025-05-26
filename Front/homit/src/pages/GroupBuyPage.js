@@ -33,6 +33,7 @@ const GroupBuyPage = () => {
     return (
         <>
 
+
             <Section>
                 <div className="Pageinfo">
                         <h2>다양한 물건을 싸게 공동구매하세요!</h2>
