@@ -8,6 +8,8 @@ import HotItemPage from './pages/HotItemPage';
 import LoginPage from './pages/loginpage/LoginPage';
 import MemberPage from './pages/memberpage/MemberPage';
 import Layout from './components/Layout';
+import GroupBuyInfoPage from './pages/GroupBuyInfoPage';
+import GroupBuyWritePage from './pages/GroupBuyWritePage';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/groupbuy" element={<GroupBuyPage />} />
+        <Route path="/groupbuy/info/:id" element={<GroupBuyInfoPage/>}/>
+        <Route path="/groupbuy/write" element={<GroupBuyWritePage/>}/>
         <Route path="/board" element={<BoardPage />} />
         <Route path="/recipe" element={<RecipePage />} />
         <Route path="/popular" element={<HotItemPage />} />
