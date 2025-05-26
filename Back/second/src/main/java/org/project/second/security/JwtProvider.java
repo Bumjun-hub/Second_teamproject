@@ -30,7 +30,7 @@ public class JwtProvider {
 
     // 액세스 토큰 생성
     public String generateAccessToken(Authentication authentication) {
-        String username = authentication.getName(); // 인증된 사용자의 이름
+        String username = authentication.getName(); // 인증된 사용자의 이름(로그인 시 인증수단 == 이메일)
         Date now = new Date(); // 현재 시간
         Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
 

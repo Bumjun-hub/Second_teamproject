@@ -35,7 +35,7 @@ public class MemberService {
 
         String enPass = passwordEncoder.encode(signupRequest.getPassword());
 
-        Role userRole = roleRepository.findByName(RoleName.USER)
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new IllegalArgumentException("기본 USER 역할이 DB에 없습니다."));
 
         Member member = Member.builder()
