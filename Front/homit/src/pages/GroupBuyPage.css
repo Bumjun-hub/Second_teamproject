@@ -1,36 +1,82 @@
 .Pageinfo {
     width: 100%;
-    text-align: left;
+    text-align: center;
     opacity: 70%;
-    
-    border: 1px solid;
+
+
+}
+
+.Pageinfo h2 {
+    margin: 0;
+    /* 👈 h2의 기본 마진 제거 */
 }
 
 .Groupbuylist {
     width: 100%;
     display: flex;
     justify-content: center;
-    border: 1px solid;
+
+
 }
 
+/* 물품 항목 칸 전체 박스 */
 .Groupbuylist-inner {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 100px;
     width: 100%;
-    border: 1px;
     max-width: 1600px;
-    border: 1px solid;
-    
-    
+
 }
 
+/* 물품 항목 칸 */
 .GroupbuyItem {
-    width: 300px;
-    height: 300px;
-    border: 1px solid;
-    
-    
+    width: 250px;
+    height: 320px;
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+}
+
+.GroupbuyItem h3 {
+    margin: 0;
+    font-size: 18px;
+    text-align: center;
+}
+
+.GroupbuyItem p {
+    margin: 8px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.apply-button {
+    margin-top: auto;
+    padding: 10px;
+    background-color: #2668A7;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.apply-button:hover {
+    background-color: #1b4f7e;
+}
+
+
+.GroupbuyItem img {
+    width: 85%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    object-fit: cover;
+
 }

@@ -15,6 +15,11 @@
   color: white;
 }
 
+.header-left a {
+  color: white;
+  text-decoration: none;
+}
+
 .header-right a {
   color: white;
   text-decoration: none;
@@ -23,5 +28,54 @@
 }
 
 .header-right a:hover {
-  text-decoration: underline;
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.notification-container {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 30px;
+  position: relative;
+  top: 5px;
+}
+
+.notification-bell:hover {
+  opacity: 0.8;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 250px;
+  z-index: 1000;
+  margin-top: 10px;
+}
+
+.notification-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+}
+
+.notification-empty {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
 }
