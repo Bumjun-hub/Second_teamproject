@@ -5,7 +5,8 @@ import GroupBuyPage from './pages/GroupBuyPage';
 import BoardPage from './pages/BoardPage';
 import RecipePage from './pages/RecipePage';
 import HotItemPage from './pages/HotItemPage';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/loginpage/LoginPage';
+import MemberPage from './pages/memberpage/MemberPage';
 import Layout from './components/Layout';
 import GroupBuyInfoPage from './pages/GroupBuyInfoPage';
 import GroupBuyWritePage from './pages/GroupBuyWritePage';
@@ -22,6 +23,7 @@ function App() {
         <Route path="/recipe" element={<RecipePage />} />
         <Route path="/popular" element={<HotItemPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/member" element={<MemberPage />} />
       </Routes>
     </Layout>
 
