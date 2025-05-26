@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     show-sql: true
     properties:
@@ -23,6 +23,6 @@ spring:
 
 jwt:
   access:
-    secret: mfGjOmlApVz+z16KQSGu+KkvHKKO2jpi29hqDlVHM2I=
+    secret: 3y8EpfsmbQI4QOkbPniiRQmsm6fAF0ohgO3DI/hFltZbsdJT8MCdE0qSYkm8GdKbqtSTGEYtMPAwEal6yBOWrQ==
   refresh:
-    secret: aB3cD9eF1gH7iJ2kL4mN6oP8qR0sT5uV9wXzY1=
+    secret: gjGtW+0kPXngmFOr4+5JgagMkEBZnra3WM4UgZt1+b7HbPrT/lOZL1QZZ9KODbPW+OX4YKr8l7hqz01xWITw5g==

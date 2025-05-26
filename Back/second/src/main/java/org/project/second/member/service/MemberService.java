@@ -57,4 +57,7 @@ public class MemberService {
                 .phone(savedMember.getPhone())
                 .build();
     }
+
+
+
 }

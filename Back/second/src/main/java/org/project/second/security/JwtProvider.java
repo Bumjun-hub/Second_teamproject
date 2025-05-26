@@ -3,8 +3,10 @@ package org.project.second.security;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,8 +26,11 @@ public class JwtProvider {
     public JwtProvider(
             @Value("${jwt.access.secret}") String accessSecret,
             @Value("${jwt.refresh.secret}") String refreshSecret) {
-        this.accessKey = Keys.hmacShaKeyFor(accessSecret.getBytes()); // 액세스 토큰용 키
-        this.refreshKey = Keys.hmacShaKeyFor(refreshSecret.getBytes()); // 리프레시 토큰용 키
+        byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecret);
+        byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecret);
+
+        this.accessKey = Keys.hmacShaKeyFor(accessKeyBytes); // 액세스 토큰용 키
+        this.refreshKey = Keys.hmacShaKeyFor(refreshKeyBytes); // 리프레시 토큰용 키
     }
 
     // 액세스 토큰 생성
@@ -73,6 +78,19 @@ public class JwtProvider {
         response.addCookie(refreshCookie);
     }
 
+    // 쿠키에서 refresh 토큰 가져오기
+    public String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refresh_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     // 액세스 토큰 검증
     public boolean validateAccessToken(String token) {
         try {
@@ -109,4 +127,22 @@ public class JwtProvider {
                 .getBody()
                 .getSubject();
     }
+
+    public void clearTokensInCookies(HttpServletResponse response) {
+        // 쿠키에 저장된 JWT 토큰을 삭제하는 방식
+        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(false);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(0);  //  0초 => 삭제
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setHttpOnly(true);
+        refreshTokenCookie.setSecure(false);
+        refreshTokenCookie.setPath("/api/refresh");
+        refreshTokenCookie.setMaxAge(0);
+        response.addCookie(refreshTokenCookie);
+    }
+
 }

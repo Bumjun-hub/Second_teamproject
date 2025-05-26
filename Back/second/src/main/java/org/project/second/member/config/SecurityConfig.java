@@ -36,15 +36,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refreshToken", "/api/community/**").permitAll()
+                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refresh", "/api/community/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(customUserDetailsService); // 유저 조회 인터페이스 설정
