@@ -123,5 +123,40 @@ public class MemberController {
         }
     }
 
+    @GetMapping("/mypage")
+    public ResponseEntity<MypageResponse> mypageInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        MypageResponse mypageResponse = memberService.mypageInfo(userDetails.getMember());
+        return ResponseEntity.ok(mypageResponse);
+    }
+
+    @PutMapping("/mypage/editProfile")
+    public ResponseEntity<?> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody EditProfileRequest editProfileRequest, HttpServletResponse response) {
+        try {
+            Member member = userDetails.getMember();
+            Member updatedMember = memberService.editProfile(member, editProfileRequest);
+
+            CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedMember);
+
+            // 토큰 재 생성을 위해 Authentication 재설정
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    updatedUserDetails, null, updatedUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            jwtProvider.clearTokensInCookies(response);
+            String newAccessToken = jwtProvider.generateAccessToken(authentication);
+            String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
+            jwtProvider.setTokensInCookies(response, newAccessToken, newRefreshToken);
+
+            return ResponseEntity.ok(new EditProfileResponse("프로필 변경 완료", updatedMember.getUsername(), updatedMember.getEmail(), updatedMember.getPhone(), updatedMember.getAddress()));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("서버 오류가 발생했습니다."));
+        }
+    }
 
 }

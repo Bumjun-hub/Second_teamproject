@@ -1,8 +1,6 @@
 package org.project.second.security;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -99,9 +97,23 @@ public class JwtProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false; // 토큰이 유효하지 않거나 만료됨
+        } catch (ExpiredJwtException e) {
+            System.out.println("[JWT Provider] 토큰 만료됨");
+        } catch (UnsupportedJwtException e) {
+            System.out.println("[JWT Provider] 지원하지 않는 토큰 형식");
+        } catch (MalformedJwtException e) {
+            System.out.println("[JWT Provider] 토큰 형식 오류");
+        } catch (SignatureException e) {
+            System.out.println("[JWT Provider] 서명 오류");
+        } catch (Exception e) {
+            System.out.println("[JWT Provider] 기타 오류: " + e.getMessage());
         }
+        return false;
+
+        // catch (JwtException | IllegalArgumentException e) {
+            // return false; // 토큰이 유효하지 않거나 만료됨
+        //}
+
     }
 
     // 리프레시 토큰 검증
