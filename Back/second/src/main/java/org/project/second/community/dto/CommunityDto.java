@@ -3,7 +3,6 @@ package org.project.second.community.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.CommunityCategory;
 
 @Data

@@ -21,6 +21,9 @@ spring:
         max-file-size: 20MB
         max-request-size: 20MB
 
+file:
+  upload-dir: ./uploads
+
 jwt:
   access:
     secret: 3y8EpfsmbQI4QOkbPniiRQmsm6fAF0ohgO3DI/hFltZbsdJT8MCdE0qSYkm8GdKbqtSTGEYtMPAwEal6yBOWrQ==
