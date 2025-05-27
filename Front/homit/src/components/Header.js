@@ -64,12 +64,10 @@ const Header = () => {
                 <Link to="/">Homit</Link>
             </div>
             <nav className="header-right">
-                <div className="header-right2">
-                    <Link to="/groupbuy">공동구매</Link>
-                    <Link to="/board">게시판</Link>
-                    <Link to="/recipe">요리레시피</Link>
-                    <Link to="/popular">인기상품</Link>
-                </div>
+                <Link to="/groupbuy">공동구매</Link>
+                <Link to="/board">게시판</Link>
+                <Link to="/recipe">요리레시피</Link>
+                <Link to="/popular">인기상품</Link>
                 
                 {/* 로그인한 사용자만 알림 표시 */}
                 {isLoggedIn && (
@@ -90,6 +88,7 @@ const Header = () => {
                         )}
                     </div>
                 )}
+
                 {/* 인증 상태에 따른 메뉴 분기 */}
                 {isLoggedIn ? (
                     // 로그인된 상태
@@ -106,7 +105,6 @@ const Header = () => {
                     // 로그인되지 않은 상태
                     <Link to="/login">로그인</Link>
                 )}
-                
             </nav>
         </header>
     );

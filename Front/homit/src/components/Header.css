@@ -20,11 +20,7 @@
     text-decoration: none;
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    margin-right: 150px; /* 전체 메뉴를 왼쪽으로 이동 */
-}
+
 
 .header-right a, 
 .header-right button {
