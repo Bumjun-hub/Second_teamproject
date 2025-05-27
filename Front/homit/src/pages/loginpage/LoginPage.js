@@ -18,7 +18,6 @@ const LoginPage = () => {
             ...prev,
             [name]: value
         }));
-        // 입력 시 에러 메시지 초기화
         if (error) {
             setError('');
         }
@@ -35,6 +34,7 @@ const LoginPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // 쿠키를 포함해서 요청
                 body: JSON.stringify({
                     email: formData.email,
                     password: formData.password
@@ -47,9 +47,8 @@ const LoginPage = () => {
                 // 로그인 성공
                 console.log('로그인 성공:', data);
                 
-                // localStorage에 로그인 상태 저장
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', data.username || formData.email);
+                // JWT 토큰은 서버에서 HttpOnly 쿠키로 자동 설정됨
+                // localStorage 사용하지 않음
                 
                 // 메인 페이지로 이동
                 navigate('/');
