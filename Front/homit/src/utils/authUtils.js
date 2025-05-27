@@ -1,5 +1,3 @@
-// utils/authUtils.js
-
 /**
  * 로그아웃 함수
  */
