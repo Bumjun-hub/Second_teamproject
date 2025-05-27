@@ -79,7 +79,7 @@ public class CommunityService {
         post.setIsDeleted(true);
     }
 
-
+    @Transactional
     public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
         List<Community> posts = communityRopository.findByCategoryAndIsDeletedFalse(category);
         return posts.stream().map(post -> new CommunityResponseDto(
@@ -94,7 +94,7 @@ public class CommunityService {
         )).collect(Collectors.toList());
     }
 
-
+    @Transactional
     public CommunityResponseDto detailPost(CommunityCategory category, Long id) {
         Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);
         return new CommunityResponseDto(
