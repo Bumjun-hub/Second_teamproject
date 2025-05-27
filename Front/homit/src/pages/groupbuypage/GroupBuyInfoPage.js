@@ -1,7 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { dummyGroupBuyData } from '../data/dummyGroupBuyData';
+import { dummyGroupBuyData } from '../../data/dummyGroupBuyData';
 import './GroupBuyInfoPage.css';
+import Section from '../../components/Section';
 
 const GroupBuyInfoPage = () => {
     const { id } = useParams();
@@ -25,6 +26,7 @@ const GroupBuyInfoPage = () => {
     if (!item) return <div>로딩 중...</div>;
 
     return (
+        <Section>
         <div className="info-container">
 
             {/* 상단 수정/삭제 버튼 (카드 밖, 오른쪽 정렬) */}
@@ -83,6 +85,7 @@ const GroupBuyInfoPage = () => {
                 </ul>
             </div>
         </div>
+        </Section>
     );
 };
 

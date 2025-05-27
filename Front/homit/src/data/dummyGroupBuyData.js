@@ -78,4 +78,187 @@ export const dummyGroupBuyData = [
         link: "https://www.naver.com",
         content: "이 제품은 공동구매로 저렴하게 제공됩니다."
     }
+
 ];
+
+export const boarddummyData = [
+{
+    id:1,
+    category: '자유',
+    title : '집보내줘',
+    content: '저는 그냥 집에가고 싶습니다',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id: 2,
+    category: '꿀팁',
+    title : '집에 가는법',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 1200,
+    count : 100
+
+},
+
+{
+    id: 3,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:4,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:5,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:6,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:7,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:8,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:9,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:10,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:11,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+
+{
+    id:12,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:13,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:14,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+
+{
+    id:15,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+{
+    id:16,
+    category: '자유',
+    title : '집보내줘',
+    writer : '조장',
+    date: '2025-05-27',
+    like: 99,
+    count : 1
+
+},
+
+]
