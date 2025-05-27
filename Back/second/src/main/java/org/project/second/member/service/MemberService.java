@@ -6,10 +6,15 @@ import org.project.second.common.enums.RoleName;
 import org.project.second.common.role.Role;
 import org.project.second.common.role.RoleRepository;
 import org.project.second.member.domain.Member;
+import org.project.second.member.dto.ChangedPwdRequest;
 import org.project.second.member.dto.SignupRequest;
+import org.project.second.member.dto.SignupResponse;
 import org.project.second.member.repository.MemberRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +23,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
-    public SignupRequest insert(@Valid SignupRequest signupRequest) {
+    public SignupResponse insert(@Valid SignupRequest signupRequest) {
         // String security : 이메일 중복 체크
         if (memberRepository.existsByEmail(signupRequest.getEmail())){
             throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
@@ -35,7 +40,7 @@ public class MemberService {
 
         String enPass = passwordEncoder.encode(signupRequest.getPassword());
 
-        Role userRole = roleRepository.findByName(RoleName.USER)
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new IllegalArgumentException("기본 USER 역할이 DB에 없습니다."));
 
         Member member = Member.builder()
@@ -49,12 +54,38 @@ public class MemberService {
 
         Member savedMember = memberRepository.save(member);
 
-        return SignupRequest.builder()
+        return SignupResponse.builder()
                 .email(savedMember.getEmail())
-                .password(savedMember.getPassword())
-                .username(savedMember.getUsername())
-                .address(savedMember.getAddress())
-                .phone(savedMember.getPhone())
                 .build();
+    }
+
+
+    public void deleteMember(Member member) {
+        memberRepository.delete(member);
+    }
+
+    public Member changedPwd(Member member, ChangedPwdRequest pwdRequest) {
+        Optional<Member> OpUser = memberRepository.findByEmail(member.getEmail());
+
+        if (OpUser.isPresent()) {
+            Member m = OpUser.get();
+
+            if (!passwordEncoder.matches(pwdRequest.getOldPassword(), m.getPassword())) {
+                throw new IllegalArgumentException("기존 비밀번호가 일치하지 않습니다.");
+            }
+
+            if (!pwdRequest.getNewPassword().equals(pwdRequest.getConfirmPassword())) {
+                throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
+            }
+
+            String enPass = passwordEncoder.encode(pwdRequest.getNewPassword());
+            m.setPassword(enPass);
+
+            memberRepository.save(m);
+
+            return m;
+        }
+        throw new IllegalArgumentException("등록되어 있지 않은 이메일입니다.");
+
     }
 }
