@@ -19,7 +19,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -120,6 +122,60 @@ public class MemberController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("서버 오류가 발생했습니다."));
+        }
+    }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<MypageResponse> mypageInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        MypageResponse mypageResponse = memberService.mypageInfo(userDetails.getMember());
+        return ResponseEntity.ok(mypageResponse);
+    }
+
+    @PutMapping("/mypage/editProfile")
+    public ResponseEntity<?> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody EditProfileRequest editProfileRequest, HttpServletResponse response) {
+        try {
+            Member member = userDetails.getMember();
+            Member updatedMember = memberService.editProfile(member, editProfileRequest);
+
+            CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedMember);
+
+            // 토큰 재 생성을 위해 Authentication 재설정
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    updatedUserDetails, null, updatedUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            jwtProvider.clearTokensInCookies(response);
+            String newAccessToken = jwtProvider.generateAccessToken(authentication);
+            String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
+            jwtProvider.setTokensInCookies(response, newAccessToken, newRefreshToken);
+
+            return ResponseEntity.ok(new EditProfileResponse("프로필 변경 완료", updatedMember.getUsername(), updatedMember.getEmail(), updatedMember.getPhone(), updatedMember.getAddress()));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("서버 오류가 발생했습니다."));
+        }
+    }
+
+    @GetMapping("/profile/getimages")
+    public ResponseEntity<List<String>> getImages() throws IOException {
+        List<String> images = memberService.getProfileImages();
+        return ResponseEntity.ok(images);
+    }
+
+    @PostMapping("/profile/upload")
+    public ResponseEntity<?> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @RequestBody ProfileImageRequest profileImageRequest, HttpServletResponse response) {
+        try {
+            Member m = userDetails.getMember();
+            memberService.uploadProfileImage(profileImageRequest.getProfile_imageName(), m.getId());
+            return ResponseEntity.ok("프로필 이미지가 저장되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("프로필 이미지 업로드 실패"));
         }
     }
 
