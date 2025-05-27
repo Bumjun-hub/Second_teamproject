@@ -18,6 +18,7 @@ const LoginPage = () => {
             ...prev,
             [name]: value
         }));
+        // 입력 시 에러 메시지 초기화
         if (error) {
             setError('');
         }
@@ -47,9 +48,14 @@ const LoginPage = () => {
                 // 로그인 성공
                 console.log('로그인 성공:', data);
                 
+                // 쿠키 설정 확인
+                setTimeout(() => {
+                    console.log('로그인 후 쿠키:', document.cookie);
+                }, 100);
+                
                 // JWT 토큰은 서버에서 HttpOnly 쿠키로 자동 설정됨
                 // localStorage 사용하지 않음
-                
+                window.dispatchEvent(new Event('authChange'));
                 // 메인 페이지로 이동
                 navigate('/');
             } else {

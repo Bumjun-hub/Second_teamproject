@@ -32,6 +32,13 @@
   text-decoration: none;
 }
 
+.header-right button {
+  color: white;
+  text-decoration: none;
+  margin-left: 30px;
+  font-size: 16px;
+}
+
 .notification-container {
   position: relative;
   display: inline-block;
