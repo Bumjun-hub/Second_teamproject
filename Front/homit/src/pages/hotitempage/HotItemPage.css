@@ -11,7 +11,7 @@
     /* 👈 h2의 기본 마진 제거 */
 }
 
-.Groupbuylist {
+.HotItemlist {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -20,7 +20,7 @@
 }
 
 /* 물품 항목 칸 전체 박스 */
-.Groupbuylist-inner {
+.Hotitemlist-inner {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -32,7 +32,7 @@
 }
 
 /* 물품 항목 칸 */
-.GroupbuyItem {
+.HotItem {
     width: 250px;
     height: 320px;
     border: 1px solid #ccc;
@@ -45,13 +45,13 @@
     background-color: #fff;
 }
 
-.GroupbuyItem h3 {
+.HotItem h3 {
     margin: 0;
     font-size: 18px;
     text-align: center;
 }
 
-.GroupbuyItem p {
+.HotItem p {
     margin: 8px 0;
     font-weight: bold;
     text-align: center;
@@ -73,10 +73,12 @@
 }
 
 
-.GroupbuyItem img {
+.HotItem img {
     width: 85%;
     aspect-ratio: 1 / 1;
     height: auto;
     object-fit: cover;
 
 }
+
+
