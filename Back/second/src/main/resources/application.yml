@@ -20,6 +20,13 @@ spring:
       multipart:
         max-file-size: 20MB
         max-request-size: 20MB
+    web:
+      resources:
+        static-locations: file:./uploads/,classpath:/static/ #디렉토리를 정적 리소스로 제공.
+
+file:
+  upload-dir: uploads # 파일 저장 디렉토리
+  profile-images-dir: static/profileimages
 
 jwt:
   access:
