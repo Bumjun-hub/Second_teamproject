@@ -2,13 +2,13 @@ package org.project.second.member.service;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.project.second.common.enums.RoleName;
 import org.project.second.common.role.Role;
 import org.project.second.common.role.RoleRepository;
+import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
-import org.project.second.member.dto.ChangedPwdRequest;
-import org.project.second.member.dto.SignupRequest;
-import org.project.second.member.dto.SignupResponse;
+import org.project.second.member.dto.*;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -88,4 +89,31 @@ public class MemberService {
         throw new IllegalArgumentException("등록되어 있지 않은 이메일입니다.");
 
     }
+
+    public MypageResponse mypageInfo(Member member) {
+        return  memberRepository.findById(member.getId())
+                .map(m -> new MypageResponse(m.getEmail(), m.getUsername()))
+                .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
+    }
+
+    public Member editProfile(Member member, EditProfileRequest editProfileRequest) {
+        Optional<Member> OpUser = memberRepository.findByEmail(member.getEmail());
+        if (OpUser.isPresent()) {
+            Member m = OpUser.get();
+            if (memberRepository.existsByUsername(editProfileRequest.getName())) {
+                throw new IllegalArgumentException("이미 존재하는 유저네임 입니다.");
+            }
+
+            Member updatedMember = Member.builder()
+                    .email(editProfileRequest.getEmail())
+                    .username(editProfileRequest.getName())
+                    .address(editProfileRequest.getAddress())
+                    .phone(editProfileRequest.getPhone())
+                    .build();
+
+            return memberRepository.save(updatedMember);
+        }
+        throw new IllegalArgumentException("등록되어 있지 않은 이메일입니다.");
+    }
+
 }
