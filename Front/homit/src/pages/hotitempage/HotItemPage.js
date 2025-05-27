@@ -1,65 +1,36 @@
-import { useEffect, useState } from "react";
-import Section from "../components/Section";
-import './GroupBuyPage.css';
-import { useLocation, useNavigate } from "react-router-dom";
-import { dummyGroupBuyData } from '../data/dummyGroupBuyData';
+import { useState } from "react";
+import Section from "../../components/Section";
+import { dummyGroupBuyData } from '../../data/dummyGroupBuyData';
+import { useNavigate } from "react-router-dom";
+import './HotItemPage.css';
 
-
-
-
-
-const GroupBuyPage = () => {
-    const [data, setData] = useState(dummyGroupBuyData);
-    const location = useLocation();
-    const navigate = useNavigate();
+const HotItemPage = () => {
+    const [data] = useState(dummyGroupBuyData);
     const [currentPage, setCurrentPage] = useState(1);
-
-
-
-    // 글쓰기 페이지에서 온 데이터 받기
-
-    useEffect(() => {
-
-
-        if (location.state?.newItem) {
-            setData(prev => [...prev, location.state.newItem]);
-            // 상태 초기화 ( 한번만 처리되게)
-            navigate('/groupbuy', { replace: true, state: null });
-        }
-    }, [location.state]);
-
-
-    // 8 아이템마다 페이지 나누기
     const ITEMS_PER_PAGE = 8;
+    const navigate = useNavigate();
+
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
         <>
-
             <Section>
-                <div className="Groupbuylist">
-                    <div className="Groupbuylist-inner">
+                <div className="HotItemlist">
+                    <div className="Hotitemlist-inner">
                         <div className="Pageinfo">
-                            <h2>다양한 물건을 싸게 공동구매하세요!</h2>
-                            <button
-                                onClick={() => navigate('/groupbuy/write')}
-                                className="write-button"
-                                style={{ marginTop: '10px' }}
-                            >
-                                글쓰기
-                            </button>
+                            <div className="board-header">
+                                <h2 className="board-title">인기있는 상품을 한눈에 확인해보세요!</h2>
+                            </div>
                         </div>
-
+                        
                         {currentItems.map((item) => (
-                            <div key={item.id} className="GroupbuyItem">
+                            <div key={item.id} className="HotItem">
                                 <img src={item.image} alt={item.name} className="item-image" />
                                 <h3>{item.name}</h3>
                                 <p>{item.price}</p>
-                                {/* 버튼 클릭시 아이템 값 전체 넘겨주기 */}
-                                <button className="apply-button" onClick={() => navigate(`/groupbuy/info/${item.id}`)}>공동구매 신청</button>
-
+                                <button className="apply-button" onClick={() => window.open(item.link, "_blank")}>상세 보기</button>
                             </div>
                         ))}
                     </div>
@@ -84,14 +55,9 @@ const GroupBuyPage = () => {
                         </button>
                     ))}
                 </div>
-
-
-
-
             </Section>
-
         </>
-    )
+    );
+};
 
-}
-export default GroupBuyPage;
+export default HotItemPage;

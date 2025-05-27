@@ -187,7 +187,7 @@ const MemberPage = () => {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            placeholder="8자 이상 입력해주세요"
+                            placeholder="4자 이상 입력해주세요"
                             className="input-field"
                             required
                         />
