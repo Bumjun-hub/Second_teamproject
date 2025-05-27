@@ -35,4 +35,7 @@ public class Member extends BaseEntity {
 
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }
