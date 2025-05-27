@@ -2,6 +2,7 @@ package org.project.second.member.config;
 
 import lombok.RequiredArgsConstructor;
 import org.project.second.member.service.CustomUserDetailsService;
+import org.project.second.security.JwtAuthenticationEntryPoint;
 import org.project.second.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class SecurityConfig {
     private static final Logger logger = Logger.getLogger(SecurityConfig.class.getName());
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,16 +36,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refreshToken", "/api/community/**").permitAll()
+                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refresh", "/api/community/**").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .exceptionHandling(ex -> ex
-//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-//                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(customUserDetailsService); // 유저 조회 인터페이스 설정
         return http.build();
