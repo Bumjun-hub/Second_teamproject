@@ -1,28 +1,23 @@
 package org.project.second.member.controller;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.project.second.member.dto.LoginRequest;
-import org.project.second.member.dto.LoginResponse;
-import org.project.second.member.dto.SignupRequest;
+import org.project.second.member.config.CustomUserDetails;
+import org.project.second.member.domain.Member;
+import org.project.second.member.dto.*;
 import org.project.second.security.JwtProvider;
 import org.project.second.member.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +33,7 @@ public class MemberController {
     //Valid : null 값 유효성 체크 자동
     @PostMapping("/signup")
     public ResponseEntity<Map<String, String>> signup(@Valid @RequestBody SignupRequest signupRequest) {
-        SignupRequest u = memberService.insert(signupRequest);
+        SignupResponse u = memberService.insert(signupRequest);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "회원가입 성공");
@@ -86,9 +81,47 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String,String>> logout(HttpServletResponse response) {
+    public ResponseEntity<LogoutResponse> logout(HttpServletResponse response) {
         jwtProvider.clearTokensInCookies(response);
-        return ResponseEntity.ok(Map.of("message", "로그아웃 되었습니다."));
+        return ResponseEntity.ok(new LogoutResponse("로그아웃 성공"));
     }
+
+    @DeleteMapping("deletion")
+    public ResponseEntity<String> deleteMember(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletResponse response) {
+        Member member = userDetails.getMember();
+        memberService.deleteMember(member);
+        jwtProvider.clearTokensInCookies(response);
+        return ResponseEntity.ok("계정이 정상적으로 삭제되었습니다.");
+    }
+
+    @PutMapping("changedPwd")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                            @RequestBody ChangedPwdRequest pwdRequest,  HttpServletResponse response) {
+        try{
+            Member member = userDetails.getMember();
+            Member updatedMember = memberService.changedPwd(member, pwdRequest);
+
+            CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedMember);
+
+            // 토큰 재 생성을 위해 Authentication 재설정
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    updatedUserDetails, null, updatedUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            jwtProvider.clearTokensInCookies(response);
+            String newAccessToken = jwtProvider.generateAccessToken(authentication);
+            String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
+            jwtProvider.setTokensInCookies(response, newAccessToken, newRefreshToken);
+
+            return ResponseEntity.ok(new ChangedPwdResponse("비밀번호 변경 성공", updatedMember.getEmail()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("서버 오류가 발생했습니다."));
+        }
+    }
+
 
 }

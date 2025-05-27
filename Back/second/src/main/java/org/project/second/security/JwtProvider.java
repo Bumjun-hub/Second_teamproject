@@ -130,14 +130,14 @@ public class JwtProvider {
 
     public void clearTokensInCookies(HttpServletResponse response) {
         // 쿠키에 저장된 JWT 토큰을 삭제하는 방식
-        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        Cookie accessTokenCookie = new Cookie("access_token", null);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setSecure(false);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(0);  //  0초 => 삭제
         response.addCookie(accessTokenCookie);
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        Cookie refreshTokenCookie = new Cookie("refresh_token", null);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(false);
         refreshTokenCookie.setPath("/api/refresh");
