@@ -41,15 +41,8 @@ public class JwtProvider {
         Date now = new Date(); // 현재 시간
         Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
 
-        String role = authentication.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new RuntimeException("권한이 없습니다."));
-
         return Jwts.builder()
                 .setSubject(username) // 토큰의 주체(사용자 이름)
-                .claim("role", role)
                 .setIssuedAt(now) // 발행 시간
                 .setExpiration(expiryDate) // 만료 시간
                 .signWith(accessKey, SignatureAlgorithm.HS512) // 서명 (HS512 알고리즘)
