@@ -1,4 +1,4 @@
-package org.project.second.item.domain;
+package org.project.second.Product.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,5 +31,11 @@ public class Product extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    private String category;
+    private String category1;
+
+    private String category2;
+
+    private String category3;
+
+    private String category4;
 }
