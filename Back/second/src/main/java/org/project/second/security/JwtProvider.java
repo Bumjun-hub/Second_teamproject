@@ -8,10 +8,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider {
@@ -37,8 +41,15 @@ public class JwtProvider {
         Date now = new Date(); // 현재 시간
         Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
 
+        String role = authentication.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElseThrow(() -> new RuntimeException("권한이 없습니다."));
+
         return Jwts.builder()
                 .setSubject(username) // 토큰의 주체(사용자 이름)
+                .claim("role", role)
                 .setIssuedAt(now) // 발행 시간
                 .setExpiration(expiryDate) // 만료 시간
                 .signWith(accessKey, SignatureAlgorithm.HS512) // 서명 (HS512 알고리즘)
@@ -116,7 +127,7 @@ public class JwtProvider {
 
     }
 
-    // 리프레시 토큰 검증
+    // 리프레시 토큰 검증 d
     public boolean validateRefreshToken(String token) {
         try {
             Jwts.parserBuilder()
