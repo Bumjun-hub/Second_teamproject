@@ -127,7 +127,7 @@ public class JwtProvider {
 
     }
 
-    // 리프레시 토큰 검증
+    // 리프레시 토큰 검증 d
     public boolean validateRefreshToken(String token) {
         try {
             Jwts.parserBuilder()
