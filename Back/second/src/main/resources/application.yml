@@ -28,9 +28,6 @@ file:
   upload-dir: uploads # 파일 저장 디렉토리
   profile-images-dir: static/profileimages
 
-file:
-  upload-dir: ./uploads
-
 jwt:
   access:
     secret: 3y8EpfsmbQI4QOkbPniiRQmsm6fAF0ohgO3DI/hFltZbsdJT8MCdE0qSYkm8GdKbqtSTGEYtMPAwEal6yBOWrQ==

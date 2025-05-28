@@ -25,29 +25,39 @@ public class CommunityController {
 
     //게시글 작성
     @PostMapping(value = "/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPost(
+    public ResponseEntity<String> createPost(
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("category") String category,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        CommunityDto communityDto = new CommunityDto();
-        communityDto.setCategory(CommunityCategory.valueOf(category));
-        communityDto.setTitle(title);
-        communityDto.setContent(content);
+        CommunityDto communityDto = CommunityDto.builder()
+                .category(CommunityCategory.valueOf(category))
+                .title(title)
+                .content(content)
+                .build();
 
-        Member loginUser = userDetails.getMember(); // 로그인 사용자 정보 꺼내기
+        Member loginUser = userDetails.getMember();
         communityService.createPost(communityDto, imageFiles, loginUser); // 서비스로 넘김
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 작성되었습니다");
     }
 
     //게시글 수정
-    @PutMapping ("/community/{id}")
+    @PutMapping (value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updatePost(
             @PathVariable Long id,
-            @RequestBody CommunityDto communityDto,
+            @RequestPart("title") String title,
+            @RequestPart("content") String content,
+            @RequestPart("category") String category,
+            @RequestPart(value = "images", required = false)List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+            CommunityDto communityDto = CommunityDto.builder()
+                .category(CommunityCategory.valueOf(category))
+                .title(title)
+                .content(content)
+                .build();
 
         Member loginUser = userDetails.getMember();
         communityService.updatePost(id, communityDto, loginUser);
@@ -55,18 +65,19 @@ public class CommunityController {
     }
 
     //게시글 삭제
-    @DeleteMapping ("/community/{id}")
+    @DeleteMapping ("/delete/{id}")
         public ResponseEntity<String> deletePost(
                 @PathVariable Long id,
                 @AuthenticationPrincipal CustomUserDetails userDetails
                 ) {
+
         Member loginUser = userDetails.getMember();
         communityService.deletePost(id, loginUser);
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 삭제되었습니다");
     }
 
     //게시글 전체조회
-    @GetMapping("/community/{category}")
+    @GetMapping("/view/{category}")
     public ResponseEntity<List<CommunityResponseDto>> getCategoryPost(
             @PathVariable CommunityCategory category
             ) {
@@ -75,11 +86,12 @@ public class CommunityController {
     }
 
     //게시글 상세조회
-    @GetMapping("/community/{category}/{id}")
+    @GetMapping("/detail/{category}/{id}")
     public ResponseEntity<CommunityResponseDto> detailPost(
             @PathVariable CommunityCategory category,
             @PathVariable Long id
     ){
+
         CommunityResponseDto post = communityService.detailPost(category,id);
         return ResponseEntity.ok(post);
     }
