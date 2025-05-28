@@ -15,21 +15,20 @@ const GroupBuyPage = () => {
 
     // ✅ JWT 쿠키에서 권한 정보 추출
     useEffect(() => {
-            console.log("현재 쿠키", document.cookie);
-        try {
-            const token = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('access_token='))
-                ?.split('=')[1];
-
-            if (token) {
-                const decoded = jwtDecode(token);
-                console.log("🔥 디코딩된 토큰:", decoded);
-                setRole(decoded.role); // ex: "ROLE_ADMIN"
+        const fetchRole = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/api/roleinfo", {
+                    credentials: "include", // HttpOnly 쿠키 인증 포함
+                });
+                const text = await res.text(); // ← 응답이 문자열이니까 .text()
+                console.log("🎯 현재 사용자 권한:", text); // 예: "ROLE_ADMIN"
+                setRole(text);
+            } catch (e) {
+                console.error("roleinfo 요청 실패:", e);
             }
-        } catch (err) {
-            console.error("JWT 디코딩 실패:", err);
-        }
+        };
+
+        fetchRole();
     }, []);
 
     // ✅ 글쓰기 후 돌아왔을 때 신규 아이템 추가
