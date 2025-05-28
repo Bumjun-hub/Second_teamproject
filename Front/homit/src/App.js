@@ -3,7 +3,8 @@ import MainPage from './pages/mainpage/MainPage';
 import { Route, Routes } from 'react-router-dom';
 import GroupBuyPage from './pages/groupbuypage/GroupBuyPage';
 import BoardPage from './pages/boardpage/BoardPage';
-import RecipePage from './pages/RecipePage';
+import RecipePage from './pages/recipepage/RecipePage';
+import RecipeInfoPage from './pages/recipepage/RecipeInfoPage';
 import HotItemPage from './pages/hotitempage/HotItemPage';
 import LoginPage from './pages/loginpage/LoginPage';
 import MemberPage from './pages/memberpage/MemberPage';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/board/info/:id" element={<BoardInfoPage />} />
         <Route path="/board/write" element={<BoardWritePage />} />
         <Route path="/recipe" element={<RecipePage />} />
+        <Route path="/RecipeInfoPage" element={<RecipeInfoPage />} />
         <Route path="/popular" element={<HotItemPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/member" element={<MemberPage />} />

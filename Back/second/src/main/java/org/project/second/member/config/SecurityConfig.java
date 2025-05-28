@@ -40,7 +40,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/refresh", "/api/community/**").permitAll()
+                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/community/**", "/api/item/search").permitAll()
+                        .requestMatchers("/api/wishlist/**", "/api/refresh").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

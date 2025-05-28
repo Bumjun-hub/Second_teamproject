@@ -1,4 +1,4 @@
-package org.project.second.item.domain;
+package org.project.second.Product.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

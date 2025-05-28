@@ -1,0 +1,88 @@
+/* 기본 */
+.recipe-info-page { min-height: 100vh; background: #f9fafb; }
+
+/* 헤더 */
+.info-header { 
+  background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  padding: 1rem 0; position: sticky; top: 0; z-index: 10; 
+}
+.info-header-container { 
+  max-width: 64rem; margin: 0 auto; padding: 0 1rem; 
+  display: flex; align-items: center; gap: 1rem; 
+}
+.back-button { 
+  padding: 0.5rem 1rem; background: #f3f4f6; color: #374151; 
+  border: none; border-radius: 0.5rem; cursor: pointer; 
+}
+.back-button:hover { background: #e5e7eb; }
+.recipe-title { font-size: 1.5rem; font-weight: bold; margin: 0; }
+
+/* 메인 */
+.info-container { max-width: 64rem; margin: 0 auto; padding: 2rem 1rem; }
+.main-image-container { text-align: center; margin-bottom: 2rem; }
+.main-image { 
+  max-width: 20rem; width: 100%; height: auto; 
+  border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+}
+
+/* 정보 그리드 */
+.info-grid { 
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 1.5rem; margin-bottom: 2rem; 
+}
+.info-card { 
+  background: white; padding: 1.5rem; border-radius: 0.75rem; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+.info-title { 
+  font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem; 
+  border-bottom: 2px solid #f97316; padding-bottom: 0.5rem; 
+}
+.info-content p { margin-bottom: 0.5rem; line-height: 1.5; }
+.info-content strong { font-weight: 600; }
+
+/* 재료 */
+.ingredients-section { margin-bottom: 2rem; }
+.section-title { 
+  font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; 
+  border-bottom: 2px solid #f97316; padding-bottom: 0.5rem; display: inline-block; 
+}
+.ingredients-content { 
+  background: white; padding: 1.5rem; border-radius: 0.75rem; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #3b82f6; 
+}
+.ingredients-content p { line-height: 1.6; margin: 0; }
+
+/* 조리 방법 */
+.cooking-section { margin-bottom: 2rem; }
+.cooking-step { 
+  display: flex; gap: 1.5rem; background: white; padding: 1.5rem; 
+  border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  margin-bottom: 1rem; align-items: flex-start; 
+}
+.step-image-container { flex-shrink: 0; }
+.step-image { 
+  width: 15rem; height: 11rem; object-fit: cover; 
+  border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+.step-content { flex: 1; }
+.step-number { 
+  font-weight: 600; color: #f97316; margin-bottom: 0.5rem; 
+  background: #fed7aa; padding: 0.25rem 0.75rem; border-radius: 9999px; 
+  display: inline-block; 
+}
+.step-instruction { line-height: 1.6; margin: 0; }
+
+/* 추가 정보 */
+.additional-info { 
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 1.5rem; margin-top: 2rem; 
+}
+.hashtag-section, .tip-section { 
+  background: white; padding: 1.5rem; border-radius: 0.75rem; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+}
+.hashtag-section { border-left: 4px solid #3b82f6; }
+.tip-section { border-left: 4px solid #10b981; }
+.hashtag-content { color: #2563eb; font-weight: 500; line-height: 1.5; margin: 0; }
+.tip-content { color: #059669; font-size: 0.875rem; line-height: 1.5; margin: 0; }

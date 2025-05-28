@@ -33,3 +33,9 @@ jwt:
     secret: 3y8EpfsmbQI4QOkbPniiRQmsm6fAF0ohgO3DI/hFltZbsdJT8MCdE0qSYkm8GdKbqtSTGEYtMPAwEal6yBOWrQ==
   refresh:
     secret: gjGtW+0kPXngmFOr4+5JgagMkEBZnra3WM4UgZt1+b7HbPrT/lOZL1QZZ9KODbPW+OX4YKr8l7hqz01xWITw5g==
+
+naver:
+  api:
+    client-id: NEnPXeTa_zeit9fylSyb
+    client-secret: ZAsvIdr3Ob
+    search-url: https://openapi.naver.com/v1/search/shop.json
