@@ -67,10 +67,14 @@ const BoardWritePage = () => {
               placeholder="내용을 입력해주세요"
               required
             />
-            <div className="form-buttons">
-              <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
-              <button type="submit" className="submit-button">등록</button>
+            <div className="form-bottom">
+              <input type='checkbox' className='checkbox' /> 공지글 등록
+              <div className='button-area'>
+                <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
+                <button type="submit" className="submit-button">등록</button>
+              </div>
             </div>
+
 
           </form>
         </div>
