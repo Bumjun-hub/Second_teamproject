@@ -47,12 +47,12 @@ const LoginPage = () => {
             if (response.ok) {
                 // 로그인 성공
                 console.log('로그인 성공:', data);
-                
+
                 // 쿠키 설정 확인
                 setTimeout(() => {
                     console.log('로그인 후 쿠키:', document.cookie);
                 }, 100);
-                
+
                 // JWT 토큰은 서버에서 HttpOnly 쿠키로 자동 설정됨
                 // localStorage 사용하지 않음
                 window.dispatchEvent(new Event('authChange'));
@@ -120,8 +120,8 @@ const LoginPage = () => {
                         </div>
                     )}
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className={'signup-button'}
                         disabled={loading}
                     >
@@ -131,9 +131,9 @@ const LoginPage = () => {
 
                 <div className="signup-link">
                     <span>아직 계정이 없으신가요? </span>
-                    <button 
-                        type="button" 
-                        onClick={handleSignupClick} 
+                    <button
+                        type="button"
+                        onClick={handleSignupClick}
                         className="signup-button2"
                     >
                         회원가입
