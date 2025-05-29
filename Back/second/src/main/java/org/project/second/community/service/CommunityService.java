@@ -84,8 +84,8 @@ public class CommunityService {
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
 
-
-
+        List<CommunityImage> images = communityImageRepository.findByCommunity(post);
+        imageService.deleteImage(images);
         post.setIsDeleted(true);
     }
 
