@@ -51,6 +51,7 @@ public class CommunityController {
             @RequestPart("content") String content,
             @RequestPart("category") String category,
             @RequestPart(value = "images", required = false)List<MultipartFile> imageFiles,
+            @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
             CommunityDto communityDto = CommunityDto.builder()
@@ -60,7 +61,7 @@ public class CommunityController {
                 .build();
 
         Member loginUser = userDetails.getMember();
-        communityService.editPost(id, communityDto, loginUser);
+        communityService.editPost(id, communityDto, loginUser, imageFiles, deleteImageIds);
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
     }
 

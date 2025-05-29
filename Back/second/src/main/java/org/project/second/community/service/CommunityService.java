@@ -61,7 +61,8 @@ public class CommunityService {
 
     //수정
     @Transactional
-    public void editPost(Long id, CommunityDto communityDto, Member loginUser) {
+    public void editPost(Long id, CommunityDto communityDto, Member loginUser,
+                         List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
         validateMember(communityDto);
@@ -70,88 +71,102 @@ public class CommunityService {
         post.setTitle(communityDto.getTitle());
         post.setContent(communityDto.getContent());
 
-        // 기존 id값 기준으로 특정 이미지 삭제 가능
-        // 생성
-        // 삭제
+        // 기존 id값 기준으로 특정 이미지 삭제
+        if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
+            for (Long imageId : deleteImageIds) {
+                imageService.deleteImage(imageId, loginUser);
+            }
+        }
+        //생성한다면
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            for (MultipartFile imageFile : imageFiles) {
+                String imageUrl = imageService.saveImage(imageFile);
 
-    }
-
-    //삭제
-    @Transactional
-    public void deletePost(Long id, Member loginUser) {
-        Community post = validatePost(id);
-        validateMember(loginUser, post.getMember());
-
-        //수정방법?
-        post.setIsDeleted(true);
-        communityRopository.delete(post);
-    }
-
-    //전체조회
-    @Transactional
-    public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
-        List<Community> posts = communityRopository.findByCategoryAndIsDeletedFalse(category);
-        return posts.stream().map(post -> new CommunityResponseDto(
-                post.getId(),
-                post.getMember().getUsername(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getViewCount(),
-                (long) post.getLikes().size()
-        )).collect(Collectors.toList());
-    }
-
-    //상세조회
-    @Transactional
-    public CommunityResponseDto detailPost(CommunityCategory category, Long id) {
-        Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);
-
-        return new CommunityResponseDto(
-                post.getId(),
-                post.getMember().getUsername(),
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUpdatedAt(),
-                post.getViewCount(),
-                (long) post.getLikes().size());
-    }
-
-
-    // 사용자 정보 확인
-    public void validateMember(Member loginUser) {
-        Member foundMember = memberRepository.findById(loginUser.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당사용자가 존재하지 않습니다"));
-
-        if (!foundMember.getEmail().equals(loginUser.getEmail())) {
-            throw new AccessDeniedException("사용자 정보가 일치하지 않습니다.");
+                CommunityImage image = CommunityImage.builder()
+                        .imgUrl(imageUrl)
+                        .community(post)
+                        .build();
+                communityImageRepository.save(image);
+            }
         }
     }
 
-    // 글작성 공백확인
-    public void validateMember(CommunityDto communityDto) {
-        if (communityDto.getTitle() == null || communityDto.getTitle().isBlank()) {
-            throw new IllegalArgumentException("제목을 입력하세요");
-        }
-        if (communityDto.getContent() == null || communityDto.getContent().isBlank()) {
-            throw new IllegalArgumentException("내용을 입력하세요");
-        }
-    }
+        //삭제
+        @Transactional
+        public void deletePost (Long id, Member loginUser){
+            Community post = validatePost(id);
+            validateMember(loginUser, post.getMember());
 
-    //작성자확인
-    public void validateMember(Member loginUser, Member writer) {
-        if (!loginUser.getId().equals(writer.getId())) {
-            throw new AccessDeniedException("작성자만 가능합니다");
+           // post.setIsDeleted(true);
+            communityRopository.delete(post);
         }
-    }
 
-    //글존재유무확인
-    public Community validatePost(Long id) {
-        return communityRopository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
-    }
+        //전체조회
+        @Transactional
+        public List<CommunityResponseDto> getCategoryPost (CommunityCategory category){
+            List<Community> posts = communityRopository.findByCategoryAndIsDeletedFalse(category);
+            return posts.stream().map(post -> new CommunityResponseDto(
+                    post.getId(),
+                    post.getMember().getUsername(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatedAt(),
+                    post.getUpdatedAt(),
+                    post.getViewCount(),
+                    (long) post.getLikes().size()
+            )).collect(Collectors.toList());
+        }
+
+        //상세조회
+        @Transactional
+        public CommunityResponseDto detailPost (CommunityCategory category, Long id){
+            Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);
+
+            return new CommunityResponseDto(
+                    post.getId(),
+                    post.getMember().getUsername(),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getCreatedAt(),
+                    post.getUpdatedAt(),
+                    post.getViewCount(),
+                    (long) post.getLikes().size());
+        }
+
+
+        // 사용자 정보 확인
+        public void validateMember (Member loginUser){
+            Member foundMember = memberRepository.findById(loginUser.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당사용자가 존재하지 않습니다"));
+
+            if (!foundMember.getEmail().equals(loginUser.getEmail())) {
+                throw new AccessDeniedException("사용자 정보가 일치하지 않습니다.");
+            }
+        }
+
+        // 글작성 공백확인
+        public void validateMember (CommunityDto communityDto){
+            if (communityDto.getTitle() == null || communityDto.getTitle().isBlank()) {
+                throw new IllegalArgumentException("제목을 입력하세요");
+            }
+            if (communityDto.getContent() == null || communityDto.getContent().isBlank()) {
+                throw new IllegalArgumentException("내용을 입력하세요");
+            }
+        }
+
+        //작성자확인
+        public void validateMember (Member loginUser, Member writer){
+            if (!loginUser.getId().equals(writer.getId())) {
+                throw new AccessDeniedException("작성자만 가능합니다");
+            }
+        }
+
+        //글존재유무확인
+        public Community validatePost (Long id){
+            return communityRopository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
+        }
+
 
 
 }

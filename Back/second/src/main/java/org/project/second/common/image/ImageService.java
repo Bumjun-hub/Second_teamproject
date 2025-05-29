@@ -71,31 +71,25 @@ public class ImageService {
     }
 
 
-    //수정
-/*    1. 이미지가 더 추가된다면
-      * 이미지를 추가하는 로직(저장처럼)
-      2. 특정 이미지가 삭제된다면
-      * 원래있던 이미지를 빼버린다면
-      3. 이미지를 다 삭제 한다면
-
- */
-    /*public List<String> editImage(List<MultipartFile> imageFiles){
-
-    }*/
-
     //삭제
     // 각자의 이미지id를 가져온다
     // 선택된 id를 삭제한다
     @Transactional
     public void deleteImage(Long id, Member loginUser) {
+        // 본인이 올린 이미지가 맞는지 한번 더 확인
         CommunityImage image = communityImageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("이미지가 존재하지 않습니다"));
 
         if(!image.getCommunity().getMember().getId().equals(loginUser.getId())) {
             throw new AccessDeniedException("이미지를 삭제 할 권한이 없습니다");
         }
-        communityImageRepository.delete(image);
+
+        File file = new File(image.getImgUrl());
+        if (file.exists()) {
+            file.delete();
+        }
     }
+
 
 
     }

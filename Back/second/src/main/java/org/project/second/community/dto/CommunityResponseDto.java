@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,4 +19,5 @@ public class CommunityResponseDto {
     private LocalDateTime updatedAt;
     private Long viewCount;
     private Long likes;
+   // private List<String> imgUrls;
 }
