@@ -16,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,17 +72,24 @@ public class CommunityService {
         post.setTitle(communityDto.getTitle());
         post.setContent(communityDto.getContent());
 
-        // 기존 id값 기준으로 특정 이미지 삭제
+        // 기존 id값 기준으로 특정 이미지 삭제 / 이미지url을 담아와서 삭제로 넘기기
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
-            for (Long imageId : deleteImageIds) {
-                imageService.deleteImage(imageId, loginUser);
+            List<CommunityImage> deleteImages = new ArrayList<>();
+            for (CommunityImage image : post.getCommunityImages()){
+                if (deleteImageIds.contains(image.getId())){
+                    imageService.deleteImage(image.getImgUrl());
+                    deleteImages.add(image);
+                }
             }
+            post.getCommunityImages().removeAll(deleteImages);
+            communityImageRepository.deleteAll(deleteImages);
         }
         //생성한다면
         if (imageFiles != null && !imageFiles.isEmpty()) {
             for (MultipartFile imageFile : imageFiles) {
                 String imageUrl = imageService.saveImage(imageFile);
 
+            //생성한부분합쳐서 다시 저장하기
                 CommunityImage image = CommunityImage.builder()
                         .imgUrl(imageUrl)
                         .community(post)

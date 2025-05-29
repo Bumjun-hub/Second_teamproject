@@ -60,14 +60,14 @@ public class ImageService {
         String savedFileName = UUID.randomUUID() + ext;
 
         String absolutePath = getAbsolutePath();
-        File file = new File(absolutePath, savedFileName);
+        File file = new File(absolutePath, savedFileName);//절대경로에저장
 
         try {
             imageFile.transferTo(file);
         } catch (IOException e) {
             throw new RuntimeException("이미지 저장 실패: " + originalFilename, e);
         }
-        return "/uploads/" + savedFileName;
+        return "/uploads/" + savedFileName; //db에 저장
     }
 
 
@@ -75,16 +75,9 @@ public class ImageService {
     // 각자의 이미지id를 가져온다
     // 선택된 id를 삭제한다
     @Transactional
-    public void deleteImage(Long id, Member loginUser) {
-        // 본인이 올린 이미지가 맞는지 한번 더 확인
-        CommunityImage image = communityImageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("이미지가 존재하지 않습니다"));
-
-        if(!image.getCommunity().getMember().getId().equals(loginUser.getId())) {
-            throw new AccessDeniedException("이미지를 삭제 할 권한이 없습니다");
-        }
-
-        File file = new File(image.getImgUrl());
+    public void deleteImage(String imageUrl) {
+        //uploads에서 이미지 삭제 정확한위치?
+        File file = new File(imageUrl);
         if (file.exists()) {
             file.delete();
         }
