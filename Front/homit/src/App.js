@@ -13,6 +13,7 @@ import GroupBuyInfoPage from './pages/groupbuypage/GroupBuyInfoPage';
 import GroupBuyWritePage from './pages/groupbuypage/GroupBuyWritePage';
 import BoardInfoPage from './pages/boardpage/BoardInfoPage';
 import BoardWritePage from './pages/boardpage/BoardWritePage';
+import MyPage from './pages/mypage/MyPage';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/popular" element={<HotItemPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/member" element={<MemberPage />} />
+        <Route path="/mypage" element={<MyPage />} />
       </Routes>
     </Layout>
 
