@@ -1,4 +1,4 @@
-package org.project.second.Product.dto;
+package org.project.second.product.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class WishlistRequestDto {
+public class ProductResponseDto {
     private String naverProductId;
     private String name;
     private String url;

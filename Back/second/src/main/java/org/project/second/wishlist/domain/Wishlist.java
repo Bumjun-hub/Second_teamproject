@@ -1,7 +1,8 @@
-package org.project.second.Product.domain;
+package org.project.second.wishlist.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.project.second.product.domain.Product;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.member.domain.Member;
 
