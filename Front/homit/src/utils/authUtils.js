@@ -60,7 +60,7 @@ export const authenticatedFetch = async (url, options = {}) => {
 };
 
 /**
- * 토큰 갱신 함수
+ * 토큰 갱신 함수 (에러 처리 강화)
  */
 export const refreshToken = async () => {
     try {
@@ -72,11 +72,20 @@ export const refreshToken = async () => {
         if (response.ok) {
             console.log('토큰 갱신 성공');
             return true;
+        } else if (response.status === 401 || response.status === 403) {
+            // 리프레시 토큰도 만료된 경우
+            console.log('리프레시 토큰 만료 - 재로그인 필요');
+            return false;
         } else {
-            console.log('토큰 갱신 실패');
+            console.log('토큰 갱신 실패:', response.status);
             return false;
         }
     } catch (error) {
+        // 네트워크 오류나 서버 연결 실패
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('서버 연결 실패 - 토큰 갱신 건너뜀');
+            return true; // 네트워크 오류는 로그아웃시키지 않음
+        }
         console.error('토큰 갱신 오류:', error);
         return false;
     }
