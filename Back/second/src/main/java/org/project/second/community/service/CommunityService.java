@@ -53,6 +53,7 @@ public class CommunityService {
                     CommunityImage image = CommunityImage.builder()
                             .imgUrl(imageUrl)
                             .community(community)
+                            .isDeleted(false)
                             .build();
                     communityImageRepository.save(image);
                 }
@@ -90,11 +91,12 @@ public class CommunityService {
                 String imageUrl = imageService.saveImage(imageFile);
 
             //생성한부분합쳐서 다시 저장하기
-                CommunityImage image = CommunityImage.builder()
+                 CommunityImage image = CommunityImage.builder()
                         .imgUrl(imageUrl)
                         .community(post)
+                         .isDeleted(false)
                         .build();
-                communityImageRepository.save(image);
+                 post.getCommunityImages().add(image);
             }
         }
     }
@@ -111,21 +113,33 @@ public class CommunityService {
 
         //전체조회
         @Transactional
-        public List<CommunityResponseDto> getCategoryPost (CommunityCategory category){
+        public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
             List<Community> posts = communityRopository.findByCategoryAndIsDeletedFalse(category);
-            return posts.stream().map(post -> new CommunityResponseDto(
-                    post.getId(),
-                    post.getMember().getUsername(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCreatedAt(),
-                    post.getUpdatedAt(),
-                    post.getViewCount(),
-                    (long) post.getLikes().size()
-            )).collect(Collectors.toList());
+            return posts.stream()
+                    .map(post -> {
+                        // 이미지 URL 리스트 만들기
+                        List<String> imageUrls = post.getCommunityImages().stream()
+                                .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
+                                .map(CommunityImage::getImgUrl)
+                                .collect(Collectors.toList());
+
+                        return new CommunityResponseDto(
+                                post.getId(),
+                                post.getMember().getUsername(),
+                                post.getTitle(),
+                                post.getContent(),
+                                post.getCreatedAt(),
+                                post.getUpdatedAt(),
+                                post.getViewCount(),
+                                (long) post.getLikes().size(),
+                                imageUrls
+                        );
+                    })
+                    .collect(Collectors.toList());
         }
 
-        //상세조회
+
+    //상세조회
         @Transactional
         public CommunityResponseDto detailPost (CommunityCategory category, Long id){
             Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);

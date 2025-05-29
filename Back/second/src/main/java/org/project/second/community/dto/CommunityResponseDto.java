@@ -19,5 +19,5 @@ public class CommunityResponseDto {
     private LocalDateTime updatedAt;
     private Long viewCount;
     private Long likes;
-   // private List<String> imgUrls;
+    private List<String> imgUrls;
 }

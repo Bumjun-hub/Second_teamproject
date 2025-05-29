@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
@@ -76,10 +77,21 @@ public class ImageService {
     // 선택된 id를 삭제한다
     @Transactional
     public void deleteImage(String imageUrl) {
-        //uploads에서 이미지 삭제 정확한위치?
-        File file = new File(imageUrl);
+        // 이미지 url이 안들어왔을 경우,
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new IllegalArgumentException("삭제할 이미지 url이 비어있습니다.");
+        }
+        // 들어온 이미지url에서 상대경로를 빼고 절대경로로 바꾸고
+        // 상대경로에서 파일명만 추출
+        String fileName = Paths.get(imageUrl).getFileName().toString();
+        // 절대경로 구하기
+        String absolutePath = getAbsolutePath();
+        // 실제경로생성 / 절대경로를 파일에 넣어서
+        File file = new File(absolutePath, fileName);
         if (file.exists()) {
             file.delete();
+        } else {
+            throw new IllegalArgumentException("삭제할 파일이 존재하지 않습니다");
         }
     }
 
