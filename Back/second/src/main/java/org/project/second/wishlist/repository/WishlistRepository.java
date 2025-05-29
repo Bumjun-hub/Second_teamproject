@@ -1,8 +1,7 @@
-package org.project.second.Product.repository;
+package org.project.second.wishlist.repository;
 
-import org.project.second.Product.domain.Product;
-import org.project.second.Product.domain.Wishlist;
-import org.project.second.Product.dto.ProductResponseDto;
+import org.project.second.product.domain.Product;
+import org.project.second.wishlist.domain.Wishlist;
 import org.project.second.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +17,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     Optional<Wishlist> findByMemberAndProduct(Member member, Product product);
 
     List<Wishlist> findByMember(Member member);
+
+
+    boolean existsByProductNaverProductId(String naverProductId);
 }
