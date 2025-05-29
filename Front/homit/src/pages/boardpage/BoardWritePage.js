@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './BoardWritePage.css';
 import Section from './../../components/Section';
 
 const BoardWritePage = () => {
   const navigate = useNavigate();
+  const [role, setRole] = useState(null); // ✅ 관리자 권한 상태로 관리
 
   const [formData, setFormData] = useState({
     title: '',
@@ -27,6 +28,23 @@ const BoardWritePage = () => {
   const handleCancel = () => {
     navigate('/board');
   };
+
+  const fetchRole = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/roleinfo", {
+        credentials: "include", // HttpOnly 쿠키 인증 포함
+      });
+      const text = await res.text(); // ← 응답이 문자열이니까 .text()
+      console.log("🎯 현재 사용자 권한:", text); // 예: "ROLE_ADMIN"
+      setRole(text);
+    } catch (e) {
+      console.error("roleinfo 요청 실패:", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchRole();
+  }, []);
 
   return (
     <Section>
@@ -68,7 +86,15 @@ const BoardWritePage = () => {
               required
             />
             <div className="form-bottom">
-              <input type='checkbox' className='checkbox' /> 공지글 등록
+
+              {/* ✅ 관리자만 체크박스 보임 */}
+              {role === "ROLE_ADMIN" && (
+                <label>
+                  <input type="checkbox" className="checkbox" />
+                  공지글 등록
+                </label>
+              )}
+
               <div className='button-area'>
                 <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
                 <button type="submit" className="submit-button">등록</button>

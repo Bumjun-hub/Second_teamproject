@@ -2,6 +2,9 @@ server:
   port: ${SERVER_PORT}
 
 spring:
+  config:
+    import: optional:.env
+
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
