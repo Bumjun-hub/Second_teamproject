@@ -48,4 +48,7 @@ public class Community extends BaseEntity {
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    @Column(name = "is_notice", nullable = false)
+    private boolean isNotice;
 }
