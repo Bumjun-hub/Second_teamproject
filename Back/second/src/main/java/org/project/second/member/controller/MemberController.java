@@ -179,5 +179,11 @@ public class MemberController {
         }
     }
 
+    @GetMapping("/roleinfo")
+    public ResponseEntity<String> getRoleInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Member m = userDetails.getMember();
+        return memberService.getRoleInfo(m);
+    }
+
 
 }

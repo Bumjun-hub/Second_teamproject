@@ -13,6 +13,7 @@ import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -152,5 +153,17 @@ public class MemberService {
 
         m.setImageUrl(profileImagesDir + "/" + profileImageName);
         memberRepository.save(m);
+    }
+
+    public ResponseEntity<String> getRoleInfo(Member m) {
+        Optional<Member> opUser =  memberRepository.findById(m.getId());
+        if (opUser.isPresent()) {
+            Member member = opUser.get();
+            String role = member.getRole().getName().name();
+            return ResponseEntity.ok(role);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 회원을 찾을 수 없습니다.");
+        }
+
     }
 }

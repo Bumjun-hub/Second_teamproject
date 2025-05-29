@@ -9,16 +9,22 @@ const BoardInfoPage = () => {
     const [item, setItem] = useState(null);
     const [commentList, setCommentList] = useState([]);
     const [commentInput, setCommentInput] = useState('');
+    const [likes, setLikes] = useState(0); // 추천 수 상태
 
     useEffect(() => {
         const found = boarddummyData.find((it) => String(it.id) === id);
         setItem(found);
+        if (found) setLikes(found.like);
     }, [id]);
+
+    const handleLikeClick = () => {
+        setLikes(prev => prev + 1);
+        // TODO: 서버에 PATCH 요청 추가
+    };
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
         if (!commentInput.trim()) return;
-
         setCommentList(prev => [...prev, commentInput.trim()]);
         setCommentInput('');
     };
@@ -28,22 +34,25 @@ const BoardInfoPage = () => {
     return (
         <Section>
             <div className="info-container">
-
-                {/* 상단 수정/삭제 버튼 */}
                 <div className="top-buttons">
                     <button className="edit-button">수정</button>
                     <button className="delete-button">삭제</button>
                 </div>
 
-                {/* 게시글 카드 */}
                 <div className="product-card">
                     <div className="details-area">
                         <div className="header-row">
                             <h2 className="title">{item.title}</h2>
-                            <div className="meta">
-                                <span>작성자: {item.writer}</span> |{" "}
-                                <span>조회수: {item.count}</span> |{" "}
-                                <span>추천수: {item.like}</span>
+
+                            <div className="meta-bar">
+                                <div className="meta-info">
+                                    <span>작성자: {item.writer}</span>
+                                    <span>조회수: {item.count}</span>
+                                    <span>추천수: {likes}</span>
+                                </div>
+                                <div className="like-area">
+                                    <button onClick={handleLikeClick} className="like-button">♡ 추천</button>
+                                </div>
                             </div>
                         </div>
 
@@ -53,7 +62,6 @@ const BoardInfoPage = () => {
                     </div>
                 </div>
 
-                {/* 댓글 영역 */}
                 <div className="comment-box">
                     <h3>댓글</h3>
                     <form onSubmit={handleCommentSubmit}>
@@ -63,9 +71,7 @@ const BoardInfoPage = () => {
                             onChange={(e) => setCommentInput(e.target.value)}
                             placeholder="댓글을 입력하세요..."
                         />
-                        <button type="submit" className="comment-submit-btn">
-                            댓글 등록
-                        </button>
+                        <button type="submit" className="comment-submit-btn">댓글 등록</button>
                     </form>
 
                     <ul className="comment-list">
@@ -74,7 +80,6 @@ const BoardInfoPage = () => {
                         ))}
                     </ul>
                 </div>
-
             </div>
         </Section>
     );

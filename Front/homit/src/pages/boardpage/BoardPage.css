@@ -54,12 +54,6 @@
   font-size: 14px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-  margin-top: 10px
-}
 
 .Pageinfo {
   width: 100%;
@@ -142,4 +136,34 @@ td a {
 .board-pagination button.active {
   background-color: #2668A7;
   color: white;
+}
+
+
+.search-bar {
+  border: 1px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.search-select,
+.search-input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.search-input{
+  width: 50%;
+}
+
+.search-button {
+  padding: 8px 16px;
+  background-color: #2668A7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
