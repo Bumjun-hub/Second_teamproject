@@ -57,17 +57,11 @@ public class CommunityService {
                 }
             }
         }
-
-        // new로 작성한 버전
-      /*  CommunityImage image = new CommunityImage();
-        image.setImgUrl(fileName);
-        image.setCommunity(community);
-        communityImageRepository.save(image);*/
     }
 
     //수정
     @Transactional
-    public void updatePost(Long id, CommunityDto communityDto, Member loginUser) {
+    public void editPost(Long id, CommunityDto communityDto, Member loginUser) {
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
         validateMember(communityDto);
@@ -75,6 +69,10 @@ public class CommunityService {
         post.setCategory(communityDto.getCategory());
         post.setTitle(communityDto.getTitle());
         post.setContent(communityDto.getContent());
+
+        // 기존 id값 기준으로 특정 이미지 삭제 가능
+        // 생성
+        // 삭제
 
     }
 
@@ -84,9 +82,9 @@ public class CommunityService {
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
 
-        List<CommunityImage> images = communityImageRepository.findByCommunity(post);
-        imageService.deleteImage(images);
+        //수정방법?
         post.setIsDeleted(true);
+        communityRopository.delete(post);
     }
 
     //전체조회

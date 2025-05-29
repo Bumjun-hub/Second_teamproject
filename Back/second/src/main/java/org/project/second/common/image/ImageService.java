@@ -3,19 +3,23 @@ package org.project.second.common.image;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.project.second.community.domain.CommunityImage;
+import org.project.second.community.repository.CommunityImageRepository;
+import org.project.second.member.domain.Member;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ImageService {
+
+    private final CommunityImageRepository communityImageRepository;
 
     // 경로설정
     @Value("${file.upload-dir}")
@@ -70,11 +74,11 @@ public class ImageService {
     //수정
 /*    1. 이미지가 더 추가된다면
       * 이미지를 추가하는 로직(저장처럼)
-      2. 이미지가 삭제된다면
+      2. 특정 이미지가 삭제된다면
       * 원래있던 이미지를 빼버린다면
-      3. 아무것도 바뀌지 않는다면
-      * 변화없음(하지만 글은 바뀔 수 있음)*/
+      3. 이미지를 다 삭제 한다면
 
+ */
     /*public List<String> editImage(List<MultipartFile> imageFiles){
 
     }*/
@@ -83,14 +87,17 @@ public class ImageService {
     // 각자의 이미지id를 가져온다
     // 선택된 id를 삭제한다
     @Transactional
-    public void deleteImage(List<CommunityImage> imageList) {
-        for (CommunityImage image : imageList) {
-            image.setIsDeleted(true);
+    public void deleteImage(Long id, Member loginUser) {
+        CommunityImage image = communityImageRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("이미지가 존재하지 않습니다"));
+
+        if(!image.getCommunity().getMember().getId().equals(loginUser.getId())) {
+            throw new AccessDeniedException("이미지를 삭제 할 권한이 없습니다");
         }
+        communityImageRepository.delete(image);
     }
 
 
-
-}
+    }
 
 

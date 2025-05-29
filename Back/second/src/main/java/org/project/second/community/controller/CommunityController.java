@@ -45,7 +45,7 @@ public class CommunityController {
 
     //게시글 수정
     @PutMapping (value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updatePost(
+    public ResponseEntity<String> editPost(
             @PathVariable Long id,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
@@ -60,7 +60,7 @@ public class CommunityController {
                 .build();
 
         Member loginUser = userDetails.getMember();
-        communityService.updatePost(id, communityDto, loginUser);
+        communityService.editPost(id, communityDto, loginUser);
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
     }
 
