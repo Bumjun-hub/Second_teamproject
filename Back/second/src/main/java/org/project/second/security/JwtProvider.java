@@ -6,19 +6,18 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.project.second.member.domain.Member;
+import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtProvider {
+    private final MemberRepository memberRepository;
     private final Key accessKey; // 액세스 토큰 서명용 키
     private final Key refreshKey; // 리프레시 토큰 서명용 키
     private final long accessTokenValidity = 15 * 60 * 1000; // 15분 * 60초 * 1000 밀리세컨
@@ -27,7 +26,8 @@ public class JwtProvider {
     // 생성자 : application.yml에서 시크릿 키 주입
     public JwtProvider(
             @Value("${jwt.access.secret}") String accessSecret,
-            @Value("${jwt.refresh.secret}") String refreshSecret) {
+            @Value("${jwt.refresh.secret}") String refreshSecret, MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
         byte[] accessKeyBytes = Decoders.BASE64.decode(accessSecret);
         byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshSecret);
 
@@ -55,12 +55,20 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
 
-        return Jwts.builder()
+        String token =  Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(refreshKey, SignatureAlgorithm.HS512)
                 .compact();
+        
+        //DB에 저장
+        Member member = memberRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+        member.setRefreshToken(token);
+        memberRepository.save(member);
+
+        return token;
     }
 
     // 토큰을 쿠키에 저장
@@ -123,11 +131,17 @@ public class JwtProvider {
     // 리프레시 토큰 검증 d
     public boolean validateRefreshToken(String token) {
         try {
-            Jwts.parserBuilder()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(refreshKey)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String username = claims.getSubject();
+            Member member = memberRepository.findByEmail(username)
+                    .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+            return token.equals(member.getRefreshToken()); // 저장된 토큰과 비교
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
