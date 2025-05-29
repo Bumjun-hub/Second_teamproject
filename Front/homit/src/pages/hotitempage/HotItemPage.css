@@ -2,14 +2,16 @@
     width: 100%;
     text-align: center;
     opacity: 70%;
-
-
+    margin-top: 0;
+    padding-top: 20px;
 }
+
 
 .Pageinfo h2 {
     margin: 0;
     /* 👈 h2의 기본 마진 제거 */
 }
+
 
 .HotItemlist {
     width: 100%;
@@ -20,21 +22,22 @@
 }
 
 /* 물품 항목 칸 전체 박스 */
-.Hotitemlist-inner {
+.HotItemlist-inner {
     display: flex;
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 100px;
+    gap: 40px;
+    /* 💡 여백 조절 */
+    max-width: 1400px;
+    /* 💡 최대 폭 제한 */
     width: 100%;
-    max-width: 1600px;
-
-}
+}   
 
 /* 물품 항목 칸 */
 .HotItem {
     width: 250px;
-    height: 320px;
+    height: 420px;
     border: 1px solid #ccc;
     padding: 16px;
     border-radius: 10px;
@@ -44,6 +47,53 @@
     justify-content: space-between;
     background-color: #fff;
 }
+
+
+
+.search-bar-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+    /* 검색창 위쪽 살짝 띄우기 */
+    margin-bottom: 20px;
+    /* 아래 콘텐츠와 자연스럽게 간격 */
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px;
+}
+
+.search-button {
+    padding: 8px 16px;
+    background-color: #2668A7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #1b4f7e;
+}
+
+.item-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 
 .HotItem h3 {
     margin: 0;
@@ -74,11 +124,9 @@
 
 
 .HotItem img {
-    width: 85%;
+    width: 100%;
     aspect-ratio: 1 / 1;
     height: auto;
     object-fit: cover;
 
 }
-
-
