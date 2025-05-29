@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
 import org.project.second.member.dto.*;
+import org.project.second.member.repository.MemberRepository;
+import org.project.second.member.service.CustomUserDetailsService;
 import org.project.second.security.JwtProvider;
 import org.project.second.member.service.MemberService;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ public class MemberController {
     private final MemberService memberService;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;  // JWT 생성 및 검증 유틸
+    private final MemberRepository memberRepository;
 
     //Valid : null 값 유효성 체크 자동
     @PostMapping("/signup")
@@ -83,7 +86,14 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logout(HttpServletResponse response) {
+    public ResponseEntity<LogoutResponse> logout(HttpServletResponse response,
+                                                 @AuthenticationPrincipal CustomUserDetails userDatails) {
+        // DB에서 리프레쉬 토큰 null 처리
+        Member member = userDatails.getMember();
+        member.setRefreshToken(null);
+        memberRepository.save(member);
+        
+        // 쿠키 삭제
         jwtProvider.clearTokensInCookies(response);
         return ResponseEntity.ok(new LogoutResponse("로그아웃 성공"));
     }
