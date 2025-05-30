@@ -7,7 +7,6 @@ import org.project.second.wishlist.dto.WishlistRequestDto;
 import org.project.second.wishlist.service.WishlistService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
