@@ -16,6 +16,28 @@
 
 .header-row {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.divider-line {
+  height: 1px;
+  background-color: #ddd;
+  margin: 12px 0 16px;
+  width: 100%;
+}
+
+.title {
+  font-size: 26px;
+  text-align: center;
+  font-weight: bold;
+  color: #222;
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+  /* ✅ 최소 너비 보장 */
 }
 
 .top-buttons {
@@ -32,12 +54,6 @@
   background-color: crimson;
 }
 
-.title {
-  font-size: 26px;
-  font-weight: bold;
-  color: #222;
-  margin-bottom: 12px;
-}
 
 /* 메타 영역 전체 (가운데 정렬 + 버튼 오른쪽) */
 .meta-bar {
@@ -82,20 +98,23 @@
   font-size: 14px;
   transition: background-color 0.2s;
 }
+
 .like-button:hover {
   background-color: #ff2e2e;
 }
 
 /* 본문 */
 .content-box {
-  padding: 20px;
-  width: 100%;
+  background-color: #fefefe;
+  /* ✅ 배경 추가 */
+  padding: 24px;
+  border: 1px solid #eee;
   border-radius: 6px;
-  line-height: 1.6;
+  line-height: 1.75;
   font-size: 16px;
   color: #333;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
   min-height: 200px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .comment-box {

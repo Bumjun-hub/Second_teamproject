@@ -128,11 +128,13 @@ public class CommunityService {
                                 post.getMember().getUsername(),
                                 post.getTitle(),
                                 post.getContent(),
+                                post.getCategory().name(),
                                 post.getCreatedAt(),
                                 post.getUpdatedAt(),
                                 post.getViewCount(),
                                 (long) post.getLikes().size(),
                                 imageUrls
+
                         );
                     })
                     .collect(Collectors.toList());
@@ -158,6 +160,7 @@ public class CommunityService {
                     post.getMember().getUsername(),
                     post.getTitle(),
                     post.getContent(),
+                    post.getCategory().name(),
                     post.getCreatedAt(),
                     post.getUpdatedAt(),
                     post.getViewCount(),
