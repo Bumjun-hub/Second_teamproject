@@ -166,4 +166,18 @@ public class MemberService {
         }
 
     }
+
+    public boolean checkPassword(Member m, String password) {
+       Optional<Member>  opUser = memberRepository.findById(m.getId());
+       if (opUser.isPresent()) {
+           Member member = opUser.get();
+
+           if (!passwordEncoder.matches(password, member.getPassword())) {
+               throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+           }
+
+           return true;
+       }
+        return false;
+    }
 }
