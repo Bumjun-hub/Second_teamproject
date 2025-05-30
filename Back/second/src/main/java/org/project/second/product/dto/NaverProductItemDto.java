@@ -1,4 +1,4 @@
-package org.project.second.Product.dto;
+package org.project.second.product.dto;
 
 import lombok.Builder;
 import lombok.Getter;
