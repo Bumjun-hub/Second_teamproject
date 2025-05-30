@@ -19,8 +19,6 @@ const MyPage = () => {
 
   // 컴포넌트 마운트 시 사용자 정보 가져오기
   useEffect(() => {
-    console.log('🏠 MyPage 컴포넌트 마운트');
-    console.log('🍪 현재 쿠키:', document.cookie); // 직접 쿠키 확인
     fetchUserInfo();
   }, []);
 
@@ -28,13 +26,6 @@ const MyPage = () => {
   const fetchUserInfo = async () => {
     try {
       setLoading(true);
-      console.log('📋 마이페이지 정보 가져오기 시작...');
-      
-      // checkAuth 호출 제거 (500 에러 방지)
-      // if (checkAuth) {
-      //   await checkAuth();
-      // }
-      
       // authenticatedFetch 사용 - 자동으로 토큰 갱신 처리
       const response = await authenticatedFetch('http://localhost:8080/api/mypage', {
         method: 'GET',
