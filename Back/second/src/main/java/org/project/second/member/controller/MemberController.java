@@ -141,6 +141,20 @@ public class MemberController {
         return ResponseEntity.ok(mypageResponse);
     }
 
+    @PostMapping("mypage/checkPwd")
+    public ResponseEntity<String> checkPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                @RequestBody CheckPasswordRequest pwdRequest) {
+        Member m = userDetails.getMember();
+        String password = pwdRequest.getPassword();
+        boolean result = memberService.checkPassword(m, password);
+
+        if (result) {
+            return ResponseEntity.ok("비밀번호 일치");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다");
+        }
+    }
+
     @PutMapping("/mypage/editProfile")
     public ResponseEntity<?> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          @RequestBody EditProfileRequest editProfileRequest, HttpServletResponse response) {
