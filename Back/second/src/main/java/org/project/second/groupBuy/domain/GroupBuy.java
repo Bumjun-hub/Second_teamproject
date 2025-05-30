@@ -5,7 +5,9 @@ import lombok.*;
 import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.GroupBuyStatus;
+import org.project.second.community.domain.CommunityImage;
 import org.project.second.like.domain.Like;
+import org.project.second.member.domain.Member;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,7 +41,10 @@ public class GroupBuy extends BaseEntity {
     private Integer currentQuantity = 0;
 
     @Column(nullable = false)
-    private Long price;
+    private Long originalPrice;
+
+    @Column(nullable = false)
+    private Long salePrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -47,6 +52,10 @@ public class GroupBuy extends BaseEntity {
 
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
@@ -57,5 +66,7 @@ public class GroupBuy extends BaseEntity {
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupBuyImage> groupBuyImages ;
 
 }
