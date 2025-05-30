@@ -2,11 +2,8 @@ package org.project.second.common.image;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.project.second.community.domain.CommunityImage;
 import org.project.second.community.repository.CommunityImageRepository;
-import org.project.second.member.domain.Member;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -94,7 +91,6 @@ public class ImageService {
             throw new IllegalArgumentException("삭제할 파일이 존재하지 않습니다");
         }
     }
-
 
 
     }

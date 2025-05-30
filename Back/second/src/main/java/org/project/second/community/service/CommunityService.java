@@ -144,6 +144,15 @@ public class CommunityService {
         public CommunityResponseDto detailPost (CommunityCategory category, Long id){
             Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);
 
+            if (post == null) {
+                throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
+            }
+            // 이미지 URL 리스트 만들기
+            List<String> imageUrls = post.getCommunityImages().stream()
+                    .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
+                    .map(CommunityImage::getImgUrl)
+                    .collect(Collectors.toList());
+
             return new CommunityResponseDto(
                     post.getId(),
                     post.getMember().getUsername(),
@@ -152,7 +161,9 @@ public class CommunityService {
                     post.getCreatedAt(),
                     post.getUpdatedAt(),
                     post.getViewCount(),
-                    (long) post.getLikes().size());
+                    (long) post.getLikes().size(),
+                    imageUrls
+            );
         }
 
 
