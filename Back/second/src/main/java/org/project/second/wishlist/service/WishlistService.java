@@ -95,7 +95,7 @@ public class WishlistService {
         }
 
         // Wishlist에 해당 상품이 있는지 확인
-        boolean isInWishlist = wishlistRepository.existsByProductNaverProductId(naverProductId);
+        boolean isInWishlist = wishlistRepository.existsByNaverProductId(naverProductId);
         if (!isInWishlist) {
             Product product = productService.findProductByNaverProductId(naverProductId);
             if (product != null) {
@@ -109,7 +109,7 @@ public class WishlistService {
         if (naverProductId == null || naverProductId.trim().isEmpty()) {
             throw new IllegalArgumentException("naverProductId가 유효하지 않습니다.");
         }
-        return wishlistRepository.existsByProductNaverProductId(naverProductId);
+        return wishlistRepository.existsByNaverProductId(naverProductId);
     }
 
     public void validateMember(Member member) {
