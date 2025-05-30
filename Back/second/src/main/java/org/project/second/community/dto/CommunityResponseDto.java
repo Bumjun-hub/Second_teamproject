@@ -15,9 +15,11 @@ public class CommunityResponseDto {
     private String username;
     private String title;
     private String content;
+    private String category;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long viewCount;
     private Long likes;
     private List<String> imgUrls;
+
 }

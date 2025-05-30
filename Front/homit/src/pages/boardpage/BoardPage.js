@@ -1,85 +1,94 @@
 import { useNavigate } from "react-router-dom";
 import Section from "../../components/Section";
-import { boarddummyData } from '../../data/dummyGroupBuyData';
 import { useState, useEffect } from "react";
 import './BoardPage.css';
 
 const BoardPage = () => {
     const navigate = useNavigate();
+    const [data, setData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
 
-    // 전체 데이터 상태
-    const [data, setData] = useState(boarddummyData);
-
-    // 페이지네이션 상태
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 15;
 
-    // 검색 조건 상태
-    const [searchField, setSearchField] = useState('title');  // 검색 기준 필드 (제목 or 작성자)
-    const [searchQuery, setSearchQuery] = useState('');       // 검색어
+    const [searchField, setSearchField] = useState('title');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // 카테고리 버튼 목록 및 선택 상태
     const categories = ['전체', '자유게시판', '꿀팁', '공구후기', '요리후기'];
     const [selectedCategory, setSelectedCategory] = useState('전체');
 
-    // 버튼에 보이는 이름과 실제 데이터 값 연결
     const categoryMap = {
-        '전체': null,
-        '자유게시판': '자유',
-        '꿀팁': '꿀팁',
-        '공구후기': '공구후기',
-        '요리후기': '요리후기',
+        '자유게시판': 'FREE',
+        '꿀팁': 'TIP',
+        '공구후기': 'GROUP_BUY_REVIEW',
+        '요리후기': 'COOKING_REVIEW'
     };
 
-    // 🔁 카테고리 버튼 클릭 시 자동으로 해당 게시글만 필터링
-    useEffect(() => {
-        let filtered = boarddummyData;
+    const categoryLabelMap = {
+        FREE: "자유게시판",
+        TIP: "꿀팁",
+        GROUP_BUY_REVIEW: "공구후기",
+        COOKING_REVIEW: "요리후기"
+    };
+    // ✅ 게시글 불러오기
+    const fetchData = async () => {
+        try {
+            let result = [];
 
-        if (selectedCategory !== '전체') {
-            const actualCategory = categoryMap[selectedCategory];
-            filtered = filtered.filter(item => item.category === actualCategory);
+            if (selectedCategory === '전체') {
+                const all = await Promise.all([
+                    fetch("/api/community/view/FREE").then(res => res.json()),
+                    fetch("/api/community/view/TIP").then(res => res.json()),
+                    fetch("/api/community/view/GROUP_BUY_REVIEW").then(res => res.json()),
+                    fetch("/api/community/view/COOKING_REVIEW").then(res => res.json()),
+                ]);
+                result = all.flat();
+            } else {
+                const categoryEnum = categoryMap[selectedCategory];
+                const res = await fetch(`/api/community/view/${categoryEnum}`);
+                result = await res.json();
+            }
+
+            setData(result);
+            setFilteredData(result);
+            setCurrentPage(1);
+        } catch (error) {
+            console.error("데이터 불러오기 실패:", error);
         }
+    };
 
-        setData(filtered);
-        setCurrentPage(1); // 필터링되면 첫 페이지로 이동
+    useEffect(() => {
+        fetchData();
     }, [selectedCategory]);
 
-    // 🔍 검색 버튼 클릭 시 필터링 (카테고리 + 입력어 기준)
+    // ✅ 검색
     const handleSearch = () => {
-        let filtered = boarddummyData;
+        let filtered = [...data];
 
-        // 카테고리 필터
-        if (selectedCategory !== '전체') {
-            const actualCategory = categoryMap[selectedCategory];
-            filtered = filtered.filter(item => item.category === actualCategory);
-        }
-
-        // 입력된 검색어 기준 필터
-        if (searchQuery.trim() !== '') {
+        if (searchQuery.trim()) {
             filtered = filtered.filter(item =>
-                item[searchField].toLowerCase().includes(searchQuery.toLowerCase())
+                item[searchField]?.toLowerCase().includes(searchQuery.toLowerCase())
             );
         }
 
-        setData(filtered);
+        setFilteredData(filtered);
         setCurrentPage(1);
     };
 
-    // 현재 페이지에서 보여줄 게시글 목록 계산
-    const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+    // ✅ 페이지 계산
+    const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentItems = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
         <Section>
-            {/* 상단 제목 영역 */}
             <div className="Pageinfo">
                 <div className="board-header">
                     <h2 className="board-title">다양한 정보를 공유해보세요!</h2>
                 </div>
             </div>
 
-            {/* 카테고리 버튼 */}
+            {/* 카테고리 필터 버튼 */}
             <div className="category-filter">
                 {categories.map((cat) => (
                     <button
@@ -93,12 +102,10 @@ const BoardPage = () => {
             </div>
 
             <div className="boardtable-container">
-                {/* 글쓰기 버튼 */}
                 <button className="write-button" onClick={() => navigate("/board/write")}>
                     글쓰기
                 </button>
 
-                {/* 게시글 테이블 */}
                 <table className="board-table">
                     <thead>
                         <tr>
@@ -113,22 +120,21 @@ const BoardPage = () => {
                     <tbody>
                         {currentItems.map((item) => (
                             <tr key={item.id}>
-                                <td>{item.category}</td>
+                                <td>{categoryLabelMap[item.category]}</td>
                                 <td>
-                                    <a onClick={() => navigate(`/board/info/${item.id}`)}>
-                                        {item.title}
-                                    </a>
+                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}
+                                    >{item.title}</a>
                                 </td>
-                                <td>{item.writer}</td>
-                                <td>{item.date}</td>
-                                <td>{item.count}</td>
-                                <td>{item.like}</td>
+                                <td>{item.username}</td>
+                                <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
+                                <td>{item.viewCount}</td>
+                                <td>{item.likes}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
 
-                {/* 페이지네이션 버튼 */}
+                {/* 페이지네이션 */}
                 <div className="board-pagination">
                     {Array.from({ length: totalPages }, (_, index) => (
                         <button

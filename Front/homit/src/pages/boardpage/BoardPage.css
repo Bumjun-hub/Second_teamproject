@@ -91,6 +91,7 @@ td a {
 
 .board-table {
   width: 100%;
+  table-layout: fixed; /* ✅ 추가 */
   border-collapse: collapse;
   background-color: white;
   border-radius: 8px;
@@ -114,6 +115,46 @@ td a {
   font-size: 14px;
   color: #333;
 }
+
+/* 카테고리 */
+.board-table th:nth-child(1),
+.board-table td:nth-child(1) {
+  width: 60px;
+}
+
+/* 제목 (조금 넓게) */
+.board-table th:nth-child(2),
+.board-table td:nth-child(2) {
+  width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 작성자 */
+.board-table th:nth-child(3),
+.board-table td:nth-child(3) {
+  width: 40px;
+}
+
+/* 작성일 */
+.board-table th:nth-child(4),
+.board-table td:nth-child(4) {
+  width: 120px;
+}
+
+/* 조회 */
+.board-table th:nth-child(5),
+.board-table td:nth-child(5) {
+  width: 80px;
+}
+
+/* 추천 */
+.board-table th:nth-child(6),
+.board-table td:nth-child(6) {
+  width: 80px;
+}
+
 
 .board-table tr:hover {
   background-color: #f0f8ff;
