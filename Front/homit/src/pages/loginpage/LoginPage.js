@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { checkAuthStatus } from '../../utils/authUtils';
 import './LoginPage.css';
 import '../memberpage/MemberPage.css';
 
@@ -10,7 +11,28 @@ const LoginPage = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [checkingAuth, setCheckingAuth] = useState(true);
     const navigate = useNavigate();
+
+    // 컴포넌트 마운트 시 자동 로그인 확인
+    useEffect(() => {
+        const checkExistingAuth = async () => {
+            try {
+                const authResult = await checkAuthStatus();
+                if (authResult.isAuthenticated) {
+                    console.log('이미 로그인된 사용자:', authResult.user);
+                    navigate('/', { replace: true });
+                    return;
+                }
+            } catch (error) {
+                console.log('자동 로그인 확인 실패:', error);
+            } finally {
+                setCheckingAuth(false);
+            }
+        };
+
+        checkExistingAuth();
+    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -18,7 +40,6 @@ const LoginPage = () => {
             ...prev,
             [name]: value
         }));
-        // 입력 시 에러 메시지 초기화
         if (error) {
             setError('');
         }
@@ -30,12 +51,13 @@ const LoginPage = () => {
         setError('');
 
         try {
+            // 직접 로그인 API 호출
             const response = await fetch('http://localhost:8080/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // 쿠키를 포함해서 요청
+                credentials: 'include',
                 body: JSON.stringify({
                     email: formData.email,
                     password: formData.password
@@ -45,21 +67,22 @@ const LoginPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // 로그인 성공
                 console.log('로그인 성공:', data);
-
+                
                 // 쿠키 설정 확인
                 setTimeout(() => {
                     console.log('로그인 후 쿠키:', document.cookie);
                 }, 100);
 
-                // JWT 토큰은 서버에서 HttpOnly 쿠키로 자동 설정됨
-                // localStorage 사용하지 않음
+                // 인증 상태 변경 이벤트 발생
                 window.dispatchEvent(new Event('authChange'));
-                // 메인 페이지로 이동
-                navigate('/');
+                
+                // 잠시 대기 후 네비게이션
+                setTimeout(() => {
+                    navigate('/', { replace: true });
+                }, 200);
+                
             } else {
-                // 로그인 실패
                 setError(data.message || '로그인에 실패했습니다.');
             }
         } catch (error) {
@@ -73,6 +96,23 @@ const LoginPage = () => {
     const handleSignupClick = () => {
         navigate('/member');
     };
+
+    // 초기 인증 상태 확인 중일 때 로딩 표시
+    if (checkingAuth) {
+        return (
+            <div className="login-container">
+                <div className="login-box">
+                    <div className="signup-header">
+                        <h2 className="page-title">로딩 중...</h2>
+                        <div className="brand">
+                            <h1 className="brand-name">HOMIT</h1>
+                            <p className="brand-subtitle">인증 상태를 확인하고 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="login-container">
