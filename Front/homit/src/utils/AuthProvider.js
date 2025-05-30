@@ -43,8 +43,9 @@ export const AuthProvider = ({ children }) => {
 
         // 주기적으로 토큰 갱신 (예: 13분마다) - Access Token 만료 전에 미리 갱신
         const tokenRefreshInterval = setInterval(async () => {
-            // 로그인된 상태일 때만 토큰 갱신 시도
-            if (isAuthenticated && user) {
+            // 현재 상태를 다시 체크해서 로그인된 상태인지 확인
+            const currentAuthResult = await checkAuthStatus();
+            if (currentAuthResult.isAuthenticated) {
                 console.log('토큰 자동 갱신 시도...');
                 const refreshResult = await refreshToken();
                 if (!refreshResult) {
@@ -60,10 +61,7 @@ export const AuthProvider = ({ children }) => {
 
         // 브라우저 focus 시 토큰 상태 확인
         const handleFocus = async () => {
-            // 로그인된 상태일 때만 확인
-            if (isAuthenticated && user) {
-                await checkAuth();
-            }
+            await checkAuth();
         };
 
         window.addEventListener('focus', handleFocus);
@@ -80,7 +78,7 @@ export const AuthProvider = ({ children }) => {
             window.removeEventListener('focus', handleFocus);
             window.removeEventListener('authChange', handleAuthChange);
         };
-    }, [isAuthenticated, user]); // 의존성 배열에 user 추가
+    }, []); // 빈 의존성 배열로 변경 - 한 번만 실행
 
     // 로그인 함수
     const login = async (email, password) => {

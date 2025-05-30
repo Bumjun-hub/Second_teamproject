@@ -97,7 +97,7 @@ export const refreshToken = async () => {
  */
 export const checkAuthStatus = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/user/profile', {
+        const response = await fetch('http://localhost:8080/api/mypage', {
             method: 'GET',
             credentials: 'include',
         });
@@ -110,7 +110,7 @@ export const checkAuthStatus = async () => {
             const refreshResult = await refreshToken();
             if (refreshResult) {
                 // 재시도
-                const retryResponse = await fetch('http://localhost:8080/api/user/profile', {
+                const retryResponse = await fetch('http://localhost:8080/api/mypage', {
                     method: 'GET',
                     credentials: 'include',
                 });
