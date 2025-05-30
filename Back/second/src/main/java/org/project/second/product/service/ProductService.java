@@ -6,12 +6,9 @@ import org.project.second.product.dto.NaverProductItemDto;
 import org.project.second.product.dto.NaverSearchResponse;
 import org.project.second.product.dto.ProductResponseDto;
 import org.project.second.product.repository.ProductRepository;
-import org.project.second.wishlist.dto.WishlistRequestDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -55,8 +52,7 @@ public class ProductService {
             throw new IllegalArgumentException("naverProductId 값이 넘어오지 않았습니다.");
         }
 
-        return  productRepository.findByNaverProductId(naverProductId)
-                .orElse(null);
+        return  productRepository.findByNaverProductId(naverProductId).orElse(null);
     }
 
     @Transactional
@@ -119,4 +115,5 @@ public class ProductService {
         }
         productRepository.delete(product);
     }
+
 }
