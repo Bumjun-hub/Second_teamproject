@@ -14,6 +14,7 @@ import GroupBuyWritePage from './pages/groupbuypage/GroupBuyWritePage';
 import BoardInfoPage from './pages/boardpage/BoardInfoPage';
 import BoardWritePage from './pages/boardpage/BoardWritePage';
 import MyPage from './pages/mypage/MyPage';
+import EditProfile from './pages/mypage/MyPageEditProfile';
 import { AuthProvider } from './utils/AuthProvider';
 
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/member" element={<MemberPage />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/editProfile" element={<EditProfile />} />
         </Routes>
       </Layout>
     </AuthProvider>
