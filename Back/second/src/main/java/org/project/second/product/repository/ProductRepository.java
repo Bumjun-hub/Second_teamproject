@@ -1,6 +1,6 @@
-package org.project.second.Product.repository;
+package org.project.second.product.repository;
 
-import org.project.second.Product.domain.Product;
+import org.project.second.product.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

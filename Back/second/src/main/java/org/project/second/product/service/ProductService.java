@@ -1,18 +1,19 @@
-package org.project.second.Product.service;
+package org.project.second.product.service;
 
 import lombok.RequiredArgsConstructor;
-import org.project.second.Product.domain.Product;
-import org.project.second.Product.dto.NaverProductItemDto;
-import org.project.second.Product.dto.NaverSearchResponse;
-import org.project.second.Product.dto.ProductResponseDto;
-import org.project.second.Product.repository.ProductRepository;
+import org.project.second.product.domain.Product;
+import org.project.second.product.dto.NaverProductItemDto;
+import org.project.second.product.dto.NaverSearchResponse;
+import org.project.second.product.dto.ProductResponseDto;
+import org.project.second.product.repository.ProductRepository;
+import org.project.second.wishlist.dto.WishlistRequestDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class ProductService {
                         .build())
                 .retrieve() // HTTP 요청 실행
                 .bodyToMono(NaverSearchResponse.class) // 역직렬화 : JSON응답 -> 객체 저장, items 배열로 들어옴
-                .onErrorMap(e -> new RuntimeException("네이버 API 호출 실패: " + e.getMessage()));
+                .onErrorResume(e -> Mono.just(new NaverSearchResponse()));
     }
 
     // 클라이언트 응답용 검색 메서드
@@ -44,28 +45,18 @@ public class ProductService {
                 .map(response -> response.getItems().stream() //steam() : 반복문
                         .map(item -> toProductResponseDto(item)) // map() : 값 넣기(키:값)
                         .collect(Collectors.toList()))
-                .defaultIfEmpty(List.of()); // 값이 안들어올 경우 빈 List 반환
+                .switchIfEmpty(Mono.just(List.of())); // 값이 안들어올 경우 빈 List 반환
     }
 
 
     @Transactional
-    public Product findOrSaveProduct(String naverProductId) {
+    public Product findProductByNaverProductId(String naverProductId) {
         if (naverProductId == null || naverProductId.trim().isEmpty()) {
             throw new IllegalArgumentException("naverProductId 값이 넘어오지 않았습니다.");
         }
 
-        return productRepository.findByNaverProductId(naverProductId)
-                .orElseGet(() -> {
-                    return getNaverProducts(naverProductId, 1, 1, "sim")
-                            .map(response -> {
-                                List<NaverProductItemDto> items = response.getItems();
-                                if (items == null || items.isEmpty()) {
-                                    return null;
-                                }
-                                return saveProduct(items.get(0));
-                            })
-                            .block();
-                });
+        return  productRepository.findByNaverProductId(naverProductId)
+                .orElse(null);
     }
 
     @Transactional
@@ -76,7 +67,6 @@ public class ProductService {
 
         return productRepository.findByNaverProductId(item.getProductId())
                 .orElseGet(() -> {
-
                     Product product = Product.builder()
                             .naverProductId(item.getProductId())
                             .name(item.getTitle())
@@ -122,4 +112,11 @@ public class ProductService {
                 .build();
     }
 
+    @Transactional
+    public void deleteProduct(Product product) {
+        if (product == null || product.getNaverProductId() == null) {
+            throw new IllegalArgumentException("삭제할 상품이 유효하지 않습니다.");
+        }
+        productRepository.delete(product);
+    }
 }
