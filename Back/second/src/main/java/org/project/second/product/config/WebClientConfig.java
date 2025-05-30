@@ -1,4 +1,4 @@
-package org.project.second.Product.config;
+package org.project.second.product.config;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
