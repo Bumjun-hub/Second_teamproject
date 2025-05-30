@@ -9,6 +9,8 @@ import org.project.second.common.enums.CommunityCategory;
 import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -49,6 +51,12 @@ public class Community extends BaseEntity {
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommunityImage> communityImages;
+
+
     @Column(name = "is_notice", nullable = false)
     private boolean isNotice;
+
 }
