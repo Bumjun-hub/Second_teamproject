@@ -106,12 +106,8 @@
   cursor: pointer;
   font-size: 16px;
   padding: 4px;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
+  margin-top: 2px;
 
-.toggle-password-btn:hover:not(:disabled) {
-  background-color: #f3f4f6;
 }
 
 .toggle-password-btn:disabled {
@@ -187,24 +183,4 @@
 .security-notice small {
   color: #6b7280;
   font-size: 12px;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 480px) {
-  .check-pw-modal {
-    margin: 16px;
-    width: calc(100% - 32px);
-  }
-  
-  .check-pw-header, .check-pw-form, .security-notice {
-    padding: 20px;
-  }
-  
-  .check-pw-buttons {
-    flex-direction: column;
-  }
-  
-  .cancel-btn, .confirm-btn {
-    width: 100%;
-  }
 }

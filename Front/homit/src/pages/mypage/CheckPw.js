@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './CheckPw.css';
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
-const CheckPw = ({ onPasswordVerified, onCancel }) => {
+const CheckPw = ({ onPasswordVerified, onCancel, authenticatedFetch }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -10,24 +11,34 @@ const CheckPw = ({ onPasswordVerified, onCancel }) => {
   // 비밀번호 확인 API 호출 함수
   const verifyPassword = async (inputPassword) => {
     try {
-      const response = await fetch('/api/mypage/checkPwd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // 또는 적절한 인증 방식
-        },
-        body: JSON.stringify({ password: inputPassword })
-      });
-
-      const data = await response.json();
+      let response;
       
-      if (response.ok) {
-        return data.isValid;
+      if (authenticatedFetch) {
+        response = await authenticatedFetch('http://localhost:8080/api/mypage/checkPwd', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ password: inputPassword })
+        });
       } else {
-        throw new Error(data.message || '비밀번호 확인에 실패했습니다.');
+        response = await fetch('http://localhost:8080/api/mypage/checkPwd', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ password: inputPassword })
+        });
+      }
+
+      if (response.ok) {
+        return true;
+      } else {
+        throw new Error('비밀번호가 일치하지 않습니다.');
       }
     } catch (err) {
-      throw new Error(err.message || '서버 오류가 발생했습니다.');
+      throw new Error(err.message || '비밀번호 확인에 실패했습니다.');
     }
   };
 
@@ -47,10 +58,10 @@ const CheckPw = ({ onPasswordVerified, onCancel }) => {
       const isValid = await verifyPassword(password);
       
       if (isValid) {
-        onPasswordVerified(); // 부모 컴포넌트에 비밀번호 확인 완료 알림
+        onPasswordVerified(password);
       } else {
         setError('비밀번호가 일치하지 않습니다.');
-        setPassword(''); // 비밀번호 입력 필드 초기화
+        setPassword('');
       }
     } catch (err) {
       setError(err.message);
@@ -62,7 +73,7 @@ const CheckPw = ({ onPasswordVerified, onCancel }) => {
   // 비밀번호 입력 처리
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    if (error) setError(''); // 에러 메시지 초기화
+    if (error) setError('');
   };
 
   // 취소 버튼 처리
@@ -99,7 +110,7 @@ const CheckPw = ({ onPasswordVerified, onCancel }) => {
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <AiFillEyeInvisible size={25}/>: <AiFillEye size={25}/>}
               </button>
             </div>
           </div>

@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './MyPage.css';
 import MyPageEditProfile from './MyPageEditProfile';
+import CheckPw from './CheckPw'; // CheckPw 컴포넌트 추가
+import ChangePw from './ChangePw';
 import { PiFinnTheHumanBold } from "react-icons/pi";
-import { authenticatedFetch, deleteAccount } from '../../utils/authUtils'; // debugCookies 추가
-import { useAuth } from '../../utils/AuthProvider'; // AuthProvider 사용
+import { authenticatedFetch, deleteAccount } from '../../utils/authUtils';
+import { useAuth } from '../../utils/AuthProvider';
 
 const MyPage = () => {
+    const [showChangePw, setShowChangePw] = useState(false);
+
+    const handleChangePassword = () => {
+        setShowChangePw(true);
+    };
+
+    const handleCloseChangePw = () => {
+        setShowChangePw(false);
+    };
+
+    const handlePasswordChangeSuccess = () => {
+        console.log('비밀번호 변경 완료');
+    };
   const [userInfo, setUserInfo] = useState({
     username: '',
     email: '',
@@ -14,11 +29,14 @@ const MyPage = () => {
     profileImage: ''
   });
   const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState('main'); // 'main' 또는 'editProfile'
-  const { user } = useAuth(); // checkAuth 제거
+  const [currentView, setCurrentView] = useState('main'); 
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false); 
+  const { user } = useAuth();
 
   // 컴포넌트 마운트 시 사용자 정보 가져오기
   useEffect(() => {
+    console.log('🏠 MyPage 컴포넌트 마운트');
+    console.log('🍪 현재 쿠키:', document.cookie);
     fetchUserInfo();
   }, []);
 
@@ -26,7 +44,8 @@ const MyPage = () => {
   const fetchUserInfo = async () => {
     try {
       setLoading(true);
-      // authenticatedFetch 사용 - 자동으로 토큰 갱신 처리
+      console.log('📋 마이페이지 정보 가져오기 시작...');
+      
       const response = await authenticatedFetch('http://localhost:8080/api/mypage', {
         method: 'GET',
       });
@@ -37,7 +56,6 @@ const MyPage = () => {
         console.log('✅ 사용자 정보 로드 성공:', data);
       } else {
         console.error('❌ 사용자 정보 가져오기 실패:', response.status);
-        // 401이 아닌 다른 에러의 경우 처리
         if (response.status === 403) {
           alert('접근 권한이 없습니다.');
         } else if (response.status === 500) {
@@ -46,7 +64,6 @@ const MyPage = () => {
       }
     } catch (error) {
       console.error('❌ 사용자 정보 가져오기 실패:', error);
-      // authenticatedFetch에서 이미 401 처리를 했으므로 여기서는 네트워크 오류 등만 처리
       if (error.message !== '인증이 만료되었습니다. 다시 로그인해주세요.') {
         alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
       }
@@ -55,22 +72,34 @@ const MyPage = () => {
     }
   };
 
-  // 비밀번호 변경 핸들러
-  const handleChangePassword = () => {
-    // 비밀번호 변경 모달이나 페이지로 이동
-    console.log('비밀번호 변경');
-    // 예: setCurrentView('changePassword') 또는 모달 열기
+  // 프로필 편집 버튼 클릭 시 - 비밀번호 확인 모달 표시
+  const handleEditProfile = () => {
+    console.log('프로필 편집 버튼 클릭 - 비밀번호 확인 모달 표시');
+    setShowPasswordCheck(true);
   };
+
+  // 비밀번호 확인 완료 시 - 프로필 편집 페이지로 이동
+  const handlePasswordVerified = () => {
+    console.log('✅ 비밀번호 확인 완료 - 프로필 편집 페이지로 이동');
+    setShowPasswordCheck(false);
+    setCurrentView('editProfile');
+  };
+
+  // 비밀번호 확인 취소 시
+  const handlePasswordCheckCancel = () => {
+    console.log('❌ 비밀번호 확인 취소');
+    setShowPasswordCheck(false);
+  };
+
 
   // 회원탈퇴 처리 (토큰 자동 갱신 포함)
   const handleDeleteAccount = async () => {
     if (window.confirm('정말로 회원탈퇴를 하시겠습니까?\n\n탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
       try {
-        const result = await deleteAccount(); // auth.js의 deleteAccount 함수 사용
+        const result = await deleteAccount();
         
         if (result.success) {
           alert('회원탈퇴가 완료되었습니다.');
-          // deleteAccount 함수에서 이미 리다이렉트 처리됨
         } else {
           alert(result.message || '회원탈퇴에 실패했습니다.');
         }
@@ -80,8 +109,6 @@ const MyPage = () => {
       }
     }
   };
-
-  // 로그아웃 처리 함수 제거
 
   if (loading) {
     return (
@@ -116,7 +143,6 @@ const MyPage = () => {
               src={`http://localhost:8080/profileimages/${userInfo.profileImage}`}
               alt="프로필"
               onError={(e) => {
-                // 이미지 로드 실패 시 기본 아이콘 표시
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'block';
               }}
@@ -131,12 +157,12 @@ const MyPage = () => {
           )}
         </div>
         <h2 className="profile-name">
-          {userInfo.username || userInfo.name || user?.username || user?.name || '홍길동'}
+          { user?.name || '홍길동'}
         </h2>
         <p className="profile-email">
           {userInfo.email || user?.email || 'example@email.com'}
         </p>
-        <button className="edit-profile-btn" onClick={() => setCurrentView('editProfile')}>
+        <button className="edit-profile-btn" onClick={handleEditProfile}>
           호밋킹
         </button>
       </div>
@@ -147,7 +173,7 @@ const MyPage = () => {
           <MenuItem 
             icon="👤" 
             text="프로필 편집" 
-            onClick={() => setCurrentView('editProfile')}
+            onClick={handleEditProfile}
           />
           <MenuItem 
             icon="🔒" 
@@ -181,6 +207,21 @@ const MyPage = () => {
           </button>
         </div>
       </div>
+
+      {/* 비밀번호 확인 모달 */}
+      {showPasswordCheck && (
+        <CheckPw
+          onPasswordVerified={handlePasswordVerified}
+          onCancel={handlePasswordCheckCancel}
+        />
+      )}
+      {/* 새로 추가: 비밀번호 변경 모달 */}
+            {showChangePw && (
+                <ChangePw 
+                    onClose={handleCloseChangePw}
+                    onSuccess={handlePasswordChangeSuccess}
+                />
+            )}
     </div>
   );
 };
