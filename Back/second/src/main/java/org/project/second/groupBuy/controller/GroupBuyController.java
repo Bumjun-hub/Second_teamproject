@@ -114,7 +114,7 @@ public class GroupBuyController {
     }
 
     //상태별조회(필요하면쓰고아니면 ㄴㄴ)
-    @GetMapping("/status/{status}")
+   // @GetMapping("/status/{status}")
 
 
 }
