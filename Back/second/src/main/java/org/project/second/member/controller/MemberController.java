@@ -184,13 +184,15 @@ public class MemberController {
                     .body(new ErrorResponse("서버 오류가 발생했습니다."));
         }
     }
-
+    
+    // 프로필 이미지 10개(선택용) 가져오기
     @GetMapping("/profile/getimages")
     public ResponseEntity<List<String>> getImages() throws IOException {
         List<String> images = memberService.getProfileImages();
         return ResponseEntity.ok(images);
     }
-
+    
+    // 사진 업로드
     @PostMapping("/profile/upload")
     public ResponseEntity<?> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                      @RequestBody ProfileImageRequest profileImageRequest, HttpServletResponse response) {

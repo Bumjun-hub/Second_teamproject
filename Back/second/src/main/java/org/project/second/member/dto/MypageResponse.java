@@ -14,4 +14,5 @@ public class MypageResponse {
     String name;
     String phone;
     String address;
+    String imageUrl;
 }
