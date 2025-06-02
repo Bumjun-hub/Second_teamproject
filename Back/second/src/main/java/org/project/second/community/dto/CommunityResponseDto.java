@@ -21,4 +21,5 @@ public class CommunityResponseDto {
     private Long viewCount;
     private Long likes;
     private List<String> imgUrls;
+    private boolean isNotice;
 }

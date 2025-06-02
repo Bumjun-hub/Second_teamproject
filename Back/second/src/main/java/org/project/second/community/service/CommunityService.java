@@ -127,18 +127,6 @@ public class CommunityService {
                             .map(CommunityImage::getImgUrl)
                             .collect(Collectors.toList());
 
-                        return new CommunityResponseDto(
-                                post.getId(),
-                                post.getMember().getUsername(),
-                                post.getTitle(),
-                                post.getContent(),
-                                post.getCategory().name(),
-                                post.getCreatedAt(),
-                                post.getUpdatedAt(),
-                                post.getViewCount(),
-                                (long) post.getLikes().size(),
-                                imageUrls
-
                     return new CommunityResponseDto(
                             post.getId(),
                             post.getMember().getUsername(),
@@ -151,6 +139,7 @@ public class CommunityService {
                             (long) post.getLikes().size(),
                             imageUrls,
                             post.isNotice()
+
                     );
                 })
                 .collect(Collectors.toList());
@@ -162,33 +151,18 @@ public class CommunityService {
     public CommunityResponseDto detailPost (CommunityCategory category, Long id){
         Community post = communityRepository.findByIdAndCategoryAndIsDeletedFalse(id, category);
 
-            if (post == null) {
-                throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
-            }
-            // 조회수
-            post.setViewCount(post.getViewCount() == null ? 1 : post.getViewCount() + 1);
-
-            // 이미지 URL 리스트 만들기
-            List<String> imageUrls = post.getCommunityImages().stream()
-                    .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
-                    .map(CommunityImage::getImgUrl)
-                    .collect(Collectors.toList());
-
-            return new CommunityResponseDto(
-                    post.getId(),
-                    post.getMember().getUsername(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCategory().name(),
-                    post.getCreatedAt(),
-                    post.getUpdatedAt(),
-                    post.getViewCount(),
-                    (long) post.getLikes().size(),
-                    imageUrls,
-                    post.isNotice()
-            );
+        if (post == null) {
+            throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
         }
-    
+        // 조회수
+        post.setViewCount(post.getViewCount() == null ? 1 : post.getViewCount() + 1);
+
+        // 이미지 URL 리스트 만들기
+        List<String> imageUrls = post.getCommunityImages().stream()
+                .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
+                .map(CommunityImage::getImgUrl)
+                .collect(Collectors.toList());
+
         return new CommunityResponseDto(
                 post.getId(),
                 post.getMember().getUsername(),
