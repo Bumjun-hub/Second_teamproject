@@ -133,7 +133,8 @@ public class CommunityService {
                                 post.getUpdatedAt(),
                                 post.getViewCount(),
                                 (long) post.getLikes().size(),
-                                imageUrls
+                                imageUrls,
+                                post.isNotice()
 
                         );
                     })
@@ -165,7 +166,8 @@ public class CommunityService {
                     post.getUpdatedAt(),
                     post.getViewCount(),
                     (long) post.getLikes().size(),
-                    imageUrls
+                    imageUrls,
+                    post.isNotice()
             );
         }
 

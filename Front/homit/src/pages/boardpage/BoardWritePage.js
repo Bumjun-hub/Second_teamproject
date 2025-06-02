@@ -14,6 +14,7 @@ const BoardWritePage = () => {
     writer: 'guest',
     category: 'FREE',
     content: '',
+    isNotice: false,
   });
 
   // 🔄 기존 게시글 불러오기 (수정용)
@@ -46,6 +47,7 @@ const BoardWritePage = () => {
     data.append('title', formData.title);
     data.append('content', formData.content);
     data.append('category', formData.category);
+    data.append('isNotice', formData.isNotice ? "1" : "0");
 
     const url = isEdit
       ? `/api/community/edit/${id}`
@@ -136,10 +138,13 @@ const BoardWritePage = () => {
             <div className="form-bottom">
               {role === "ROLE_ADMIN" && (
                 <label>
-                  <input type="checkbox" className="checkbox" />
+                  <input type="checkbox" className="checkbox" checked={formData.isNotice} onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, isNotice: e.target.checked }))
+                  } />
                   공지글 등록
                 </label>
               )}
+
               <div className='button-area'>
                 <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
                 <button type="submit" className="submit-button">{isEdit ? "수정" : "등록"}</button>

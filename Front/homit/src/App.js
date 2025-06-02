@@ -28,13 +28,17 @@ function App() {
           <Route path="/groupbuy" element={<GroupBuyPage />} />
           <Route path="/groupbuy/info/:id" element={<GroupBuyInfoPage />} />
           <Route path="/groupbuy/write" element={<GroupBuyWritePage />} />
+
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/info/:category/:id" element={<BoardInfoPage />} />
           <Route path="/board/write" element={<BoardWritePage />} />
-          <Route path="/board/edit/:category/:id" element={<BoardWritePage />} />
+          <Route path="/board/edit/:category/:id" element={<BoardWritePage />} />w
+
           <Route path="/recipe" element={<RecipePage />} />
           <Route path="/RecipeInfoPage" element={<RecipeInfoPage />} />
+
           <Route path="/popular" element={<HotItemPage />} />
+          
           <Route path="/login" element={<LoginPage />} />
           <Route path="/member" element={<MemberPage />} />
           <Route path="/mypage" element={<MyPage />} />

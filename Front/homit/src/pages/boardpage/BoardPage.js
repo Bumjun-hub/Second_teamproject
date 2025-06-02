@@ -118,20 +118,44 @@ const BoardPage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((item) => (
-                            <tr key={item.id}>
-                                <td>{categoryLabelMap[item.category]}</td>
-                                <td>
-                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}
-                                    >{item.title}</a>
-                                </td>
-                                <td>{item.username}</td>
-                                <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
-                                <td>{item.viewCount}</td>
-                                <td>{item.likes}</td>
-                            </tr>
-                        ))}
+                        {/* 공지글 항상 맨 위 */}
+                        {filteredData
+                            .filter(item => item.isNotice)
+                            .map((item) => (
+                                <tr key={item.id} className="notice-row">
+                                    <td>{categoryLabelMap[item.category]}</td>
+                                    <td>
+                                        <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                            {item.title}
+                                        </a>
+                                    </td>
+                                    <td>{item.username}</td>
+                                    <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
+                                    <td>{item.viewCount}</td>
+                                    <td>{item.likes}</td>
+                                </tr>
+                            ))}
+
+                        {/* 일반글 - 페이지네이션 대상 */}
+                        {filteredData
+                            .filter(item => !item.isNotice)
+                            .slice(startIndex, startIndex + ITEMS_PER_PAGE)
+                            .map((item) => (
+                                <tr key={item.id}>
+                                    <td>{categoryLabelMap[item.category]}</td>
+                                    <td>
+                                        <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                            {item.title}
+                                        </a>
+                                    </td>
+                                    <td>{item.username}</td>
+                                    <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
+                                    <td>{item.viewCount}</td>
+                                    <td>{item.likes}</td>
+                                </tr>
+                            ))}
                     </tbody>
+
                 </table>
 
                 {/* 페이지네이션 */}

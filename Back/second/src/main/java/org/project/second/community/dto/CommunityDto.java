@@ -14,4 +14,5 @@ public class CommunityDto {
     private CommunityCategory category;
     private String title;
     private String content;
+    private boolean isNotice;
 }
