@@ -34,25 +34,39 @@ public class GroupBuy extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    //최대참여자
+    @Column(name = "max_participants", nullable = false)
+    private Integer maxParticipants;
+
+    //최소참여자
+    @Column(name = "min_participants", nullable = false)
+    private Integer minParticipants;
+
+    //현재참여자
+    @Column(name = "current_participants", nullable = false)
+    private Integer currentParticipants = 0;
+
+    //최대주문수량
     @Column(name = "max_quantity", nullable = false)
     private Integer maxQuantity;
 
+    //현재주문갯수
     @Column(name = "current_quantity", nullable = false)
     private Integer currentQuantity = 0;
 
+    //원래가격
     @Column(nullable = false)
     private Long originalPrice;
 
+    //할인된가격
     @Column(nullable = false)
     private Long salePrice;
-
-    @Column(nullable = false)//빼야함
-    private Long price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private GroupBuyStatus status;
 
+    //마감일
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
 

@@ -39,9 +39,11 @@ public class GroupBuyService {
                 .title(groupBuyDto.getTitle())
                 .content(groupBuyDto.getContent())
                 .description(groupBuyDto.getDescription())
+                .maxParticipants(groupBuyDto.getMaxParticipants())
+                .minParticipants(groupBuyDto.getMinParticipants())
+                .currentParticipants(0)
                 .maxQuantity(groupBuyDto.getMaxQuantity())
                 .originalPrice(groupBuyDto.getOriginalPrice())
-                .price(0L)  //빼야함
                 .currentQuantity(0)
                 .salePrice(groupBuyDto.getSalePrice())
                 .deadline(groupBuyDto.getDeadline())
@@ -79,6 +81,8 @@ public class GroupBuyService {
         post.setTitle(groupBuyDto.getTitle());
         post.setContent(groupBuyDto.getContent());
         post.setDescription(groupBuyDto.getDescription());
+        post.setMaxParticipants(groupBuyDto.getMaxParticipants());
+        post.setMinParticipants(groupBuyDto.getMinParticipants());
         post.setOriginalPrice(groupBuyDto.getOriginalPrice());
         post.setSalePrice(groupBuyDto.getSalePrice());
         post.setMaxQuantity(groupBuyDto.getMaxQuantity());
@@ -139,6 +143,9 @@ public class GroupBuyService {
                             post.getMember().getUsername(),
                             post.getDescription(),
                             post.getContent(),
+                            post.getMaxParticipants(),
+                            post.getMinParticipants(),
+                            post.getCurrentParticipants(),
                             post.getMaxQuantity(),
                             post.getCurrentQuantity(),
                             post.getOriginalPrice(),
@@ -169,6 +176,9 @@ public class GroupBuyService {
                 post.getMember().getUsername(),
                 post.getDescription(),
                 post.getContent(),
+                post.getMaxParticipants(),
+                post.getMinParticipants(),
+                post.getCurrentParticipants(),
                 post.getMaxQuantity(),
                 post.getCurrentQuantity(),
                 post.getOriginalPrice(),
@@ -198,6 +208,9 @@ public class GroupBuyService {
                             post.getMember().getUsername(),
                             post.getDescription(),
                             post.getContent(),
+                            post.getMaxParticipants(),
+                            post.getMinParticipants(),
+                            post.getCurrentParticipants(),
                             post.getMaxQuantity(),
                             post.getCurrentQuantity(),
                             post.getOriginalPrice(),

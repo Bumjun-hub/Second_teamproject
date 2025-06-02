@@ -18,8 +18,11 @@ public class GroupBuyResponseDto {
     private String title;
     private String description;
     private String content;
-    private Integer maxQuantity;
-    private Integer currentQuantity;
+    private Integer maxParticipants;        //최대참여자
+    private Integer minParticipants;        //최소참여자
+    private Integer currentParticipants;    //현재참여자
+    private Integer maxQuantity;            //최대주문수량
+    private Integer currentQuantity;        //현재주문수량
     private Long originalPrice;
     private Long salePrice;
     private LocalDateTime deadline;
