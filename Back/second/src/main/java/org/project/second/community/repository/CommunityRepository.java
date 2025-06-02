@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CommunityRopository extends JpaRepository<Community, Long> {
+public interface CommunityRepository extends JpaRepository<Community, Long> {
     List<Community> findByCategoryAndIsDeletedFalse(CommunityCategory category);
 
     Community findByIdAndCategoryAndIsDeletedFalse(Long id, CommunityCategory category);

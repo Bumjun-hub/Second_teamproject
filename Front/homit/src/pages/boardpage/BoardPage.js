@@ -30,7 +30,7 @@ const BoardPage = () => {
         GROUP_BUY_REVIEW: "공구후기",
         COOKING_REVIEW: "요리후기"
     };
-    // ✅ 게시글 불러오기
+
     const fetchData = async () => {
         try {
             let result = [];
@@ -61,7 +61,6 @@ const BoardPage = () => {
         fetchData();
     }, [selectedCategory]);
 
-    // ✅ 검색
     const handleSearch = () => {
         let filtered = [...data];
 
@@ -75,10 +74,14 @@ const BoardPage = () => {
         setCurrentPage(1);
     };
 
-    // ✅ 페이지 계산
-    const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+    // 공지글과 일반글 분리
+    const noticePosts = filteredData.filter(item => item.notice === true);
+    const normalPosts = filteredData.filter(item => item.notice !== true);
+
+
+    const totalPages = Math.ceil(normalPosts.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentItems = normalPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     return (
         <Section>
@@ -118,12 +121,30 @@ const BoardPage = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* 공지글 항상 맨 위 */}
+                        {noticePosts.map((item) => (
+                            <tr key={item.id} className="notice-row">
+                                <td>{item.notice === true ? "공지사항" : categoryLabelMap[item.category]}</td>
+                                <td>
+                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                        {item.title}
+                                    </a>
+                                </td>
+                                <td>{item.username}</td>
+                                <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
+                                <td>{item.viewCount}</td>
+                                <td>{item.likes}</td>
+                            </tr>
+                        ))}
+
+                        {/* 일반글 - 페이지네이션 대상 */}
                         {currentItems.map((item) => (
                             <tr key={item.id}>
                                 <td>{categoryLabelMap[item.category]}</td>
                                 <td>
-                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}
-                                    >{item.title}</a>
+                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                        {item.title}
+                                    </a>
                                 </td>
                                 <td>{item.username}</td>
                                 <td>{new Date(item.createdAt).toISOString().slice(0, 10)}</td>
