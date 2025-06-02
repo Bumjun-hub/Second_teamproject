@@ -16,8 +16,7 @@ import org.project.second.recipe.domain.Recipe;
 @Builder
 @Table(name = "likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"member_id", "community_id"}),
-        @UniqueConstraint(columnNames = {"member_id", "groupBuy_id"}),
-        @UniqueConstraint(columnNames = {"member_id", "recipe_id"})
+        @UniqueConstraint(columnNames = {"member_id", "groupBuy_id"})
 })
 
 public class Like extends BaseEntity {
@@ -36,8 +35,4 @@ public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupBuy_id", nullable = true)
     private GroupBuy groupBuy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_id", nullable = true)
-    private Recipe recipe;
 }

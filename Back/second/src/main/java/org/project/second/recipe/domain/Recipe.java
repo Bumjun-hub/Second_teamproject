@@ -30,9 +30,6 @@ public class Recipe extends BaseEntity {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
-    
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorite> favorites;
