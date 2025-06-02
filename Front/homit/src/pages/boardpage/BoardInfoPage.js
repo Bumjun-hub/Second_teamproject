@@ -1,25 +1,92 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { boarddummyData } from '../../data/dummyGroupBuyData';
 import './BoardInfoPage.css';
 import Section from "../../components/Section";
 
 const BoardInfoPage = () => {
-    const { id } = useParams();
+    const { category, id } = useParams();
     const [item, setItem] = useState(null);
     const [commentList, setCommentList] = useState([]);
     const [commentInput, setCommentInput] = useState('');
     const [likes, setLikes] = useState(0); // 추천 수 상태
 
+    const navigate = useNavigate();
+
+    // 수정 삭제 버튼 보이기/ 숨기기를 하기위한 user확인
+    const [currentUser, setCurrentUser] = useState("");
+
+
+    // 디버깅 로그
+    console.log("✅ item.username:", item?.username);
+    console.log("✅ currentUser:", currentUser);
+
+
+
+
+    // 로그인 사용자 정보 fetch (쿠키 or API로)
     useEffect(() => {
-        const found = boarddummyData.find((it) => String(it.id) === id);
-        setItem(found);
-        if (found) setLikes(found.like);
-    }, [id]);
+        fetch("/api/mypage", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                setCurrentUser(data.name);  // 여기에 사용자 이름 들어옴!
+            });
+    }, []);
+
+
+
+    // 카테고리랑 아이디 넘김
+    useEffect(() => {
+        const fetchItem = async () => {
+            try {
+                const res = await fetch(`/api/community/detail/${category}/${id}`); // category는 BoardPage에서 넘기면 좋음
+                const json = await res.json();
+                setItem(json);
+                setLikes(json.likes);
+            } catch (err) {
+                console.error("게시글 상세 불러오기 실패", err);
+            }
+        };
+
+        fetchItem();
+    }, [category, id]);
 
     const handleLikeClick = () => {
         setLikes(prev => prev + 1);
         // TODO: 서버에 PATCH 요청 추가
+    };
+
+
+    // 수정 기능
+    const handleEdit = () => {
+        if (item.username !== currentUser) {
+            alert("권한이 없습니다");
+            return;
+        }
+        navigate(`/board/edit/${item.category}/${item.id}`);
+
+    };
+
+    // 삭제기능
+    const handleDelete = async () => {
+        if (item.username !== currentUser) {
+            alert("권한이 없습니다");
+            return;
+        }
+
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            try {
+                await fetch(`/api/community/delete/${item.id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+                alert("삭제 완료!");
+                navigate("/board");
+            } catch (err) {
+                alert("삭제 실패!");
+                console.error(err);
+            }
+        }
     };
 
     const handleCommentSubmit = (e) => {
@@ -34,22 +101,27 @@ const BoardInfoPage = () => {
     return (
         <Section>
             <div className="info-container">
+
                 <div className="top-buttons">
-                    <button className="edit-button">수정</button>
-                    <button className="delete-button">삭제</button>
+                    <button className="edit-button" onClick={handleEdit}>수정</button>
+                    <button className="delete-button" onClick={handleDelete}>삭제</button>
                 </div>
+
 
                 <div className="product-card">
                     <div className="details-area">
                         <div className="header-row">
                             <h2 className="title">{item.title}</h2>
-
+                            <div className="divider-line"></div>
                             <div className="meta-bar">
                                 <div className="meta-info">
-                                    <span>작성자: {item.writer}</span>
-                                    <span>조회수: {item.count}</span>
-                                    <span>추천수: {likes}</span>
+                                    <span><strong>작성자</strong> {item.username}</span>
+                                    {/* toIOString() : 2025-05-30T12:34:56.000Z 형태*/}
+                                    <span><strong>작성일</strong> {new Date(item.createdAt).toISOString().slice(0, 10)}</span>
+                                    <span><strong>조회</strong> {item.viewCount}</span>
+                                    <span><strong>추천</strong> {likes}</span>
                                 </div>
+
                                 <div className="like-area">
                                     <button onClick={handleLikeClick} className="like-button">♡ 추천</button>
                                 </div>
