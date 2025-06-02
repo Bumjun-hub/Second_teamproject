@@ -17,7 +17,7 @@
   background-color: white;
   color: #444;
   border: 1px solid #ccc;
-  
+
 }
 
 .submit-button {
@@ -49,15 +49,29 @@
   resize: none;
 }
 
-.form-bottom{
-  gap:10px;
+.form-bottom {
+  gap: 10px;
+}
+
+.upload-button {
+  background-color: #2668A7;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 10px;
+}
+
+.image-preview-area img {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 
-
-.button-area{
+.button-area {
   float: right;
-  
+
 }
-
-
