@@ -129,7 +129,20 @@ const BoardInfoPage = () => {
                         </div>
 
                         <div className="middle-content">
-                            <div className="content-box">{item.content}</div>
+                            <div className="content-box" dangerouslySetInnerHTML={{ __html: item.content }} />
+                            {item.imgUrls && item.imgUrls.length > 0 && (
+                                <div className="image-gallery">
+                                    {item.imgUrls.map((url, idx) => (
+                                        <img
+                                            key={idx}
+                                            src={url}
+                                            alt={`첨부 이미지 ${idx + 1}`}
+                                            className="attached-image"
+                                            style={{ maxWidth: '100%', display: 'block', margin: '10px auto' }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

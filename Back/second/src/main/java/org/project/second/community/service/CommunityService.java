@@ -33,6 +33,7 @@ public class CommunityService {
     //작성
     @Transactional
     public void createPost(CommunityDto communityDto, List<MultipartFile> imageFiles , Member loginUser) {
+        System.out.println("🚨 isNotice 값: " + communityDto.getIsNotice());
         validateMember(loginUser);
         validateMember(communityDto);
         Community community = Community.builder()
@@ -40,8 +41,10 @@ public class CommunityService {
                 .content(communityDto.getContent())
                 .category(communityDto.getCategory())
                 .member(loginUser)
+                .isNotice(communityDto.isNoticeBoolean())  // ✅ 공지글 반영
                 .isDeleted(false)
                 .build();
+
         communityRepository.save(community);
 
 
@@ -62,6 +65,7 @@ public class CommunityService {
     }
 
     //수정
+
     @Transactional
     public void editPost(Long id, CommunityDto communityDto, Member loginUser,
                          List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
@@ -134,6 +138,7 @@ public class CommunityService {
                                 post.getViewCount(),
                                 (long) post.getLikes().size(),
                                 imageUrls
+
                         );
                     })
                     .collect(Collectors.toList());
