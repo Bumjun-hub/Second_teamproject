@@ -5,7 +5,9 @@ import lombok.*;
 import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.GroupBuyStatus;
+import org.project.second.community.domain.CommunityImage;
 import org.project.second.like.domain.Like;
+import org.project.second.member.domain.Member;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,21 +34,37 @@ public class GroupBuy extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "max_participants", nullable = false)
+    private Integer maxParticipants;  //최대참여자
+
+    @Column(name = "min_participants", nullable = false)
+    private Integer minParticipants;  //최소참여자
+
+    @Column(name = "current_participants", nullable = false)
+    private Integer currentParticipants = 0;  //현재참여자
+
     @Column(name = "max_quantity", nullable = false)
-    private Integer maxQuantity;
+    private Integer maxQuantity;  //최대주문수량
 
     @Column(name = "current_quantity", nullable = false)
-    private Integer currentQuantity = 0;
+    private Integer currentQuantity = 0;   //현재주문갯수
 
     @Column(nullable = false)
-    private Long price;
+    private Long originalPrice;  //원래가격
+
+    @Column(nullable = false)
+    private Long salePrice; //할인된가격
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private GroupBuyStatus status;
 
     @Column(name = "deadline", nullable = false)
-    private LocalDateTime deadline;
+    private LocalDateTime deadline;  //마감일
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
@@ -57,5 +75,7 @@ public class GroupBuy extends BaseEntity {
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupBuyImage> groupBuyImages ;
 
 }
