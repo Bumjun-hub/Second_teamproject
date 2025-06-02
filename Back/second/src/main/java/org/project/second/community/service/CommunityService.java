@@ -48,8 +48,8 @@ public class CommunityService {
         communityRepository.save(community);
 
 
-        if (imageFiles != null && !imageFiles.isEmpty()) {
-            for (MultipartFile imageFile : imageFiles) {
+        if (imageFiles != null && !imageFiles.isEmpty()){
+            for (MultipartFile imageFile  : imageFiles) {
                 String imageUrl = imageService.saveImage(imageFile);
 
                 if (imageUrl != null) {
@@ -80,8 +80,8 @@ public class CommunityService {
         // 기존 id값 기준으로 특정 이미지 삭제 / 이미지url을 담아와서 삭제로 넘기기
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
             List<CommunityImage> deleteImages = new ArrayList<>();
-            for (CommunityImage image : post.getCommunityImages()) {
-                if (deleteImageIds.contains(image.getId())) {
+            for (CommunityImage image : post.getCommunityImages()){
+                if (deleteImageIds.contains(image.getId())){
                     imageService.deleteImage(image.getImgUrl());
                     deleteImages.add(image);
                 }
@@ -107,75 +107,52 @@ public class CommunityService {
 
     //삭제
     @Transactional
-    public void deletePost(Long id, Member loginUser) {
+    public void deletePost (Long id, Member loginUser){
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
 
-           // post.setIsDeleted(true);
-            communityRepository.delete(post);
-        }
+        // post.setIsDeleted(true);
+        communityRepository.delete(post);
+    }
 
-        //전체조회
-        @Transactional
-        public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
-            List<Community> posts = communityRepository.findByCategoryAndIsDeletedFalse(category);
-            return posts.stream()
-                    .map(post -> {
-                        // 이미지 URL 리스트 만들기
-                        List<String> imageUrls = post.getCommunityImages().stream()
-                                .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
-                                .map(CommunityImage::getImgUrl)
-                                .collect(Collectors.toList());
+    //전체조회
+    @Transactional
+    public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
+        List<Community> posts = communityRepository.findByCategoryAndIsDeletedFalse(category);
+        return posts.stream()
+                .map(post -> {
+                    // 이미지 URL 리스트 만들기
+                    List<String> imageUrls = post.getCommunityImages().stream()
+                            .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
+                            .map(CommunityImage::getImgUrl)
+                            .collect(Collectors.toList());
 
-                        return new CommunityResponseDto(
-                                post.getId(),
-                                post.getMember().getUsername(),
-                                post.getTitle(),
-                                post.getContent(),
-                                post.getCategory().name(),
-                                post.getCreatedAt(),
-                                post.getUpdatedAt(),
-                                post.getViewCount(),
-                                (long) post.getLikes().size(),
-                                imageUrls,
-                                post.isNotice()
+                    return new CommunityResponseDto(
+                            post.getId(),
+                            post.getMember().getUsername(),
+                            post.getTitle(),
+                            post.getContent(),
+                            post.getCategory().name(),
+                            post.getCreatedAt(),
+                            post.getUpdatedAt(),
+                            post.getViewCount(),
+                            (long) post.getLikes().size(),
+                            imageUrls,
+                            post.isNotice()
 
-                        );
-                    })
-                    .collect(Collectors.toList());
-        }
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 
 
     //상세조회
-        @Transactional
-        public CommunityResponseDto detailPost (CommunityCategory category, Long id){
-            Community post = communityRepository.findByIdAndCategoryAndIsDeletedFalse(id, category);
+    @Transactional
+    public CommunityResponseDto detailPost (CommunityCategory category, Long id){
+        Community post = communityRepository.findByIdAndCategoryAndIsDeletedFalse(id, category);
 
-            if (post == null) {
-                throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
-            }
-            // 조회수
-            post.setViewCount(post.getViewCount() == null ? 1 : post.getViewCount() + 1);
-
-            // 이미지 URL 리스트 만들기
-            List<String> imageUrls = post.getCommunityImages().stream()
-                    .filter(img -> !img.getIsDeleted()) // 삭제된 이미지 제외 (optional)
-                    .map(CommunityImage::getImgUrl)
-                    .collect(Collectors.toList());
-
-            return new CommunityResponseDto(
-                    post.getId(),
-                    post.getMember().getUsername(),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getCategory().name(),
-                    post.getCreatedAt(),
-                    post.getUpdatedAt(),
-                    post.getViewCount(),
-                    (long) post.getLikes().size(),
-                    imageUrls,
-                    post.isNotice()
-            );
+        if (post == null) {
+            throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
         }
         // 조회수
         post.setViewCount(post.getViewCount() == null ? 1 : post.getViewCount() + 1);
@@ -203,7 +180,7 @@ public class CommunityService {
 
 
     // 사용자 정보 확인
-    public void validateMember(Member loginUser) {
+    public void validateMember (Member loginUser){
         Member foundMember = memberRepository.findById(loginUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당사용자가 존재하지 않습니다"));
 
@@ -213,7 +190,7 @@ public class CommunityService {
     }
 
     // 글작성 공백확인
-    public void validateMember(CommunityDto communityDto) {
+    public void validateMember (CommunityDto communityDto){
         if (communityDto.getTitle() == null || communityDto.getTitle().isBlank()) {
             throw new IllegalArgumentException("제목을 입력하세요");
         }
@@ -223,17 +200,18 @@ public class CommunityService {
     }
 
     //작성자확인
-    public void validateMember(Member loginUser, Member writer) {
+    public void validateMember (Member loginUser, Member writer){
         if (!loginUser.getId().equals(writer.getId())) {
             throw new AccessDeniedException("작성자만 가능합니다");
         }
     }
 
     //글존재유무확인
-    public Community validatePost(Long id) {
+    public Community validatePost (Long id){
         return communityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
     }
+
 
 
 }
