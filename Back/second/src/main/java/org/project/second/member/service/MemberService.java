@@ -108,7 +108,7 @@ public class MemberService {
 
     public MypageResponse mypageInfo(Member member) {
         return  memberRepository.findById(member.getId())
-                .map(m -> new MypageResponse(m.getEmail(), m.getUsername(), m.getPhone(), m.getAddress()))
+                .map(m -> new MypageResponse(m.getEmail(), m.getUsername(), m.getPhone(), m.getAddress(), m.getImageUrl()))
                 .orElseThrow(() -> new RuntimeException("해당 회원을 찾을 수 없습니다."));
     }
 
@@ -121,10 +121,13 @@ public class MemberService {
             }
 
             Member updatedMember = Member.builder()
+                    .id(m.getId())
                     .email(editProfileRequest.getEmail())
+                    .password(m.getPassword())
                     .username(editProfileRequest.getName())
                     .address(editProfileRequest.getAddress())
                     .phone(editProfileRequest.getPhone())
+                    .role(m.getRole())
                     .build();
 
             return memberRepository.save(updatedMember);

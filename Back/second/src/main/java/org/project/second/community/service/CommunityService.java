@@ -9,7 +9,7 @@ import org.project.second.community.domain.CommunityImage;
 import org.project.second.community.dto.CommunityDto;
 import org.project.second.community.dto.CommunityResponseDto;
 import org.project.second.community.repository.CommunityImageRepository;
-import org.project.second.community.repository.CommunityRopository;
+import org.project.second.community.repository.CommunityRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommunityService {
 
-    private final CommunityRopository communityRopository;
+    private final CommunityRepository communityRepository;
     private final MemberRepository memberRepository;
     private final ImageService imageService;
     private final CommunityImageRepository communityImageRepository;
@@ -42,7 +42,7 @@ public class CommunityService {
                 .member(loginUser)
                 .isDeleted(false)
                 .build();
-        communityRopository.save(community);
+        communityRepository.save(community);
 
 
         if (imageFiles != null && !imageFiles.isEmpty()){
@@ -108,13 +108,13 @@ public class CommunityService {
             validateMember(loginUser, post.getMember());
 
            // post.setIsDeleted(true);
-            communityRopository.delete(post);
+            communityRepository.delete(post);
         }
 
         //전체조회
         @Transactional
         public List<CommunityResponseDto> getCategoryPost(CommunityCategory category) {
-            List<Community> posts = communityRopository.findByCategoryAndIsDeletedFalse(category);
+            List<Community> posts = communityRepository.findByCategoryAndIsDeletedFalse(category);
             return posts.stream()
                     .map(post -> {
                         // 이미지 URL 리스트 만들기
@@ -144,7 +144,7 @@ public class CommunityService {
     //상세조회
         @Transactional
         public CommunityResponseDto detailPost (CommunityCategory category, Long id){
-            Community post = communityRopository.findByIdAndCategoryAndIsDeletedFalse(id, category);
+            Community post = communityRepository.findByIdAndCategoryAndIsDeletedFalse(id, category);
 
             if (post == null) {
                 throw  new IllegalArgumentException("해당 게시글이 존재하지 않습니다");
@@ -199,7 +199,7 @@ public class CommunityService {
 
         //글존재유무확인
         public Community validatePost (Long id){
-            return communityRopository.findById(id)
+            return communityRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
         }
 
