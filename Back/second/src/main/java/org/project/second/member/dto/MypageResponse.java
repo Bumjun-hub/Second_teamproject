@@ -12,4 +12,6 @@ import lombok.Setter;
 public class MypageResponse {
     String email;
     String name;
+    String phone;
+    String address;
 }

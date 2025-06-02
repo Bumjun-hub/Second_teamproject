@@ -6,6 +6,7 @@ import org.project.second.security.JwtAuthenticationEntryPoint;
 import org.project.second.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,7 +26,6 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final Logger logger = Logger.getLogger(SecurityConfig.class.getName());
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -40,8 +40,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/api/signup", "/api/login", "/api/logout", "/api/community/**", "/api/item/search").permitAll()
-                        .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/signup", "/api/login").permitAll()
+                        .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**").permitAll()
+                        .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

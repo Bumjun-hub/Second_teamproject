@@ -1,4 +1,4 @@
-package org.project.second.recipe.domain;
+package org.project.second.viewHistory.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,15 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.member.domain.Member;
-
-import java.time.LocalDateTime;
+import org.project.second.recipe.domain.Recipe;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecipeViewHistory {
+public class RecipeViewHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,8 +26,5 @@ public class RecipeViewHistory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
-
-    @Column(name = "viewed_at", nullable = false)
-    private LocalDateTime viewedAt;
 
 }
