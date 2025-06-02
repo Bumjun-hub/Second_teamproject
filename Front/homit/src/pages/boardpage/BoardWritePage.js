@@ -175,7 +175,6 @@ const BoardWritePage = () => {
                   </div>
                 ))}
               </div>
-
             )}
 
             <div className="form-bottom">
