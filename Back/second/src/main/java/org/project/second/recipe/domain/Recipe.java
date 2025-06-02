@@ -2,9 +2,9 @@ package org.project.second.recipe.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Where;
 import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
+import org.project.second.favorite.domain.Favorite;
 import org.project.second.like.domain.Like;
 
 import java.util.List;
@@ -18,31 +18,23 @@ import java.util.List;
 public class Recipe extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // PK
+    private Long id;  // PK
 
-    @Column(nullable = false)
-    private String title;
+    @Column(name = "recipe_id", nullable = false, unique = true)
+    private String recipeId; // 외부 API ID 키
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String ingredients;
+    @Column(name = "recipe_name", nullable = false, length = 255)
+    private String recipeName;
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String instructions;
-
-    @Column(name = "image_url")
     private String imageUrl;
-
+    
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FavoriteRecipe> favoriteRecipes;
+    private List<Favorite> favorites;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
