@@ -7,6 +7,7 @@ import org.project.second.wishlist.dto.WishlistRequestDto;
 import org.project.second.wishlist.service.WishlistService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,13 @@ public class WishlistController {
     @PostMapping("/add")
     public ResponseEntity<MessageResponse> addWishlist(@RequestBody WishlistRequestDto requestDto,
                                                        @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        Member member = userDetails.getMember();
-        wishlistService.addToWishlist(requestDto, member);
-        return ResponseEntity.ok(new MessageResponse("위시리스트에 상품이 추가되었습니다. 성공"));
+        try {
+            Member member = userDetails.getMember();
+            wishlistService.addToWishlist(requestDto, member);
+            return ResponseEntity.ok(new MessageResponse("위시리스트에 상품이 추가되었습니다. 성공"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("위시리스트 추가에 실패하였습니다."));
+        }
     }
 
     @DeleteMapping("/delete/{naverProductId}")
