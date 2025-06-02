@@ -108,8 +108,63 @@ const BoardInfoPage = () => {
                   <span><strong>추천</strong> {likes}</span>
                 </div>
 
-                <div className="like-area">
-                  <button onClick={handleLikeClick} className="like-button">♡ 추천</button>
+
+                <div className="product-card">
+                    <div className="details-area">
+                        <div className="header-row">
+                            <h2 className="title">{item.title}</h2>
+                            <div className="divider-line"></div>
+                            <div className="meta-bar">
+                                <div className="meta-info">
+                                    <span><strong>작성자</strong> {item.username}</span>
+                                    {/* toIOString() : 2025-05-30T12:34:56.000Z 형태*/}
+                                    <span><strong>작성일</strong> {new Date(item.createdAt).toISOString().slice(0, 10)}</span>
+                                    <span><strong>조회</strong> {item.viewCount}</span>
+                                    <span><strong>추천</strong> {likes}</span>
+                                </div>
+
+                                <div className="like-area">
+                                    <button onClick={handleLikeClick} className="like-button">♡ 추천</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="middle-content">
+                            <div className="content-box" dangerouslySetInnerHTML={{ __html: item.content }} />
+                            {item.imgUrls && item.imgUrls.length > 0 && (
+                                <div className="image-gallery">
+                                    {item.imgUrls.map((url, idx) => (
+                                        <img
+                                            key={idx}
+                                            src={url}
+                                            alt={`첨부 이미지 ${idx + 1}`}
+                                            className="attached-image"
+                                            style={{ maxWidth: '100%', display: 'block', margin: '10px auto' }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="comment-box">
+                    <h3>댓글</h3>
+                    <form onSubmit={handleCommentSubmit}>
+                        <textarea
+                            className="comment-textarea"
+                            value={commentInput}
+                            onChange={(e) => setCommentInput(e.target.value)}
+                            placeholder="댓글을 입력하세요..."
+                        />
+                        <button type="submit" className="comment-submit-btn">댓글 등록</button>
+                    </form>
+
+                    <ul className="comment-list">
+                        {commentList.map((comment, index) => (
+                            <li key={index} className="comment-item">• {comment}</li>
+                        ))}
+                    </ul>
                 </div>
               </div>
             </div>
