@@ -29,6 +29,7 @@ public class CommunityController {
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("category") String category,
+            @RequestPart("isNotice") String isNotice,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -36,6 +37,7 @@ public class CommunityController {
                 .category(CommunityCategory.valueOf(category))
                 .title(title)
                 .content(content)
+                .isNotice(isNotice)
                 .build();
 
         Member loginUser = userDetails.getMember();
@@ -44,20 +46,22 @@ public class CommunityController {
     }
 
     //게시글 수정
-    @PutMapping (value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> editPost(
             @PathVariable Long id,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("category") String category,
-            @RequestPart(value = "images", required = false)List<MultipartFile> imageFiles,
-            @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
+            @RequestPart("isNotice") String isNotice,
+            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
+            @RequestPart(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-            CommunityDto communityDto = CommunityDto.builder()
+        CommunityDto communityDto = CommunityDto.builder()
                 .category(CommunityCategory.valueOf(category))
                 .title(title)
                 .content(content)
+                .isNotice(isNotice)
                 .build();
 
         Member loginUser = userDetails.getMember();
@@ -66,11 +70,11 @@ public class CommunityController {
     }
 
     //게시글 삭제
-    @DeleteMapping ("/delete/{id}")
-        public ResponseEntity<String> deletePost(
-                @PathVariable Long id,
-                @AuthenticationPrincipal CustomUserDetails userDetails
-                ) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
 
         Member loginUser = userDetails.getMember();
         communityService.deletePost(id, loginUser);
@@ -81,7 +85,7 @@ public class CommunityController {
     @GetMapping("/view/{category}")
     public ResponseEntity<List<CommunityResponseDto>> getCategoryPost(
             @PathVariable CommunityCategory category
-            ) {
+    ) {
         List<CommunityResponseDto> posts = communityService.getCategoryPost(category);
         return ResponseEntity.ok(posts);
     }
@@ -91,15 +95,11 @@ public class CommunityController {
     public ResponseEntity<CommunityResponseDto> detailPost(
             @PathVariable CommunityCategory category,
             @PathVariable Long id
-    ){
+    ) {
 
-        CommunityResponseDto post = communityService.detailPost(category,id);
+        CommunityResponseDto post = communityService.detailPost(category, id);
         return ResponseEntity.ok(post);
     }
-
-
-
-
 
 
 }

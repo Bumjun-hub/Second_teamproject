@@ -5,10 +5,13 @@ import Section from './../../components/Section';
 
 const BoardWritePage = () => {
   const navigate = useNavigate();
-  const { id, category: urlCategory } = useParams(); // 수정 모드: 게시글 ID와 카테고리
+  const { id, category: urlCategory } = useParams();
   const isEdit = !!id;
 
   const [role, setRole] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]); // ✅ 미리보기용 URL
+
   const [formData, setFormData] = useState({
     title: '',
     writer: 'guest',
@@ -17,7 +20,6 @@ const BoardWritePage = () => {
     isNotice: false,
   });
 
-  // 🔄 기존 게시글 불러오기 (수정용)
   useEffect(() => {
     if (isEdit && urlCategory) {
       fetch(`/api/community/detail/${urlCategory}/${id}`)
@@ -28,7 +30,13 @@ const BoardWritePage = () => {
             writer: data.username,
             category: data.category,
             content: data.content,
+            isNotice: data.isNotice
           });
+
+          // 기존 이미지 경로도 미리보기로 추가
+          if (data.imgUrls && data.imgUrls.length > 0) {
+            setPreviewUrls(data.imgUrls);
+          }
         })
         .catch((err) => {
           console.error("수정용 게시글 불러오기 실패", err);
@@ -41,6 +49,14 @@ const BoardWritePage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setImageFiles(files); // 서버 업로드용
+
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls); // 본문 아래 미리보기
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -48,6 +64,10 @@ const BoardWritePage = () => {
     data.append('content', formData.content);
     data.append('category', formData.category);
     data.append('isNotice', formData.isNotice ? "1" : "0");
+
+    imageFiles.forEach((file) => {
+      data.append("images", file);
+    });
 
     const url = isEdit
       ? `/api/community/edit/${id}`
@@ -79,9 +99,16 @@ const BoardWritePage = () => {
     navigate('/board');
   };
 
+  // 🔁 이미지 삭제 함수 추가
+  const handleImageRemove = (index) => {
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+
   const fetchRole = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/roleinfo", {
+      const res = await fetch("/api/roleinfo", {
         credentials: "include",
       });
       const text = await res.text();
@@ -135,20 +162,52 @@ const BoardWritePage = () => {
               placeholder="내용을 입력해주세요"
               required
             />
-            <div className="form-bottom">
-              {role === "ROLE_ADMIN" && (
-                <label>
-                  <input type="checkbox" className="checkbox" checked={formData.isNotice} onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, isNotice: e.target.checked }))
-                  } />
-                  공지글 등록
-                </label>
-              )}
 
-              <div className='button-area'>
+            {/* ✅ 이미지 미리보기 영역 */}
+            {previewUrls.length > 0 && (
+              <div className="image-preview-area">
+                {previewUrls.map((url, idx) => (
+                  <div key={idx} className="image-preview-wrapper">
+                    <img src={url} alt={`첨부 이미지 ${idx + 1}`} />
+                    <button type="button" className="remove-image-btn" onClick={() => handleImageRemove(idx)}>
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+            )}
+
+            <div className="form-bottom">
+              <div className="button-area">
+                <label className="upload-button">
+                  첨부 이미지
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+
                 <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
                 <button type="submit" className="submit-button">{isEdit ? "수정" : "등록"}</button>
               </div>
+
+              {role === "ROLE_ADMIN" && (
+                <label>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={formData.isNotice}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, isNotice: e.target.checked }))
+                    }
+                  />
+                  공지글 등록
+                </label>
+              )}
             </div>
           </form>
         </div>
