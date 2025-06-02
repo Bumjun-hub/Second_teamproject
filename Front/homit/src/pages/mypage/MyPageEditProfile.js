@@ -3,16 +3,18 @@ import './MyPageEditProfile.css';
 
 const MyPageEditProfile = () => {
   const [profile, setProfile] = useState({
-    name: '', email: '', phone: '', address: ''
+    name: '', email: '', phone: '', address: '', imageUrl: ''
   });
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
+  const [availableImages, setAvailableImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchProfile();
+    fetchAvailableImages();
   }, []);
 
   const fetchProfile = async () => {
@@ -21,9 +23,7 @@ const MyPageEditProfile = () => {
       const response = await fetch('/api/mypage', {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
       
       if (response.ok) {
@@ -32,7 +32,8 @@ const MyPageEditProfile = () => {
           name: data.username || data.name,
           email: data.email,
           phone: data.phone,
-          address: data.address
+          address: data.address,
+          imageUrl: data.imageUrl || '/static/profileimages/default.jpg'
         });
       } else {
         setError(`서버 오류: ${response.status}`);
@@ -41,6 +42,23 @@ const MyPageEditProfile = () => {
       setError('네트워크 오류가 발생했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAvailableImages = async () => {
+    try {
+      const response = await fetch('/api/profile/getimages', {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const images = await response.json();
+        setAvailableImages(images);
+      }
+    } catch (err) {
+      console.error('이미지 목록 로드 실패:', err);
     }
   };
 
@@ -61,120 +79,73 @@ const MyPageEditProfile = () => {
     setEditData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleImageSelect = (imageUrl) => {
+    setEditData(prev => ({ ...prev, imageUrl }));
+  };
+
   const updateProfile = async () => {
     try {
       setLoading(true);
       
-      // 변경된 필드만 찾기
-      const changedFields = {};
-      let hasChanges = false;
-      
-      Object.keys(editData).forEach(key => {
-        if (editData[key] !== profile[key]) {
-          changedFields[key] = editData[key];
-          hasChanges = true;
-        }
+      // 1. 프로필 정보 업데이트
+      const profileResponse = await fetch('/api/mypage/editProfile', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editData.name,
+          email: editData.email,
+          phone: editData.phone,
+          address: editData.address
+        })
       });
-      
-      console.log('현재 프로필:', profile);
-      console.log('편집 데이터:', editData);
-      console.log('변경된 필드만:', changedFields);
-      
-      // 변경사항이 없으면 바로 완료
-      if (!hasChanges) {
-        setSuccess('변경사항이 없습니다.');
-        setEditMode(false);
-        setEditData({});
-        return;
+
+      if (!profileResponse.ok) {
+        throw new Error('프로필 업데이트 실패');
       }
-      
-      // 이름이 변경되지 않았다면 기존 이름 제외하고 전송
-      const sendData = { ...editData };
-      if (editData.name === profile.name) {
-        // 이름이 같으면 이름 필드 제외
-        const { name, ...dataWithoutName } = sendData;
-        console.log('이름 제외하고 전송:', dataWithoutName);
-        
-        const response = await fetch('/api/mypage/editProfile', {
-          method: 'PUT',
+
+      // 2. 프로필 이미지 업데이트 (변경된 경우에만)
+      if (editData.imageUrl && editData.imageUrl !== profile.imageUrl) {
+        const imageName = editData.imageUrl.substring(editData.imageUrl.lastIndexOf('/') + 1);
+        const imageResponse = await fetch('/api/profile/upload', {
+          method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(dataWithoutName)
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            profile_imageName: imageName
+          })
         });
-        
-        await handleResponse(response);
-      } else {
-        // 이름이 변경되었으면 전체 데이터 전송
-        console.log('전체 데이터 전송:', sendData);
-        
-        const response = await fetch('/api/mypage/editProfile', {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(sendData)
-        });
-        
-        await handleResponse(response);
+
+        if (!imageResponse.ok) {
+          throw new Error('프로필 이미지 업데이트 실패');
+        }
       }
-      
+
+      // 3. 성공 처리
+      const data = await profileResponse.json();
+      setProfile({
+        name: data.username || data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        imageUrl: editData.imageUrl || profile.imageUrl
+      });
+      setSuccess('프로필이 성공적으로 업데이트되었습니다.');
+      setEditMode(false);
+      setEditData({});
+
     } catch (err) {
-      console.error('에러:', err);
-      setError('네트워크 오류가 발생했습니다.');
+      setError(err.message || '업데이트 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResponse = async (response) => {
-    console.log('응답 상태:', response.status);
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('응답 데이터:', data);
-      
-      setProfile({
-        name: data.username || data.name,
-        email: data.email,
-        phone: data.phone,
-        address: data.address
-      });
-      setSuccess(data.message || '프로필이 성공적으로 업데이트되었습니다.');
-      setEditMode(false);
-      setEditData({});
-    } else {
-      const responseText = await response.text();
-      console.log('에러 응답:', responseText);
-      
-      if (response.status === 401) {
-        setError('인증 오류: 로그인을 다시 해주세요.');
-      } else {
-        try {
-          const errorData = JSON.parse(responseText);
-          setError(errorData.error || errorData.message || '프로필 업데이트 실패');
-        } catch (e) {
-          setError('서버 오류가 발생했습니다.');
-        }
-      }
-    }
-  };
-
-  if (loading && !editMode) {
-    return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="mypage-container">
       <div className="mypage-card">
         <div className="mypage-header">
-          <h1>마이페이지</h1>
+          <h1>프로필 편집</h1>
           {!editMode && (
             <button onClick={startEdit} className="edit-button">편집</button>
           )}
@@ -184,6 +155,38 @@ const MyPageEditProfile = () => {
         {success && <div className="alert success">{success}</div>}
 
         <div className="profile-content">
+          {/* 프로필 이미지 섹션 */}
+          <div className="field-group">
+            <label>프로필 이미지</label>
+            <div className="profile-image-section">
+              <div className="current-image">
+                <img 
+                  src={editMode ? (editData.imageUrl || profile.imageUrl) : profile.imageUrl} 
+                  alt="프로필 이미지" 
+                  className="profile-image-preview"
+                />
+              </div>
+              
+              {editMode && (
+                <div className="image-selection">
+                  <p className="selection-label">이미지 선택:</p>
+                  <div className="image-grid">
+                    {availableImages.map((imageUrl, index) => (
+                      <div 
+                        key={index}
+                        className={`image-option ${editData.imageUrl === imageUrl ? 'selected' : ''}`}
+                        onClick={() => handleImageSelect(imageUrl)}
+                      >
+                        <img src={imageUrl} alt={`프로필 옵션 ${index + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 기존 필드들 */}
           <div className="field-group">
             <label>사용자명</label>
             {editMode ? (
