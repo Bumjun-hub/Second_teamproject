@@ -46,6 +46,9 @@ public class GroupBuy extends BaseEntity {
     @Column(nullable = false)
     private Long salePrice;
 
+    @Column(nullable = false)//빼야함
+    private Long price;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private GroupBuyStatus status;

@@ -2,6 +2,7 @@ package org.project.second.groupBuy.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.common.image.ImageService;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.domain.GroupBuyImage;
@@ -40,9 +41,12 @@ public class GroupBuyService {
                 .description(groupBuyDto.getDescription())
                 .maxQuantity(groupBuyDto.getMaxQuantity())
                 .originalPrice(groupBuyDto.getOriginalPrice())
+                .price(0L)  //빼야함
+                .currentQuantity(0)
                 .salePrice(groupBuyDto.getSalePrice())
                 .deadline(groupBuyDto.getDeadline())
                 .status(groupBuyDto.getStatus())
+                .member(loginUser)
                 .build();
         groupBuyRepository.save(groupBuy);
 
@@ -54,6 +58,7 @@ public class GroupBuyService {
                     GroupBuyImage image = GroupBuyImage.builder()
                             .imgUrl(imageUrl)
                             .groupBuy(groupBuy)
+                            .isDeleted(false)
                             .build();
                     groupBuyImageRepository.save(image);
                 }
@@ -175,13 +180,36 @@ public class GroupBuyService {
         );
     }
 
-
-
-
-
-
-
-
+    //상태별 조회(status)
+    public List<GroupBuyResponseDto> statusView(GroupBuyStatus status) {
+        List<GroupBuy> posts = groupBuyRepository.findByStatus(status);
+        return posts.stream()
+                .map(post -> {
+                    //이미지
+                    List<String> imageUrls = post.getGroupBuyImages().stream()
+                            .filter(img -> !img.getIsDeleted())
+                            .map(GroupBuyImage::getImgUrl)
+                            .collect(Collectors.toList());
+                    //글
+                    return new GroupBuyResponseDto(
+                            post.getId(),
+                            post.getStatus(),
+                            post.getTitle(),
+                            post.getMember().getUsername(),
+                            post.getDescription(),
+                            post.getContent(),
+                            post.getMaxQuantity(),
+                            post.getCurrentQuantity(),
+                            post.getOriginalPrice(),
+                            post.getSalePrice(),
+                            post.getDeadline(),
+                            imageUrls,
+                            post.getCreatedAt(),
+                            post.getUpdatedAt()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 
 
 

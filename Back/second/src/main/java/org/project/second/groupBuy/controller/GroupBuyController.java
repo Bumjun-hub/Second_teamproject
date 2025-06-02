@@ -15,29 +15,34 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/groupBy")
+@RequestMapping("/api/groupBuy")
 public class GroupBuyController {
 
     private final GroupBuyService groupBuyService;
 
     //작성
-    @PostMapping(value = "admin/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "admin/write")
     public ResponseEntity<String> createPost(
             @RequestPart("status") String status,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("description") String description,
-            @RequestPart("maxQuantity") Integer maxQuantity,
-            @RequestPart("originalPrice") Long originalPrice,
-            @RequestPart("salePrice") Long salePrice,
-            @RequestPart("deadline")LocalDateTime deadline,
+            @RequestPart("maxQuantity") String maxQuantityStr,
+            @RequestPart("originalPrice") String originalPriceStr,
+            @RequestPart("salePrice") String salePriceStr,
+            @RequestPart("deadline")String deadlineStr,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // 파싱 처리 (Postman 테스트용)  Str 빼기
+        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
+        Integer maxQuantity = Integer.parseInt(maxQuantityStr);
+        Long originalPrice = Long.parseLong(originalPriceStr);
+        Long salePrice = Long.parseLong(salePriceStr);
 
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))
@@ -63,13 +68,19 @@ public class GroupBuyController {
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("description") String description,
-            @RequestPart("maxQuantity") Integer maxQuantity,
-            @RequestPart("originalPrice") Long originalPrice,
-            @RequestPart("salePrice") Long salePrice,
-            @RequestPart("deadline")LocalDateTime deadline,
+            @RequestPart("maxQuantity") String maxQuantityStr,
+            @RequestPart("originalPrice") String originalPriceStr,
+            @RequestPart("salePrice") String salePriceStr,
+            @RequestPart("deadline")String deadlineStr,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // 파싱 처리 (Postman 테스트용)  Str 빼기
+        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
+        Integer maxQuantity = Integer.parseInt(maxQuantityStr);
+        Long originalPrice = Long.parseLong(originalPriceStr);
+        Long salePrice = Long.parseLong(salePriceStr);
 
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))
@@ -113,8 +124,14 @@ public class GroupBuyController {
         return ResponseEntity.ok(post);
     }
 
-    //상태별조회(필요하면쓰고아니면 ㄴㄴ)
-   // @GetMapping("/status/{status}")
+    //상태별조회(필요하면쓰고)
+    @GetMapping("/view/{status}")
+    public ResponseEntity<List<GroupBuyResponseDto>> statusView(
+            @PathVariable GroupBuyStatus status
+    ){
+        List<GroupBuyResponseDto> post = groupBuyService.statusView(status);
+        return ResponseEntity.ok(post);
+    }
 
 
 }
