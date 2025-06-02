@@ -10,8 +10,7 @@ const BoardWritePage = () => {
 
   const [role, setRole] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
-  const [previewUrls, setPreviewUrls] = useState([]); // ✅ 미리보기용 URL
-
+  const [previewUrls, setPreviewUrls] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     writer: 'guest',
@@ -30,10 +29,9 @@ const BoardWritePage = () => {
             writer: data.username,
             category: data.category,
             content: data.content,
-            isNotice: data.isNotice
+            isNotice: data.isNotice,
           });
 
-          // 기존 이미지 경로도 미리보기로 추가
           if (data.imgUrls && data.imgUrls.length > 0) {
             setPreviewUrls(data.imgUrls);
           }
@@ -51,10 +49,14 @@ const BoardWritePage = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImageFiles(files); // 서버 업로드용
-
+    setImageFiles((prev) => [...prev, ...files]);
     const urls = files.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls); // 본문 아래 미리보기
+    setPreviewUrls((prev) => [...prev, ...urls]);
+  };
+
+  const handleImageRemove = (index) => {
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -98,13 +100,6 @@ const BoardWritePage = () => {
   const handleCancel = () => {
     navigate('/board');
   };
-
-  // 🔁 이미지 삭제 함수 추가
-  const handleImageRemove = (index) => {
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
 
   const fetchRole = async () => {
     try {
@@ -163,19 +158,21 @@ const BoardWritePage = () => {
               required
             />
 
-            {/* ✅ 이미지 미리보기 영역 */}
             {previewUrls.length > 0 && (
               <div className="image-preview-area">
                 {previewUrls.map((url, idx) => (
                   <div key={idx} className="image-preview-wrapper">
                     <img src={url} alt={`첨부 이미지 ${idx + 1}`} />
-                    <button type="button" className="remove-image-btn" onClick={() => handleImageRemove(idx)}>
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => handleImageRemove(idx)}
+                    >
                       ×
                     </button>
                   </div>
                 ))}
               </div>
-
             )}
 
             <div className="form-bottom">
@@ -191,8 +188,12 @@ const BoardWritePage = () => {
                   />
                 </label>
 
-                <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
-                <button type="submit" className="submit-button">{isEdit ? "수정" : "등록"}</button>
+                <button type="button" className="cancel-button" onClick={handleCancel}>
+                  취소
+                </button>
+                <button type="submit" className="submit-button">
+                  {isEdit ? "수정" : "등록"}
+                </button>
               </div>
 
               {role === "ROLE_ADMIN" && (
@@ -202,7 +203,10 @@ const BoardWritePage = () => {
                     className="checkbox"
                     checked={formData.isNotice}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, isNotice: e.target.checked }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        isNotice: e.target.checked,
+                      }))
                     }
                   />
                   공지글 등록
