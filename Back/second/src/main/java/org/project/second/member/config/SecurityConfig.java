@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/signup", "/api/login").permitAll()
                         .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**").permitAll()
-                        .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**", "/api/likes/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
