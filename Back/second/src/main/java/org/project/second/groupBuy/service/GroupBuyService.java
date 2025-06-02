@@ -152,6 +152,7 @@ public class GroupBuyService {
                             post.getSalePrice(),
                             post.getDeadline(),
                             imageUrls,
+                            (long) post.getLikes().size(),
                             post.getCreatedAt(),
                             post.getUpdatedAt()
                     );
@@ -185,6 +186,7 @@ public class GroupBuyService {
                 post.getSalePrice(),
                 post.getDeadline(),
                 imageUrls,
+                (long) post.getLikes().size(),
                 post.getCreatedAt(),
                 post.getUpdatedAt()
         );
@@ -217,6 +219,7 @@ public class GroupBuyService {
                             post.getSalePrice(),
                             post.getDeadline(),
                             imageUrls,
+                            (long) post.getLikes().size(),
                             post.getCreatedAt(),
                             post.getUpdatedAt()
                     );
@@ -258,7 +261,5 @@ public class GroupBuyService {
         return groupBuyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
     }
-
-
-
+    
 }

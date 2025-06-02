@@ -27,6 +27,7 @@ public class GroupBuyResponseDto {
     private Long salePrice;
     private LocalDateTime deadline;
     private List<String> imgUrls;
+    private Long likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

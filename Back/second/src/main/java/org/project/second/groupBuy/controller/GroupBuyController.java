@@ -40,14 +40,6 @@ public class GroupBuyController {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        /*// 파싱 처리 (Postman 테스트용)  Str 빼기
-        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
-            Integer maxParticipants = Integer.parseInt(maxParticipantsStr);
-    Integer minParticipants = Integer.parseInt(minParticipantsStr);
-        Integer maxQuantity = Integer.parseInt(maxQuantityStr);
-        Long originalPrice = Long.parseLong(originalPriceStr);
-        Long salePrice = Long.parseLong(salePriceStr);*/
-
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))
                 .title(title)
@@ -83,14 +75,6 @@ public class GroupBuyController {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        // 파싱 처리 (Postman 테스트용)  Str 빼기
-        /*LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
-        Integer maxParticipants = Integer.parseInt(maxParticipantsStr);
-        Integer minParticipants = Integer.parseInt(minParticipantsStr);
-        Integer maxQuantity = Integer.parseInt(maxQuantityStr);
-        Long originalPrice = Long.parseLong(originalPriceStr);
-        Long salePrice = Long.parseLong(salePriceStr);*/
 
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))

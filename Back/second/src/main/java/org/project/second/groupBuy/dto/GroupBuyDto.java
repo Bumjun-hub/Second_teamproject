@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class GroupBuyDto {
 
-    private GroupBuyStatus status;          //상태 open
+    private GroupBuyStatus status;
     private String title;
     private String description;
     private String content;
