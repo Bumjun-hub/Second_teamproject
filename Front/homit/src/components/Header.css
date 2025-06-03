@@ -1,29 +1,71 @@
 .Header {
     width: 100%;
-    height: 80px;
-    background-color: #2668A7;
+    height: 90px;
+    background: linear-gradient(135deg, #2668A7 0%, #4a90e2 50%, #667eea 100%);
     display: flex;
-    justify-content: space-between;  /* 좌우 정렬 */
-    align-items: center;              /* 수직 중앙 정렬 */
-    padding: 0 40px;                  /* 좌우 여백 */
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
     box-sizing: border-box;
+    position: relative;
+    overflow: flex;
 }
 
+.Header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0v46.29c47.79 22.2 103.59 32.17 158 28 70.36-5.37 136.33-33.31 206.8-37.5C438.64 32.43 512.34 53.67 583 72.05c69.27 18 138.3 24.88 209.4 13.08 36.15-6 69.85-17.84 104.45-29.34C989.49 25 1113-14.29 1200 52.47V0z' fill='%23ffffff' fill-opacity='0.08'/%3E%3C/svg%3E") repeat-x;
+    animation: wave 15s linear infinite;
+    pointer-events: none;
+}
+
+/* 두 번째 웨이브 레이어 */
+.Header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M985.66 92.83C906.67 72 823.78 31 743.84 14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84 11.73-114 31.07-172 41.86A600.21 600.21 0 0 1 0 27.35V120h1200V95.8c-85.28-2.25-170.28-18.42-214.34-2.97z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E") repeat-x;
+    animation: wave 20s linear infinite reverse;
+    pointer-events: none;
+}
+
+@keyframes wave {
+    0% { 
+        background-position-x: 0; 
+    }
+    100% { 
+        background-position-x: 1200px; 
+    }
+}
+
+
 .header-left {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 2;
+    justify-self: start;
 }
 
 .header-left a {
     color: white;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-
-
 .header-right a, 
-.header-right button {
+.header-right button,
+.header-center a, 
+.header-center button {
     color: white;
     text-decoration: none;
     margin-left: 30px;
@@ -35,9 +77,74 @@
 }
 
 .header-right a:hover,
-.header-right button:hover {
+.header-right button:hover,
+.header-center a:hover,
+.header-center button:hover {
     opacity: 0.8;
     text-decoration: none;
+}
+
+
+.header-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    z-index: 1;
+}
+
+.header-center a,
+.header-center button {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 12px 0;
+    position: relative;
+    transition: all 0.3s ease;
+    margin-left: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* 그라디언트 언더라인 애니메이션 */
+.header-center a::after,
+.header-center button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #87CEEB, #ffffff, #87CEEB);
+    transition: width 0.4s ease;
+    border-radius: 2px;
+}
+
+.header-center a:hover::after,
+.header-center button:hover::after {
+    width: 100%;
+}
+
+.header-center a:hover,
+.header-center button:hover {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+/* 활성 상태 (현재 페이지) */
+.header-center a.active::after {
+    width: 100%;
+    background: linear-gradient(90deg, #ffffff, #87CEEB, #ffffff);
+}
+
+.header-center a.active {
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
 }
 
 .notification-container {

@@ -44,7 +44,7 @@ public class CommunityService {
                 .isNotice(communityDto.isNoticeBoolean())  // ✅ 공지글 반영
                 .isDeleted(false)
                 .build();
-
+        
         communityRepository.save(community);
 
 
