@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddressInput from './AddressInput'; // 새로 만든 컴포넌트 import
 import './MemberPage.css';
 
 const MemberPage = () => {
@@ -28,8 +29,28 @@ const MemberPage = () => {
         }
     };
 
-    const handleAgreementChange = (e)=> {
+    const handleAgreementChange = (e) => {
         setAgreed(e.target.checked);
+        if (error) {
+            setError('');
+        }
+    };
+    // 주소 변경 핸들러
+    const handleAddressChange = (address) => {
+        setFormData(prev => ({
+            ...prev,
+            address: address
+        }));
+        if (error) {
+            setError('');
+        }
+    };
+    // 상세주소 변경 핸들러
+    const handleDetailAddressChange = (detailAddress) => {
+        setFormData(prev => ({
+            ...prev,
+            detailAddress: detailAddress
+        }));
         if (error) {
             setError('');
         }
@@ -66,10 +87,11 @@ const MemberPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if(!validateForm()) {
+        if (!validateForm()) {
             return;
         }
         setError('');
+        setLoading(true);
 
         try {
             const response = await fetch('http://localhost:8080/api/signup', {
@@ -90,13 +112,10 @@ const MemberPage = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // 회원가입 성공
                 console.log('회원가입 성공:', data);
                 alert('회원가입이 완료되었습니다!');
-                // 로그인 페이지로 이동
                 navigate('/login');
             } else {
-                // 회원가입 실패
                 setError(data.message || '회원가입에 실패했습니다.');
             }
         } catch (error) {
@@ -109,34 +128,6 @@ const MemberPage = () => {
 
     const handleLoginClick = () => {
         navigate('/login');
-    };
-
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-        script.async = true;
-        document.head.appendChild(script);
-
-        return () => {
-            if (document.head.contains(script)) {
-                document.head.removeChild(script);
-            }
-        };
-    }, []);
-
-    // 주소 검색
-    const findAddress = () => {
-        new window.daum.Postcode({
-            oncomplete: function(data) {
-                let selectedAddr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
-                
-                // formData 업데이트
-                setFormData(prev => ({
-                    ...prev,
-                    address: selectedAddr
-                }));
-            }
-        }).open();
     };
 
     return (
@@ -207,41 +198,15 @@ const MemberPage = () => {
                         />
                     </div>
 
-                    <div className="input-group">
-                        <label htmlFor="address" className="input-label">주소 (선택)</label>
-                        
-                        {/* 기본 주소 검색 */}
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                            <input
-                                type="text"
-                                id="address"
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                placeholder="주소를 입력해주세요"
-                                className="input-field"
-                                readOnly
-                            />
-                            <button
-                                type="button"
-                                onClick={findAddress}
-                                className="address-search-btn"
-                            >
-                                주소 검색
-                            </button>
-                        </div>
-                        
-                        {/* 상세주소 입력 */}
-                        <input
-                            type="text"
-                            id="detailAddress"
-                            name="detailAddress"
-                            value={formData.detailAddress}
-                            onChange={handleChange}
-                            placeholder="상세주소를 입력해주세요 (아파트명, 동/호수 등)"
-                            className="input-field"
-                        />
-                    </div>
+                    {/* 기존의 주소 입력 부분을 AddressInput 컴포넌트로 교체 */}
+                    <AddressInput
+                        address={formData.address}
+                        detailAddress={formData.detailAddress}
+                        onAddressChange={handleAddressChange}
+                        onDetailAddressChange={handleDetailAddressChange}
+                        label="주소 (선택)"
+                        className="input-group"
+                    />
 
                     <div className="input-group">
                         <label htmlFor="phone" className="input-label">전화번호 (선택)</label>
@@ -281,7 +246,7 @@ const MemberPage = () => {
                         className={'signup-button'}
                         disabled={loading}
                     >
-                        {'회원가입'}
+                        {loading ? '가입 중...' : '회원가입'}
                     </button>
                 </form>
 
@@ -299,6 +264,5 @@ const MemberPage = () => {
         </div>
     );
 };
-
 
 export default MemberPage;

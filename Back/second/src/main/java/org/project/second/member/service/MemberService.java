@@ -36,8 +36,9 @@ public class MemberService {
     private String profileImagesDir;
 
     private static final List<String> ALLOWED_IMAGES = Arrays.asList(
-            "profile1.jpg", "profile2.jpg", "profile3.jpg", "profile4.jpg", "profile5.jpg",
-            "profile6.jpg", "profile7.jpg", "profile8.jpg", "profile9.jpg", "profile10.jpg"
+            "profile1.png", "profile2.png", "profile3.png", "profile4.png", "profile5.png",
+            "profile6.png", "profile7.png", "profile8.png", "profile9.png", "profile10.png",
+            "profile11.png", "profile12.png"
     );
 
     public SignupResponse insert(@Valid SignupRequest signupRequest) {
@@ -116,7 +117,8 @@ public class MemberService {
         Optional<Member> OpUser = memberRepository.findByEmail(member.getEmail());
         if (OpUser.isPresent()) {
             Member m = OpUser.get();
-            if (memberRepository.existsByUsername(editProfileRequest.getName())) {
+            if (!editProfileRequest.getName().equals(m.getUsername())
+                    && memberRepository.existsByUsername(editProfileRequest.getName())) {
                 throw new IllegalArgumentException("이미 존재하는 유저네임 입니다.");
             }
 
@@ -127,6 +129,7 @@ public class MemberService {
                     .username(editProfileRequest.getName())
                     .address(editProfileRequest.getAddress())
                     .phone(editProfileRequest.getPhone())
+                    .imageUrl(m.getImageUrl())
                     .role(m.getRole())
                     .build();
 
@@ -136,12 +139,12 @@ public class MemberService {
     }
 
     public List<String> getProfileImages() throws IOException {
-        // 패턴을 이용해 클래스패스(classpath)에 있는 리소스들(파일 등)을 찾는 데 사용 : classpath:/static/images/*.jpg
+        // 패턴을 이용해 클래스패스(classpath)에 있는 리소스들(파일 등)을 찾는 데 사용 : classpath:/static/images/*.png
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         //Resource는 스프링에서 지원하는 추상화된 파일 객체
-        Resource[] resources = resolver.getResources("classpath:" + profileImagesDir + "/*.jpg");
+        Resource[] resources = resolver.getResources("classpath:" + profileImagesDir.trim() + "/*.png");
         return Arrays.stream(resources)
-                .map(resource -> "/static/profileimages/" + resource.getFilename())
+                .map(resource -> "/profileimages/" + resource.getFilename())
                 .filter(path -> ALLOWED_IMAGES.contains(path.substring(path.lastIndexOf("/") + 1)))
                 .collect(Collectors.toList());
     }
@@ -154,7 +157,7 @@ public class MemberService {
         Member m = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
 
-        m.setImageUrl(profileImagesDir + "/" + profileImageName);
+        m.setImageUrl("/profileimages/" + profileImageName);
         memberRepository.save(m);
     }
 
