@@ -21,7 +21,14 @@ public class GroupBuyParticipationService {
         if (member == null) {
             throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
         }
+        // 사람이 중복되면 안돼!
+        if ()
+
     }
+
+
+
+
 
 
 }

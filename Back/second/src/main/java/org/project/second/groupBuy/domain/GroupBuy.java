@@ -44,10 +44,10 @@ public class GroupBuy extends BaseEntity {
     private Integer currentParticipants = 0;  //현재참여자
 
     @Column(name = "max_quantity", nullable = false)
-    private Integer maxQuantity;  //최대주문수량
+    private Integer maxQuantity;  //인당 최대주문수량
 
     @Column(name = "current_quantity", nullable = false)
-    private Integer currentQuantity = 0;   //현재주문갯수
+    private Integer currentQuantity = 0;   //현재주문 누적(관리자용)
 
     @Column(nullable = false)
     private Long originalPrice;  //원래가격
