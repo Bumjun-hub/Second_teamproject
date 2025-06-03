@@ -89,18 +89,22 @@
 
 /* 추천 버튼 */
 .like-button {
-  background-color: #ff5c5c;
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background-color: #ff6b6b;
   border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: white;
   font-size: 14px;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .like-button:hover {
-  background-color: #ff2e2e;
+  transform: scale(1.05);
 }
 
 /* 본문 */
@@ -218,3 +222,4 @@
   line-height: 22px;
   text-align: center;
 }
+

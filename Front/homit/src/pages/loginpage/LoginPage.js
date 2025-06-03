@@ -68,11 +68,6 @@ const LoginPage = () => {
 
             if (response.ok) {
                 console.log('로그인 성공:', data);
-                
-                // 쿠키 설정 확인
-                setTimeout(() => {
-                    console.log('로그인 후 쿠키:', document.cookie);
-                }, 100);
 
                 // 인증 상태 변경 이벤트 발생
                 window.dispatchEvent(new Event('authChange'));

@@ -10,11 +10,14 @@ const BoardWritePage = () => {
 
   const [role, setRole] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
-  const [previewUrls, setPreviewUrls] = useState([]); // ✅ 미리보기용 URL
+  const [previewUrls, setPreviewUrls] = useState([]); // 전체 미리보기 이미지
+  const [originalImageUrls, setOriginalImageUrls] = useState([]); // 기존 이미지만 따로 저장
+  const [removedImages, setRemovedImages] = useState([]); // 삭제 대상 이미지
 
+  // 사용자가 입력한 글 제목, 작성자, 카테고리, 내용 , 공지 여부 결정
   const [formData, setFormData] = useState({
     title: '',
-    writer: 'guest',
+    writer: '',
     category: 'FREE',
     content: '',
     isNotice: false,
@@ -33,8 +36,8 @@ const BoardWritePage = () => {
             isNotice: data.isNotice
           });
 
-          // 기존 이미지 경로도 미리보기로 추가
           if (data.imgUrls && data.imgUrls.length > 0) {
+            setOriginalImageUrls(data.imgUrls);
             setPreviewUrls(data.imgUrls);
           }
         })
@@ -43,6 +46,33 @@ const BoardWritePage = () => {
         });
     }
   }, [isEdit, id, urlCategory]);
+
+  useEffect(() => {
+    fetchRole();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch("/api/mypage", {
+          credentials: "include",
+        });
+        const data = await res.json();
+
+        if (!isEdit) {
+          setFormData((prev) => ({
+            ...prev,
+            writer: data.name, // 🔥 username을 writer에 세팅
+          }));
+        }
+      } catch (e) {
+        console.error("사용자 정보 불러오기 실패:", e);
+      }
+    };
+
+    fetchUserInfo();
+  }, [isEdit]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,7 +84,18 @@ const BoardWritePage = () => {
     setImageFiles(files); // 서버 업로드용
 
     const urls = files.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls); // 본문 아래 미리보기
+    setPreviewUrls((prev) => [...prev, ...urls]);
+  };
+
+  const handleImageRemove = (index) => {
+    const removedUrl = previewUrls[index];
+
+    if (originalImageUrls.includes(removedUrl)) {
+      setRemovedImages((prev) => [...prev, removedUrl]);
+    }
+
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -68,6 +109,10 @@ const BoardWritePage = () => {
     imageFiles.forEach((file) => {
       data.append("images", file);
     });
+
+    if (isEdit) {
+      data.append("removedImages", JSON.stringify(removedImages));
+    }
 
     const url = isEdit
       ? `/api/community/edit/${id}`
@@ -99,13 +144,6 @@ const BoardWritePage = () => {
     navigate('/board');
   };
 
-  // 🔁 이미지 삭제 함수 추가
-  const handleImageRemove = (index) => {
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-
   const fetchRole = async () => {
     try {
       const res = await fetch("/api/roleinfo", {
@@ -118,9 +156,7 @@ const BoardWritePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRole();
-  }, []);
+
 
   return (
     <Section>
@@ -163,7 +199,6 @@ const BoardWritePage = () => {
               required
             />
 
-            {/* ✅ 이미지 미리보기 영역 */}
             {previewUrls.length > 0 && (
               <div className="image-preview-area">
                 {previewUrls.map((url, idx) => (
@@ -175,7 +210,6 @@ const BoardWritePage = () => {
                   </div>
                 ))}
               </div>
-
             )}
 
             <div className="form-bottom">
