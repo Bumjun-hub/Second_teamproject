@@ -2,13 +2,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './BoardInfoPage.css';
 import Section from "../../components/Section";
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 
 const BoardInfoPage = () => {
   const { category, id } = useParams();
   const [item, setItem] = useState(null);
   const [commentList, setCommentList] = useState([]);
   const [commentInput, setCommentInput] = useState('');
+
   const [likes, setLikes] = useState(0);
+  const [isLiked, setIsLiked] = useState(false); // 하트 토글용
+
   const [currentUser, setCurrentUser] = useState("");
 
   const navigate = useNavigate();
@@ -28,7 +32,9 @@ const BoardInfoPage = () => {
         const json = await res.json();
         setItem(json);
         setLikes(json.likes);
+        setIsLiked(json.liked);
       } catch (err) {
+
         console.error("게시글 상세 불러오기 실패", err);
       }
     };
@@ -36,9 +42,25 @@ const BoardInfoPage = () => {
     fetchItem();
   }, [category, id]);
 
-  const handleLikeClick = () => {
-    setLikes(prev => prev + 1);
-    // 서버 PATCH 요청 추가 예정
+  // 추천 버튼 클릭시
+  const handleLikeClick = async () => {
+    try {
+      const res = await fetch(`/api/likes/COMMUNITY/${item.id}`, {
+        method: "POST",
+        credentials: "include"
+      });
+
+      if (res.ok) {
+        setIsLiked(prev => !prev); // 하트 토글
+        setLikes(prev => isLiked ? prev - 1 : prev + 1); // 추천 수 증가
+
+      } else {
+        alert("추천 실패");
+      }
+    } catch (err) {
+      console.error("추천 요청 오류:", err);
+      alert("서버오류");
+    }
   };
 
   const handleEdit = () => {
@@ -108,7 +130,10 @@ const BoardInfoPage = () => {
                   <span><strong>추천</strong> {likes}</span>
                 </div>
                 <div className="like-area">
-                  <button onClick={handleLikeClick} className="like-button">♡ 추천</button>
+                  <button onClick={handleLikeClick} className="like-button">{isLiked
+                    ? <AiFillHeart size={17} color="red" />
+                    : <AiOutlineHeart size={17} color="white" />}
+                    <span style={{ marginLeft: "6px", color: "#fff" }}>추천</span></button>
                 </div>
               </div>
             </div>
