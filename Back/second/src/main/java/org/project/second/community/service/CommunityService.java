@@ -68,7 +68,7 @@ public class CommunityService {
 
     @Transactional
     public void editPost(Long id, CommunityDto communityDto, Member loginUser,
-                         List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
+                         List<MultipartFile> imageFiles, List<String> deleteImageUrls) {
         Community post = validatePost(id);
         validateMember(loginUser, post.getMember());
         validateMember(communityDto);
@@ -78,16 +78,16 @@ public class CommunityService {
         post.setContent(communityDto.getContent());
 
         // 기존 id값 기준으로 특정 이미지 삭제 / 이미지url을 담아와서 삭제로 넘기기
-        if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
+        if (deleteImageUrls != null && !deleteImageUrls.isEmpty()) {
             List<CommunityImage> deleteImages = new ArrayList<>();
             for (CommunityImage image : post.getCommunityImages()){
-                if (deleteImageIds.contains(image.getId())){
-                    imageService.deleteImage(image.getImgUrl());
-                    deleteImages.add(image);
+                if (deleteImageUrls.contains(image.getImgUrl())) {
+                    imageService.deleteImage(image.getImgUrl()); // 실제 파일 삭제
+                    image.setIsDeleted(true);                    // DB에서 논리 삭제
                 }
             }
-            post.getCommunityImages().removeAll(deleteImages);
-            communityImageRepository.deleteAll(deleteImages);
+//            post.getCommunityImages().removeAll(deleteImages);
+//            communityImageRepository.deleteAll(deleteImages);
         }
         //생성한다면
         if (imageFiles != null && !imageFiles.isEmpty()) {
