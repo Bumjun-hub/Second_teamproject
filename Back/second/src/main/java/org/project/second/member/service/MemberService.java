@@ -116,7 +116,8 @@ public class MemberService {
         Optional<Member> OpUser = memberRepository.findByEmail(member.getEmail());
         if (OpUser.isPresent()) {
             Member m = OpUser.get();
-            if (memberRepository.existsByUsername(editProfileRequest.getName())) {
+            if (!editProfileRequest.getName().equals(m.getUsername())
+                    && memberRepository.existsByUsername(editProfileRequest.getName())) {
                 throw new IllegalArgumentException("이미 존재하는 유저네임 입니다.");
             }
 
@@ -141,7 +142,7 @@ public class MemberService {
         //Resource는 스프링에서 지원하는 추상화된 파일 객체
         Resource[] resources = resolver.getResources("classpath:" + profileImagesDir + "/*.jpg");
         return Arrays.stream(resources)
-                .map(resource -> "/static/profileimages/" + resource.getFilename())
+                .map(resource -> "/profileimages/" + resource.getFilename())
                 .filter(path -> ALLOWED_IMAGES.contains(path.substring(path.lastIndexOf("/") + 1)))
                 .collect(Collectors.toList());
     }
