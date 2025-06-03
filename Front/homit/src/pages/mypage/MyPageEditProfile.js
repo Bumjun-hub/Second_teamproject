@@ -33,11 +33,12 @@ const MyPageEditProfile = () => {
           email: data.email,
           phone: data.phone,
           address: data.address,
-          imageUrl: data.imageUrl || '/static/profileimages/default.jpg'
+          imageUrl: data.imageUrl || '/static/profileimages/profile1.jpg'  
         });
       } else {
         setError(`서버 오류: ${response.status}`);
       }
+
     } catch (err) {
       setError('네트워크 오류가 발생했습니다.');
     } finally {

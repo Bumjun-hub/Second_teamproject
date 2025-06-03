@@ -167,3 +167,54 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.attached-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;  /* ⬅️ 가운데 정렬 + 여백 */
+  border-radius: 6px;
+}
+
+.image-preview-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.image-preview-wrapper img {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: crimson;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 22px;
+  text-align: center;
+}
