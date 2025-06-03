@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import AddressInput from '../memberpage/AddressInput'; 
 import './MyPageEditProfile.css';
 
 const MyPageEditProfile = () => {
   const [profile, setProfile] = useState({
-    name: '', email: '', phone: '', address: '', imageUrl: ''
+    name: '', email: '', phone: '', address: '', detailAddress: '', imageUrl: ''
   });
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
@@ -17,6 +18,18 @@ const MyPageEditProfile = () => {
     fetchAvailableImages();
   }, []);
 
+  const parseAddress = (fullAddress) => {
+    if (!fullAddress) return { address: '', detailAddress: '' };
+    const parts = fullAddress.split(' ');
+    if (parts.length > 3) {
+      return { 
+        address: parts.slice(0, -2).join(' '), 
+        detailAddress: parts.slice(-2).join(' ') 
+      };
+    }
+    return { address: fullAddress, detailAddress: '' };
+  };
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -28,17 +41,19 @@ const MyPageEditProfile = () => {
       
       if (response.ok) {
         const data = await response.json();
+        const { address, detailAddress } = parseAddress(data.address);
+        
         setProfile({
           name: data.username || data.name,
           email: data.email,
           phone: data.phone,
-          address: data.address,
+          address,
+          detailAddress,
           imageUrl: data.imageUrl || '/static/profileimages/profile1.jpg'  
         });
       } else {
         setError(`서버 오류: ${response.status}`);
       }
-
     } catch (err) {
       setError('네트워크 오류가 발생했습니다.');
     } finally {
@@ -59,7 +74,7 @@ const MyPageEditProfile = () => {
         setAvailableImages(images);
       }
     } catch (err) {
-      console.error('이미지 목록 로드 실패:', err);
+      // 이미지 로드 실패는 UI에 영향 없음
     }
   };
 
@@ -77,18 +92,30 @@ const MyPageEditProfile = () => {
   };
 
   const handleInputChange = (field, value) => {
+  if (field === 'phone') {
+    const formattedPhone = formatPhoneNumber(value);
+    setEditData(prev => ({ ...prev, [field]: formattedPhone }));
+  } else {
     setEditData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleImageSelect = (imageUrl) => {
-    setEditData(prev => ({ ...prev, imageUrl }));
-  };
+  }
+};
+const formatPhoneNumber = (value) => {
+  const numbers = value.replace(/[^\d]/g, '');
+  // 길이에 따른 포맷팅
+  if (numbers.length <= 3) {
+    return numbers;
+  } else if (numbers.length <= 7) {
+    return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+  } else {
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  }
+};
 
   const updateProfile = async () => {
     try {
       setLoading(true);
       
-      // 1. 프로필 정보 업데이트
+      // 프로필 정보 업데이트
       const profileResponse = await fetch('/api/mypage/editProfile', {
         method: 'PUT',
         credentials: 'include',
@@ -97,7 +124,7 @@ const MyPageEditProfile = () => {
           name: editData.name,
           email: editData.email,
           phone: editData.phone,
-          address: editData.address
+          address: `${editData.address} ${editData.detailAddress}`.trim()
         })
       });
 
@@ -105,31 +132,35 @@ const MyPageEditProfile = () => {
         throw new Error('프로필 업데이트 실패');
       }
 
-      // 2. 프로필 이미지 업데이트 (변경된 경우에만)
+      // 프로필 이미지 업데이트
+      let finalImageUrl = profile.imageUrl;
+      
       if (editData.imageUrl && editData.imageUrl !== profile.imageUrl) {
         const imageName = editData.imageUrl.substring(editData.imageUrl.lastIndexOf('/') + 1);
         const imageResponse = await fetch('/api/profile/upload', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            profile_imageName: imageName
-          })
+          body: JSON.stringify({ profile_imageName: imageName })
         });
 
         if (!imageResponse.ok) {
           throw new Error('프로필 이미지 업데이트 실패');
         }
+        finalImageUrl = editData.imageUrl;
       }
 
-      // 3. 성공 처리
+      // 성공 처리
       const data = await profileResponse.json();
+      const { address, detailAddress } = parseAddress(data.address);
+      
       setProfile({
         name: data.username || data.name,
         email: data.email,
         phone: data.phone,
-        address: data.address,
-        imageUrl: editData.imageUrl || profile.imageUrl
+        address,
+        detailAddress,
+        imageUrl: finalImageUrl
       });
       setSuccess('프로필이 성공적으로 업데이트되었습니다.');
       setEditMode(false);
@@ -148,7 +179,7 @@ const MyPageEditProfile = () => {
         <div className="mypage-header">
           <h1>프로필 편집</h1>
           {!editMode && (
-            <button onClick={startEdit} className="edit-button">편집</button>
+            <button onClick={startEdit} className="edit-button1">편집</button>
           )}
         </div>
 
@@ -170,24 +201,25 @@ const MyPageEditProfile = () => {
               
               {editMode && (
                 <div className="image-selection">
-                  <p className="selection-label">이미지 선택:</p>
+                  <p className="selection-label">이미지 선택 (선택사항):</p>
                   <div className="image-grid">
                     {availableImages.map((imageUrl, index) => (
                       <div 
                         key={index}
                         className={`image-option ${editData.imageUrl === imageUrl ? 'selected' : ''}`}
-                        onClick={() => handleImageSelect(imageUrl)}
+                        onClick={() => handleInputChange('imageUrl', imageUrl)}
                       >
                         <img src={imageUrl} alt={`프로필 옵션 ${index + 1}`} />
                       </div>
                     ))}
                   </div>
+                  <p className="image-help-text">이미지를 선택하지 않으면 기존 이미지가 유지됩니다.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* 기존 필드들 */}
+          {/* 기본 정보 필드들 */}
           <div className="field-group">
             <label>사용자명</label>
             {editMode ? (
@@ -209,7 +241,7 @@ const MyPageEditProfile = () => {
                 type="email"
                 value={editData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="이메일을 입력하세요"
+                placeholder="이메일을 입력하세요"disabled
               />
             ) : (
               <span>{profile.email || '설정되지 않음'}</span>
@@ -224,6 +256,7 @@ const MyPageEditProfile = () => {
                 value={editData.phone || ''}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 placeholder="전화번호를 입력하세요"
+                maxLength="13"
               />
             ) : (
               <span>{profile.phone || '설정되지 않음'}</span>
@@ -233,21 +266,24 @@ const MyPageEditProfile = () => {
           <div className="field-group">
             <label>주소</label>
             {editMode ? (
-              <textarea
-                value={editData.address || ''}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                placeholder="주소를 입력하세요"
-                rows={3}
+              <AddressInput
+                address={editData.address || ''}
+                detailAddress={editData.detailAddress || ''}
+                onAddressChange={(address) => handleInputChange('address', address)}
+                onDetailAddressChange={(detailAddress) => handleInputChange('detailAddress', detailAddress)}
+                label=""
+                editMode={true}
+                className=""
               />
             ) : (
-              <span>{profile.address || '설정되지 않음'}</span>
+              <span>{`${profile.address} ${profile.detailAddress}`.trim() || '설정되지 않음'}</span>
             )}
           </div>
         </div>
 
         {editMode && (
           <div className="action-buttons">
-            <button onClick={cancelEdit} className="cancel-button">취소</button>
+            <button onClick={cancelEdit} className="cancel-button1">취소</button>
             <button onClick={updateProfile} disabled={loading} className="save-button">
               {loading ? '저장 중...' : '저장'}
             </button>

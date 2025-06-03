@@ -27,7 +27,7 @@
   font-weight: 600;
 }
 
-.edit-button {
+.edit-button1 {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -39,7 +39,7 @@
   transition: all 0.3s ease;
 }
 
-.edit-button:hover {
+.edit-button1:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
@@ -125,7 +125,7 @@
   justify-content: flex-end;
 }
 
-.cancel-button,
+.cancel-button1,
 .save-button {
   padding: 14px 28px;
   border: none;
@@ -136,12 +136,12 @@
   transition: all 0.3s ease;
 }
 
-.cancel-button {
+.cancel-button1 {
   background: linear-gradient(135deg, #74b9ff, #0984e3);
   color: white;
 }
 
-.cancel-button:hover {
+.cancel-button1:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(116, 185, 255, 0.4);
 }

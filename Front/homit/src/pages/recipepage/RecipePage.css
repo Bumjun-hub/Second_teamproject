@@ -57,14 +57,14 @@
 .recipe-rating { color: #ea580c; font-size: 0.875rem; }
 
 /* 페이지네이션 */
-.pagination { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-.pagination-btn { 
+.pagination1 { display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+.pagination1-btn { 
   padding: 0.5rem; border-radius: 4px; border: none; 
   background: transparent; cursor: pointer; 
   min-width: 2.5rem; text-align: center;
 }
-.pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.pagination-btn.active { background: #f97316; color: white; }
+.pagination1-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pagination1-btn.active { background: #f97316; color: white; }
 
 /* 검색결과 없음 */
 .no-results { text-align: center; padding: 3rem 1rem; height: 100vh;}
