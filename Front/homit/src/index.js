@@ -8,11 +8,11 @@ import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  
     <BrowserRouter>
       <App /> {/* 여기서 라우터와 App 컴포넌트를 연결 */}
     </BrowserRouter>
-  </React.StrictMode>
+  
 );
 
 reportWebVitals();
