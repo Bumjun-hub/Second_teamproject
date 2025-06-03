@@ -1,5 +1,7 @@
 package org.project.second.community.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.CommunityCategory;
 import org.project.second.community.dto.CommunityDto;
@@ -54,7 +56,7 @@ public class CommunityController {
             @RequestPart("category") String category,
             @RequestPart("isNotice") String isNotice,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
-            @RequestPart(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
+            @RequestPart(value = "removedImages", required = false) String removedImagesJson, // ✅ 수정됨
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         CommunityDto communityDto = CommunityDto.builder()
@@ -65,7 +67,21 @@ public class CommunityController {
                 .build();
 
         Member loginUser = userDetails.getMember();
-        communityService.editPost(id, communityDto, loginUser, imageFiles, deleteImageIds);
+
+        List<String> removedUrls = List.of(); // ✅ 삭제할 이미지 URL들
+        if (removedImagesJson != null && !removedImagesJson.isEmpty()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                removedUrls = objectMapper.readValue(removedImagesJson, new TypeReference<List<String>>() {
+                });
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 삭제 목록 파싱 실패");
+            }
+        }
+
+        // 서비스로 넘김
+        communityService.editPost(id, communityDto, loginUser, imageFiles, removedUrls);
+
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
     }
 
