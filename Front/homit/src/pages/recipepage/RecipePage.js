@@ -149,13 +149,13 @@ useEffect(() => {
         </div>
         {/* 페이지네이션 */}
           {totalPages > 1 && (
-          <div className="pagination">
+          <div className="pagination1">
             {/* 네비게이션 버튼들 */}
             {[
               [() => setCurrentPage(1), currentPage === 1, MdOutlineKeyboardDoubleArrowLeft],
               [() => setCurrentPage(Math.max(1, currentPage - 1)), currentPage === 1, MdOutlineKeyboardArrowLeft],
             ].map(([onClick, disabled, Icon], idx) => (
-              <button key={idx} onClick={onClick} disabled={disabled} className="pagination-btn">
+              <button key={idx} onClick={onClick} disabled={disabled} className="pagination1-btn">
                 <Icon size={25} />
               </button>
             ))}
@@ -171,7 +171,7 @@ useEffect(() => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                className={`pagination1-btn ${currentPage === page ? 'active' : ''}`}
               >
                 {page}
               </button>
@@ -181,7 +181,7 @@ useEffect(() => {
               [() => setCurrentPage(Math.min(totalPages, currentPage + 1)), currentPage === totalPages, MdOutlineKeyboardArrowRight],
               [() => setCurrentPage(totalPages), currentPage === totalPages, MdOutlineKeyboardDoubleArrowRight],
             ].map(([onClick, disabled, Icon], idx) => (
-              <button key={idx + 2} onClick={onClick} disabled={disabled} className="pagination-btn">
+              <button key={idx + 2} onClick={onClick} disabled={disabled} className="pagination1-btn">
                 <Icon size={25} />
               </button>
             ))}

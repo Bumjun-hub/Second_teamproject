@@ -1,195 +1,294 @@
 import React, { useState, useEffect } from 'react';
+import AddressInput from '../memberpage/AddressInput'; 
 import './MyPageEditProfile.css';
 
 const MyPageEditProfile = () => {
   const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    profileImage: ''
+    name: '', email: '', phone: '', address: '', detailAddress: '', imageUrl: ''
   });
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [availableImages, setAvailableImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchProfile();
+    fetchAvailableImages();
   }, []);
+
+  const parseAddress = (fullAddress) => {
+    if (!fullAddress) return { address: '', detailAddress: '' };
+    const parts = fullAddress.split(' ');
+    if (parts.length > 3) {
+      return { 
+        address: parts.slice(0, -2).join(' '), 
+        detailAddress: parts.slice(-2).join(' ') 
+      };
+    }
+    return { address: fullAddress, detailAddress: '' };
+  };
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      
-      const currentResponse = await fetch('/api/mypage', {
+      const response = await fetch('/api/mypage', {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      if (!currentResponse.ok) {
-        throw new Error(`현재 정보 조회 실패! status: ${currentResponse.status}`);
-      }
-
-      const currentData = await currentResponse.json();
       
-      const editRequest = {
-        name: (currentData.username || currentData.name || '') + '_temp_' + Date.now(),
-        email: currentData.email || '',
-        phone: currentData.phone || '',
-        address: currentData.address || ''
-      };
-      
-      const editResponse = await fetch('/api/mypage/editProfile', {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(editRequest)
-      });
-
-      if (!editResponse.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        const { address, detailAddress } = parseAddress(data.address);
+        
         setProfile({
-          name: currentData.username || currentData.name || '',
-          email: currentData.email || '',
-          phone: currentData.phone || '',
-          address: currentData.address || '',
-          profileImage: currentData.profileImage || ''
-        });
-        return;
-      }
-
-      const editData = await editResponse.json();
-      
-      const revertRequest = {
-        name: currentData.username || currentData.name || '',
-        email: editData.email || '',
-        phone: editData.phone || '',
-        address: editData.address || ''
-      };
-      
-      const revertResponse = await fetch('/api/mypage/editProfile', {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(revertRequest)
-      });
-
-      if (revertResponse.ok) {
-        const finalData = await revertResponse.json();
-        setProfile({
-          name: finalData.name || '',
-          email: finalData.email || '',
-          phone: finalData.phone || '',
-          address: finalData.address || '',
-          profileImage: ''
+          name: data.username || data.name,
+          email: data.email,
+          phone: data.phone,
+          address,
+          detailAddress,
+          imageUrl: data.imageUrl || '/static/profileimages/profile1.jpg'  
         });
       } else {
-        setProfile({
-          name: (editData.name || '').replace(/_temp_\d+$/, ''),
-          email: editData.email || '',
-          phone: editData.phone || '',
-          address: editData.address || '',
-          profileImage: ''
-        });
+        setError(`서버 오류: ${response.status}`);
       }
-      
     } catch (err) {
-      setError(err.message);
+      setError('네트워크 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="profile-container">
-        <div className="loading">프로필 정보를 불러오는 중...</div>
-      </div>
-    );
-  }
+  const fetchAvailableImages = async () => {
+    try {
+      const response = await fetch('/api/profile/getimages', {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const images = await response.json();
+        setAvailableImages(images);
+      }
+    } catch (err) {
+      // 이미지 로드 실패는 UI에 영향 없음
+    }
+  };
 
-  if (error) {
-    return (
-      <div className="profile-container">
-        <div className="error">
-          <h3>오류가 발생했습니다</h3>
-          <p>{error}</p>
-          <button onClick={fetchProfile} className="retry-btn">다시 시도</button>
-        </div>
-      </div>
-    );
+  const startEdit = () => {
+    setEditData({ ...profile });
+    setEditMode(true);
+    setError('');
+    setSuccess('');
+  };
+
+  const cancelEdit = () => {
+    setEditMode(false);
+    setEditData({});
+    setError('');
+  };
+
+  const handleInputChange = (field, value) => {
+  if (field === 'phone') {
+    const formattedPhone = formatPhoneNumber(value);
+    setEditData(prev => ({ ...prev, [field]: formattedPhone }));
+  } else {
+    setEditData(prev => ({ ...prev, [field]: value }));
   }
+};
+const formatPhoneNumber = (value) => {
+  const numbers = value.replace(/[^\d]/g, '');
+  // 길이에 따른 포맷팅
+  if (numbers.length <= 3) {
+    return numbers;
+  } else if (numbers.length <= 7) {
+    return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+  } else {
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  }
+};
+
+  const updateProfile = async () => {
+    try {
+      setLoading(true);
+      
+      // 프로필 정보 업데이트
+      const profileResponse = await fetch('/api/mypage/editProfile', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editData.name,
+          email: editData.email,
+          phone: editData.phone,
+          address: `${editData.address} ${editData.detailAddress}`.trim()
+        })
+      });
+
+      if (!profileResponse.ok) {
+        throw new Error('프로필 업데이트 실패');
+      }
+
+      // 프로필 이미지 업데이트
+      let finalImageUrl = profile.imageUrl;
+      
+      if (editData.imageUrl && editData.imageUrl !== profile.imageUrl) {
+        const imageName = editData.imageUrl.substring(editData.imageUrl.lastIndexOf('/') + 1);
+        const imageResponse = await fetch('/api/profile/upload', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile_imageName: imageName })
+        });
+
+        if (!imageResponse.ok) {
+          throw new Error('프로필 이미지 업데이트 실패');
+        }
+        finalImageUrl = editData.imageUrl;
+      }
+
+      // 성공 처리
+      const data = await profileResponse.json();
+      const { address, detailAddress } = parseAddress(data.address);
+      
+      setProfile({
+        name: data.username || data.name,
+        email: data.email,
+        phone: data.phone,
+        address,
+        detailAddress,
+        imageUrl: finalImageUrl
+      });
+      setSuccess('프로필이 성공적으로 업데이트되었습니다.');
+      setEditMode(false);
+      setEditData({});
+
+    } catch (err) {
+      setError(err.message || '업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <h2>내 프로필</h2>
-        <button className="edit-btn" disabled>
-          수정하기 (준비중)
-        </button>
-      </div>
+    <div className="mypage-container">
+      <div className="mypage-card">
+        <div className="mypage-header">
+          <h1>프로필 편집</h1>
+          {!editMode && (
+            <button onClick={startEdit} className="edit-button1">편집</button>
+          )}
+        </div>
 
-      <div className="profile-content">
-        {/* 프로필 이미지 섹션 */}
-        <div className="profile-image-section">
-          <div className="profile-image-wrapper">
-            {profile.profileImage ? (
-              <img 
-                src={profile.profileImage} 
-                alt="프로필 이미지"
-                className="profile-image"
+        {error && <div className="alert error">{error}</div>}
+        {success && <div className="alert success">{success}</div>}
+
+        <div className="profile-content">
+          {/* 프로필 이미지 섹션 */}
+          <div className="field-group">
+            <label>프로필 이미지</label>
+            <div className="profile-image-section">
+              <div className="current-image">
+                <img 
+                  src={editMode ? (editData.imageUrl || profile.imageUrl) : profile.imageUrl} 
+                  alt="프로필 이미지" 
+                  className="profile-image-preview"
+                />
+              </div>
+              
+              {editMode && (
+                <div className="image-selection">
+                  <p className="selection-label">이미지 선택 (선택사항):</p>
+                  <div className="image-grid">
+                    {availableImages.map((imageUrl, index) => (
+                      <div 
+                        key={index}
+                        className={`image-option ${editData.imageUrl === imageUrl ? 'selected' : ''}`}
+                        onClick={() => handleInputChange('imageUrl', imageUrl)}
+                      >
+                        <img src={imageUrl} alt={`프로필 옵션 ${index + 1}`} />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="image-help-text">이미지를 선택하지 않으면 기존 이미지가 유지됩니다.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 기본 정보 필드들 */}
+          <div className="field-group">
+            <label>사용자명</label>
+            {editMode ? (
+              <input
+                type="text"
+                value={editData.name || ''}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="사용자명을 입력하세요"
               />
             ) : (
-              <div className="default-profile-image">
-                <span>{profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}</span>
-              </div>
+              <span>{profile.name || '설정되지 않음'}</span>
+            )}
+          </div>
+
+          <div className="field-group">
+            <label>이메일</label>
+            {editMode ? (
+              <input
+                type="email"
+                value={editData.email || ''}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="이메일을 입력하세요"disabled
+              />
+            ) : (
+              <span>{profile.email || '설정되지 않음'}</span>
+            )}
+          </div>
+
+          <div className="field-group">
+            <label>전화번호</label>
+            {editMode ? (
+              <input
+                type="tel"
+                value={editData.phone || ''}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="전화번호를 입력하세요"
+                maxLength="13"
+              />
+            ) : (
+              <span>{profile.phone || '설정되지 않음'}</span>
+            )}
+          </div>
+
+          <div className="field-group">
+            <label>주소</label>
+            {editMode ? (
+              <AddressInput
+                address={editData.address || ''}
+                detailAddress={editData.detailAddress || ''}
+                onAddressChange={(address) => handleInputChange('address', address)}
+                onDetailAddressChange={(detailAddress) => handleInputChange('detailAddress', detailAddress)}
+                label=""
+                editMode={true}
+                className=""
+              />
+            ) : (
+              <span>{`${profile.address} ${profile.detailAddress}`.trim() || '설정되지 않음'}</span>
             )}
           </div>
         </div>
 
-        {/* 프로필 정보 섹션 */}
-        <div className="profile-info-section">
-          <div className="info-group">
-            <label>이름</label>
-            <div className="info-value">
-              {profile.name && profile.name.trim() !== '' ? profile.name : '정보 없음'}
-            </div>
+        {editMode && (
+          <div className="action-buttons">
+            <button onClick={cancelEdit} className="cancel-button1">취소</button>
+            <button onClick={updateProfile} disabled={loading} className="save-button">
+              {loading ? '저장 중...' : '저장'}
+            </button>
           </div>
-
-          <div className="info-group">
-            <label>이메일</label>
-            <div className="info-value">
-              {profile.email && profile.email.trim() !== '' ? profile.email : '정보 없음'}
-            </div>
-          </div>
-
-          <div className="info-group">
-            <label>전화번호</label>
-            <div className="info-value">
-              {profile.phone && profile.phone.trim() !== '' ? profile.phone : '전화번호 정보 없음'}
-            </div>
-          </div>
-
-          <div className="info-group">
-            <label>주소</label>
-            <div className="info-value">
-              {profile.address && profile.address.trim() !== '' ? profile.address : '주소 정보 없음'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 디버그 정보 (개발용) */}
-      <div className="debug-section">
-        <details>
-          <summary>디버그 정보 (개발용)</summary>
-          <pre>{JSON.stringify(profile, null, 2)}</pre>
-        </details>
+        )}
       </div>
     </div>
   );
