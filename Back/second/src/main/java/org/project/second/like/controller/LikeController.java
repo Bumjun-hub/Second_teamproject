@@ -1,7 +1,6 @@
 package org.project.second.like.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.project.second.common.enums.LikeEntityType;
 import org.project.second.like.service.LikeService;
 import org.project.second.member.config.CustomUserDetails;
