@@ -4,6 +4,7 @@ import MyPageEditProfile from './MyPageEditProfile';
 import CheckPw from './CheckPw'; 
 import ChangePw from './ChangePw';
 import WishList  from './WishList';
+import RecipeFavorite  from './RecipeFavorite';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch, deleteAccount } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -110,6 +111,11 @@ const MyPage = () => {
     window.history.pushState({page: 'wishlist'}, '', window.location.pathname);
     setCurrentView('wishlist');
   };
+
+  const handleGoToRecipeFavorite = () => {
+    window.history.pushState({page: 'recipeFavorite'}, '', window.location.pathname);
+    setCurrentView('recipeFavorite');
+  };
   
   // 회원탈퇴 처리 (토큰 자동 갱신 포함)
   const handleDeleteAccount = async () => {
@@ -140,6 +146,14 @@ const MyPage = () => {
   if (currentView === 'wishlist') {
     return (
       <WishList 
+        // onBack 제거 - 브라우저 뒤로가기 사용
+      />
+    );
+  }
+
+  if (currentView === 'recipeFavorite') {
+    return (
+      <RecipeFavorite 
         // onBack 제거 - 브라우저 뒤로가기 사용
       />
     );
@@ -206,7 +220,7 @@ const MyPage = () => {
           <MenuItem 
             icon="🔖" 
             text="레시피 즐겨찾기" 
-            onClick={() => console.log('레시피 즐겨찾기')}
+            onClick={handleGoToRecipeFavorite}
           />
           <MenuItem 
             icon="📝" 
