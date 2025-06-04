@@ -134,10 +134,10 @@ const HotItemPage = () => {
             <div key={index} className="HotItem">
               <div className="image-container">
                 <img src={item.imageUrl} alt={item.name} className="item-image" />
-                <button className="heart-button" onClick={() => handleWishlist(item)}>
+                <button className="heart-button-wishlist" onClick={() => handleWishlist(item)}>
                   {wishlistIds.has(item.naverProductId)
                     ? <AiFillHeart size={24} color="red" />
-                    : <AiOutlineHeart size={24} color="white" />}
+                    : <AiOutlineHeart size={24} color="#8C8C8C" />}
                 </button>
               </div>
               <h3>{item.name.replace(/<[^>]*>/g, '')}</h3>

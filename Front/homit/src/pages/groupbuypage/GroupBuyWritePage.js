@@ -1,81 +1,354 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import './GroupBuyWritePage.css';
-import { dummyGroupBuyData } from '../../data/dummyGroupBuyData';
 import Section from '../../components/Section';
 
 const GroupBuyWritePage = () => {
-    const [formData, setFormData] = useState({
-        title: '',
-        link: '',
-        image: '',
-        content: '',
-        price: '',
-    });
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
 
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    description: '',
+    productUrl: '',
+    maxParticipants: 10,
+    minParticipants: 1,
+    currentParticipants: 0,
+    maxQuantity: 5,
+    originalPrice: 20000,
+    salePrice: 10000,
+    deadline: '',
+    status: 'OPEN'
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  const [imageFiles, setImageFiles] = useState([]);
+  const [existingImages, setExistingImages] = useState([]); // 기존 이미지 (ID와 URL 포함)
+  const [newImagePreviews, setNewImagePreviews] = useState([]); // 새로 추가된 이미지 미리보기
+  const [deletedImageIds, setDeletedImageIds] = useState([]); // 삭제할 기존 이미지 ID들
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({ ...prev, image: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
+  useEffect(() => {
+    if (isEdit) {
+      fetch(`/api/groupBuy/detail/${id}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          setFormData({
+            title: data.title,
+            content: data.content,
+            description: data.description,
+            productUrl: data.productUrl,
+            maxParticipants: data.maxParticipants,
+            minParticipants: data.minParticipants,
+            currentParticipants: data.currentParticipants,
+            maxQuantity: data.maxQuantity,
+            originalPrice: data.originalPrice,
+            salePrice: data.salePrice,
+            deadline: data.deadline?.slice(0, 16),
+            status: data.status
+          });
+
+          // 기존 이미지들을 ID와 URL로 매핑
+          if (data.imgUrls && data.imgIds && data.imgUrls.length > 0) {
+            const existingImgs = data.imgUrls.map((url, index) => ({
+              id: data.imgIds[index],
+              url: url,
+              isExisting: true
+            }));
+            setExistingImages(existingImgs);
+          }
+        })
+        .catch(err => {
+          console.error('데이터 로드 실패:', err);
+          alert('게시글 정보를 불러오는데 실패했습니다.');
+        });
+    }
+  }, [isEdit, id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // 새로운 파일들을 imageFiles에 추가
+    setImageFiles(prev => [...prev, ...files]);
+
+    // 새로운 미리보기 생성
+    const newPreviews = files.map(file => ({
+      file: file,
+      url: URL.createObjectURL(file),
+      isExisting: false
+    }));
+
+    setNewImagePreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const handleExistingImageRemove = (imageId, index) => {
+    // 기존 이미지 삭제
+    setDeletedImageIds(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleNewImageRemove = (index) => {
+    // 새로 추가된 이미지 삭제
+    const removedPreview = newImagePreviews[index];
+
+    // 메모리 누수 방지를 위해 Object URL 해제
+    if (removedPreview && removedPreview.url) {
+      URL.revokeObjectURL(removedPreview.url);
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const newItem = {
-            ...formData,
-            id: dummyGroupBuyData.length + 1,
-        };
-        navigate('/groupbuy', { state: { newItem } });
-    };
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
-    const handleCancel = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = new FormData();
+    data.append('status', formData.status);
+    data.append('title', formData.title);
+    data.append('content', formData.content);
+    data.append('description', formData.description);
+    data.append('productUrl', formData.productUrl);
+    data.append('maxParticipants', formData.maxParticipants);
+    data.append('minParticipants', formData.minParticipants);
+    data.append('currentParticipants', formData.currentParticipants);
+    data.append('maxQuantity', formData.maxQuantity);
+    data.append('originalPrice', formData.originalPrice);
+    data.append('salePrice', formData.salePrice);
+    data.append('deadline', formData.deadline);
+
+    // 새로운 이미지 파일들 추가
+    imageFiles.forEach((file) => {
+      data.append('images', file);
+    });
+
+    // 수정 모드에서 삭제할 이미지 ID들 추가
+    if (isEdit && deletedImageIds.length > 0) {
+      deletedImageIds.forEach(id => {
+        data.append('deleteImageIds', id);
+      });
+    }
+
+    const url = isEdit
+      ? `/api/groupBuy/admin/edit/${id}`
+      : '/api/groupBuy/admin/write';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        body: data,
+      });
+
+      if (response.ok) {
+        alert(isEdit ? '공동구매 글이 수정되었습니다!' : '공동구매 글이 등록되었습니다!');
+
+        // 메모리 정리
+        newImagePreviews.forEach(preview => {
+          if (preview.url) {
+            URL.revokeObjectURL(preview.url);
+          }
+        });
+
         navigate('/groupbuy');
+      } else {
+        const errorText = await response.text();
+        alert('요청 실패: ' + errorText);
+      }
+    } catch (err) {
+      console.error('요청 실패', err);
+      alert('서버 연결 실패');
+    }
+  };
+
+  const handleCancel = () => {
+    // 메모리 정리
+    newImagePreviews.forEach(preview => {
+      if (preview.url) {
+        URL.revokeObjectURL(preview.url);
+      }
+    });
+    navigate('/groupbuy');
+  };
+
+  // 컴포넌트 언마운트 시 메모리 정리
+  useEffect(() => {
+    return () => {
+      newImagePreviews.forEach(preview => {
+        if (preview.url) {
+          URL.revokeObjectURL(preview.url);
+        }
+      });
     };
+  }, []);
 
-    return (
-        <Section>
-            <div className="write-wrapper">
+  return (
+    <Section>
+      <div className="write-wrapper">
+        <div className="write-container">
+          <form className="input-form" onSubmit={handleSubmit}>
+            <h2>{isEdit ? '공동구매 글 수정' : '공동구매 글 작성'}</h2>
 
-                <div className="write-container">
-                    <form id="writeForm" className="input-form" onSubmit={handleSubmit}>
-                        <label>제목</label>
-                        <input name="title" value={formData.title} onChange={handleChange} placeholder="제목을 입력해주세요" required />
+            <label>제목</label>
+            <input
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
 
-                        <div className="row-group">
-                            <div className="link-group">
-                                <label>제품 상세보기 링크</label>
-                                <input name="link" value={formData.link} onChange={handleChange} placeholder="제품 상세보기 URI를 입력해주세요" />
-                            </div>
-                            <div className="image-group">
-                                <label>제품 이미지</label>
-                                <input type="file" accept="img/*" onChange={handleImageChange} />
-                                {formData.image && <img src={formData.image} alt='미리보기' style={{ marginTop: '10px', maxWidth: '100%' }} />}
-                            </div>
-                        </div>
+            <label>제품 상세 링크</label>
+            <input
+              name="productUrl"
+              value={formData.productUrl}
+              onChange={handleChange}
+            />
 
-                        <label>내용</label>
-                        <textarea name="content" value={formData.content} onChange={handleChange} placeholder="내용을 입력해주세요" required />
-                        <div className="form-buttons">
-                            <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
-                            <button type="submit" className="submit-button">등록</button>
-                        </div>
-                    </form>
-                </div>
+            <label>내용</label>
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              required
+            />
+
+            <label>상품 설명</label>
+            <input
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            />
+
+            <label>정가</label>
+            <input
+              name="originalPrice"
+              type="number"
+              value={formData.originalPrice}
+              onChange={handleChange}
+              required
+            />
+
+            <label>할인가</label>
+            <input
+              name="salePrice"
+              type="number"
+              value={formData.salePrice}
+              onChange={handleChange}
+              required
+            />
+
+            <label>최대 인원</label>
+            <input
+              name="maxParticipants"
+              type="number"
+              value={formData.maxParticipants}
+              onChange={handleChange}
+              required
+            />
+
+            <label>최소 인원</label>
+            <input
+              name="minParticipants"
+              type="number"
+              value={formData.minParticipants}
+              onChange={handleChange}
+              required
+            />
+
+            <label>최대 수량</label>
+            <input
+              name="maxQuantity"
+              type="number"
+              value={formData.maxQuantity}
+              onChange={handleChange}
+              required
+            />
+
+            <label>마감일</label>
+            <input
+              name="deadline"
+              type="datetime-local"
+              value={formData.deadline}
+              onChange={handleChange}
+              required
+            />
+            
+            <label>현재 인원</label>
+            <input
+              name="currentParticipants"
+              type="number"
+              value={formData.currentParticipants}
+              disabled
+              readOnly
+            />
+
+            {/* 기존 이미지들 표시 */}
+            {existingImages.length > 0 && (
+              <div className="image-preview-area">
+                <h4>기존 이미지</h4>
+                {existingImages.map((img, idx) => (
+                  <div key={`existing-${img.id}`} className="image-preview-wrapper">
+                    <img src={img.url} alt={`기존 이미지 ${idx + 1}`} />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => handleExistingImageRemove(img.id, idx)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 새로 추가된 이미지들 표시 */}
+            {newImagePreviews.length > 0 && (
+              <div className="image-preview-area">
+                <h4>새로 추가된 이미지</h4>
+                {newImagePreviews.map((preview, idx) => (
+                  <div key={`new-${idx}`} className="image-preview-wrapper">
+                    <img src={preview.url} alt={`새 이미지 ${idx + 1}`} />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => handleNewImageRemove(idx)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="form-bottom">
+              <div className="button-area">
+                <label className="upload-button">
+                  이미지 첨부
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+
+                <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
+                <button type="submit" className="submit-button">{isEdit ? '수정' : '등록'}</button>
+              </div>
             </div>
-        </Section>
-    );
+          </form>
+        </div>
+      </div>
+    </Section>
+  );
 };
 
 export default GroupBuyWritePage;

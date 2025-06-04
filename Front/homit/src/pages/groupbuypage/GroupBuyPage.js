@@ -1,45 +1,58 @@
 import { useEffect, useState } from "react";
-import Section from "../../components/Section";
-import './GroupBuyPage.css';
 import { useLocation, useNavigate } from "react-router-dom";
-import { dummyGroupBuyData } from '../../data/dummyGroupBuyData';
-import { jwtDecode } from "jwt-decode";
+import Section from "../../components/Section";
+import "./GroupBuyPage.css";
 
 const GroupBuyPage = () => {
-    const [data, setData] = useState(dummyGroupBuyData);
+    const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [role, setRole] = useState(null); // ✅ 관리자 권한 상태로 관리
+    const [role, setRole] = useState(null);
 
     const location = useLocation();
     const navigate = useNavigate();
 
-    // ✅ JWT 쿠키에서 권한 정보 추출
+    // 권한 정보 불러오기
     useEffect(() => {
         const fetchRole = async () => {
             try {
                 const res = await fetch("http://localhost:8080/api/roleinfo", {
-                    credentials: "include", // HttpOnly 쿠키 인증 포함
+                    credentials: "include",
                 });
-                const text = await res.text(); // ← 응답이 문자열이니까 .text()
-                console.log("🎯 현재 사용자 권한:", text); // 예: "ROLE_ADMIN"
+                const text = await res.text();
+                console.log("🎯 현재 사용자 권한:", text);
                 setRole(text);
             } catch (e) {
                 console.error("roleinfo 요청 실패:", e);
             }
         };
-
         fetchRole();
     }, []);
 
-    // ✅ 글쓰기 후 돌아왔을 때 신규 아이템 추가
+    // 공동구매 목록 불러오기
     useEffect(() => {
-        if (location.state?.newItem) {
-            setData(prev => [...prev, location.state.newItem]);
-            navigate('/groupbuy', { replace: true, state: null });
-        }
-    }, [location.state]);
+        const fetchGroupBuys = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/api/groupBuy/view");
+                
+                const json = await res.json();
+                console.log("✅ 서버 응답 확인:", json);
 
-    // ✅ 페이지네이션 처리
+                if (Array.isArray(json)) {
+                    setData(json); // 정상 응답이면 세팅
+                } else {
+                    console.error("❌ 응답이 배열이 아님:", json);
+                    setData([]); // slice 오류 방지용 빈 배열
+                }
+            } catch (err) {
+                console.error("공동구매 목록 불러오기 실패:", err);
+                setData([]); // 네트워크 실패 시도 slice 방지
+            }
+        };
+        fetchGroupBuys();
+    }, []);
+
+
+    // 페이지네이션
     const ITEMS_PER_PAGE = 8;
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -53,10 +66,13 @@ const GroupBuyPage = () => {
                 </div>
             </div>
 
-            {/* ✅ 관리자만 글쓰기 버튼 보임 */}
+            {/* 관리자만 글쓰기 가능 */}
             {role === "ROLE_ADMIN" && (
                 <div className="write-button-wrapper">
-                    <button className="write-button" onClick={() => navigate("/groupbuy/write")}>
+                    <button
+                        className="write-button"
+                        onClick={() => navigate("/groupbuy/write")}
+                    >
                         글쓰기
                     </button>
                 </div>
@@ -66,15 +82,21 @@ const GroupBuyPage = () => {
                 <div className="Groupbuylist-inner">
                     {currentItems.map((item) => (
                         <div key={item.id} className="GroupbuyItem">
-                            <img src={item.image} alt={item.name} className="item-image" />
-                            <h3>{item.name}</h3>
-                            <p>{item.price}</p>
-                            <button className="apply-button" onClick={() => navigate(`/groupbuy/info/${item.id}`)}>공동구매 신청</button>
+                            <img src={item.imgUrls?.[0]} alt={item.title} className="item-image" />
+                            <h3>{item.title}</h3>
+                            <p>{item.salePrice?.toLocaleString()}원</p>
+                            <button
+                                className="apply-button"
+                                onClick={() => navigate(`/groupbuy/info/${item.id}`)}
+                            >
+                                공동구매 신청
+                            </button>
                         </div>
                     ))}
                 </div>
             </div>
 
+            {/* 페이지네이션 버튼 */}
             <div style={{ textAlign: "center", marginTop: "40px" }}>
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
