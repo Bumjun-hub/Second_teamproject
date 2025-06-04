@@ -51,7 +51,7 @@ public class GroupBuyParticipationService {
         groupBuyParticipationRepository.save(groupBuyParticipation);
 
         // 신청하기 누르면 1씩 증가
-        int updateParticipations = groupBuy.getCurrentParticipants() +1;
+        int updateParticipations = groupBuy.getCurrentParticipants() + 1;
         groupBuy.setCurrentParticipants(updateParticipations);
 
         //신청인원이 max인원이 되면 completed 해라
@@ -74,7 +74,7 @@ public class GroupBuyParticipationService {
         List<GroupBuyParticipation> participationList
                 = groupBuyParticipationRepository.findByGroupBuy(groupBuy);
 
-        return  participationList.stream().map(participation -> new GroupBuyParticipationDto(
+        return participationList.stream().map(participation -> new GroupBuyParticipationDto(
                         participation.getMember().getId(),
                         participation.getMember().getUsername(),
                         participation.getQuantity(),
@@ -92,7 +92,7 @@ public class GroupBuyParticipationService {
         GroupBuyParticipation participation = groupBuyParticipationRepository
                 .findByGroupBuyAndMember(groupBuy, member)
                 .orElseThrow(() -> new IllegalArgumentException("신청내역이 없습니다"));
-        if (LocalDateTime.now().isAfter(groupBuy.getDeadline())){
+        if (LocalDateTime.now().isAfter(groupBuy.getDeadline())) {
             throw new IllegalArgumentException("마감일 이후에는 신청을 취소할 수 없습니다");
         }
 
@@ -103,8 +103,8 @@ public class GroupBuyParticipationService {
     @Transactional
     public List<GroupBuyResponseDto> myParticipationList(Member member) {
         //신청내역 가져오기
-        List<GroupBuyParticipation> participationList
-                = groupBuyParticipationRepository.findByMember(member);
+        List<GroupBuyParticipation> participationList =
+                groupBuyParticipationRepository.findByMember(member);
 
         List<GroupBuy> Buys = participationList.stream()
                 .map(GroupBuyParticipation::getGroupBuy)
@@ -118,11 +118,16 @@ public class GroupBuyParticipationService {
                             .map(GroupBuyImage::getImgUrl)
                             .collect(Collectors.toList());
 
+                    List<Long> imageIds = post.getGroupBuyImages().stream()
+                            .filter(img -> !img.getIsDeleted())
+                            .map(GroupBuyImage::getId)
+                            .collect(Collectors.toList());
+
                     return new GroupBuyResponseDto(
                             post.getId(),
                             post.getStatus(),
-                            post.getTitle(),
                             post.getMember().getUsername(),
+                            post.getTitle(),
                             post.getDescription(),
                             post.getContent(),
                             post.getProductUrl(),
@@ -135,6 +140,7 @@ public class GroupBuyParticipationService {
                             post.getSalePrice(),
                             post.getDeadline(),
                             imageUrls,
+                            imageIds,
                             (long) post.getLikes().size(),
                             post.getCreatedAt(),
                             post.getUpdatedAt()
@@ -143,17 +149,16 @@ public class GroupBuyParticipationService {
                 .collect(Collectors.toList());
     }
 
-    public GroupBuy validatepost (Long groupBuyId) {
+    public GroupBuy validatepost(Long groupBuyId) {
         return groupBuyRepository.findById(groupBuyId)
                 .orElseThrow(() -> new IllegalArgumentException("해당공동구매가 없습니다"));
     }
 
-    public void validateLogin(Member member){
+    public void validateLogin(Member member) {
         if (member == null) {
             throw new IllegalArgumentException("로그인이 필요한 기능입니다.");
         }
     }
-
 
 
 }

@@ -16,7 +16,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,12 +28,11 @@ public class GroupBuyService {
     private final ImageService imageService;
     private final GroupBuyImageRepository groupBuyImageRepository;
 
-
-    //작성
     @Transactional
     public void createPost(GroupBuyDto groupBuyDto, List<MultipartFile> imageFiles, Member loginUser) {
         validateMember(loginUser);
         validateMember(groupBuyDto);
+
         GroupBuy groupBuy = GroupBuy.builder()
                 .title(groupBuyDto.getTitle())
                 .content(groupBuyDto.getContent())
@@ -69,7 +67,6 @@ public class GroupBuyService {
         }
     }
 
-    //수정
     @Transactional
     public void editPost(Long id, GroupBuyDto groupBuyDto, Member loginUser,
                          List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
@@ -77,7 +74,6 @@ public class GroupBuyService {
         validateMember(loginUser, post.getMember());
         validateMember(groupBuyDto);
 
-        //글
         post.setStatus(groupBuyDto.getStatus());
         post.setTitle(groupBuyDto.getTitle());
         post.setContent(groupBuyDto.getContent());
@@ -90,152 +86,112 @@ public class GroupBuyService {
         post.setMaxQuantity(groupBuyDto.getMaxQuantity());
         post.setDeadline(groupBuyDto.getDeadline());
 
-        //이미지 삭제
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
-            List<GroupBuyImage> deletedImages = new ArrayList<>();
-            for (GroupBuyImage image : post.getGroupBuyImages()) {
-                if (deleteImageIds.contains(image.getId())) {
+            List<GroupBuyImage> imagesToDelete = groupBuyImageRepository.findAllById(deleteImageIds);
+
+            for (GroupBuyImage image : imagesToDelete) {
+                if (image.getGroupBuy().getId().equals(id)) {
                     imageService.deleteImage(image.getImgUrl());
-                    deletedImages.add(image);
+                    image.setIsDeleted(true);
+                    groupBuyImageRepository.save(image);
                 }
             }
-            post.getGroupBuyImages().removeAll(deletedImages);
-            groupBuyImageRepository.deleteAll(deletedImages);
         }
 
-        //이미지생성
         if (imageFiles != null && !imageFiles.isEmpty()) {
             for (MultipartFile imageFile : imageFiles) {
-                String imageUrl = imageService.saveImage(imageFile);
+                if (!imageFile.isEmpty()) {
+                    String imageUrl = imageService.saveImage(imageFile);
 
-                GroupBuyImage image = GroupBuyImage.builder()
-                        .imgUrl(imageUrl)
-                        .groupBuy(post)
-                        .isDeleted(false)
-                        .build();
-                post.getGroupBuyImages().add(image);
+                    if (imageUrl != null) {
+                        GroupBuyImage image = GroupBuyImage.builder()
+                                .imgUrl(imageUrl)
+                                .groupBuy(post)
+                                .isDeleted(false)
+                                .build();
+
+                        groupBuyImageRepository.save(image);
+                    }
+                }
             }
         }
     }
 
-    //삭제
     @Transactional
     public void deletePost(Long id, Member loginUser) {
         GroupBuy post = validatePost(id);
         validateMember(loginUser, post.getMember());
-
         groupBuyRepository.delete(post);
     }
 
-    //전체조회
     public List<GroupBuyResponseDto> viewAll() {
-        List<GroupBuy> posts = groupBuyRepository.findAll();
-        return posts.stream()
-                .map(post -> {
-                    //이미지
-                    List<String> imageUrls = post.getGroupBuyImages().stream()
-                            .filter(img -> !img.getIsDeleted())
-                            .map(GroupBuyImage::getImgUrl)
-                            .collect(Collectors.toList());
+        return groupBuyRepository.findAll().stream().map(post -> {
+            List<String> imageUrls = post.getGroupBuyImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyImage::getImgUrl)
+                    .collect(Collectors.toList());
+            List<Long> imageIds = post.getGroupBuyImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyImage::getId)
+                    .collect(Collectors.toList());
 
-                    return new GroupBuyResponseDto(
-                            post.getId(),                          // id
-                            post.getStatus(),                      // status
-                            post.getMember().getUsername(),        // ✅ username
-                            post.getTitle(),                       // ✅ title
-                            post.getDescription(),
-                            post.getContent(),
-                            post.getProductUrl(),
-                            post.getMaxParticipants(),
-                            post.getMinParticipants(),
-                            post.getCurrentParticipants(),
-                            post.getMaxQuantity(),
-                            post.getCurrentQuantity(),
-                            post.getOriginalPrice(),
-                            post.getSalePrice(),
-                            post.getDeadline(),
-                            imageUrls,
-                            (long) post.getLikes().size(),
-                            post.getCreatedAt(),
-                            post.getUpdatedAt()
-                    );
-                })
-                .collect(Collectors.toList());
+            return new GroupBuyResponseDto(
+                    post.getId(), post.getStatus(), post.getMember().getUsername(),
+                    post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
+                    post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
+                    post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
+                    post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
+            );
+        }).collect(Collectors.toList());
     }
 
-    //상세조회
     public GroupBuyResponseDto detailView(Long id) {
-        GroupBuy post = groupBuyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
+        GroupBuy post = validatePost(id);
 
         List<String> imageUrls = post.getGroupBuyImages().stream()
                 .filter(img -> !img.getIsDeleted())
                 .map(GroupBuyImage::getImgUrl)
                 .collect(Collectors.toList());
 
+        List<Long> imageIds = post.getGroupBuyImages().stream()
+                .filter(img -> !img.getIsDeleted())
+                .map(GroupBuyImage::getId)
+                .collect(Collectors.toList());
+
         return new GroupBuyResponseDto(
-                post.getId(),                          // id
-                post.getStatus(),                      // status
-                post.getMember().getUsername(),        // ✅ username
-                post.getTitle(),                       // ✅ title
-                post.getDescription(),
-                post.getContent(),
-                post.getProductUrl(),
-                post.getMaxParticipants(),
-                post.getMinParticipants(),
-                post.getCurrentParticipants(),
-                post.getMaxQuantity(),
-                post.getCurrentQuantity(),
-                post.getOriginalPrice(),
-                post.getSalePrice(),
-                post.getDeadline(),
-                imageUrls,
-                (long) post.getLikes().size(),
-                post.getCreatedAt(),
-                post.getUpdatedAt()
+                post.getId(), post.getStatus(), post.getMember().getUsername(),
+                post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
+                post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
+                post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
+                post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
         );
     }
 
-    //상태별 조회(status)
     public List<GroupBuyResponseDto> statusView(GroupBuyStatus status) {
-        List<GroupBuy> posts = groupBuyRepository.findByStatus(status);
-        return posts.stream()
-                .map(post -> {
-                    //이미지
-                    List<String> imageUrls = post.getGroupBuyImages().stream()
-                            .filter(img -> !img.getIsDeleted())
-                            .map(GroupBuyImage::getImgUrl)
-                            .collect(Collectors.toList());
-                    //글
-                    return new GroupBuyResponseDto(
-                            post.getId(),
-                            post.getStatus(),
-                            post.getTitle(),
-                            post.getMember().getUsername(),
-                            post.getDescription(),
-                            post.getContent(),
-                            post.getProductUrl(),
-                            post.getMaxParticipants(),
-                            post.getMinParticipants(),
-                            post.getCurrentParticipants(),
-                            post.getMaxQuantity(),
-                            post.getCurrentQuantity(),
-                            post.getOriginalPrice(),
-                            post.getSalePrice(),
-                            post.getDeadline(),
-                            imageUrls,
-                            (long) post.getLikes().size(),
-                            post.getCreatedAt(),
-                            post.getUpdatedAt()
-                    );
-                })
-                .collect(Collectors.toList());
+        return groupBuyRepository.findByStatus(status).stream().map(post -> {
+            List<String> imageUrls = post.getGroupBuyImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyImage::getImgUrl)
+                    .collect(Collectors.toList());
+            List<Long> imageIds = post.getGroupBuyImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyImage::getId)
+                    .collect(Collectors.toList());
+
+            return new GroupBuyResponseDto(
+                    post.getId(), post.getStatus(), post.getMember().getUsername(),
+                    post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
+                    post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
+                    post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
+                    post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
+            );
+        }).collect(Collectors.toList());
     }
 
-
-
-    // 사용자 정보 확인
-    public void validateMember (Member loginUser){
+    public void validateMember(Member loginUser) {
         Member foundMember = memberRepository.findById(loginUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당사용자가 존재하지 않습니다"));
 
@@ -244,8 +200,7 @@ public class GroupBuyService {
         }
     }
 
-    // 글작성 공백확인 + 추가해야함
-    public void validateMember (GroupBuyDto groupBuyDto){
+    public void validateMember(GroupBuyDto groupBuyDto) {
         if (groupBuyDto.getTitle() == null || groupBuyDto.getTitle().isBlank()) {
             throw new IllegalArgumentException("제목을 입력하세요");
         }
@@ -253,18 +208,15 @@ public class GroupBuyService {
             throw new IllegalArgumentException("내용을 입력하세요");
         }
     }
-    
-    // 작성자 확인
-    public void validateMember (Member loginUser ,Member writer) {
+
+    public void validateMember(Member loginUser, Member writer) {
         if (!loginUser.getId().equals(writer.getId())) {
             throw new AccessDeniedException("작성자만 가능합니다");
         }
     }
-    
-    //글존재유무확인
-    public GroupBuy validatePost (Long id) {
+
+    public GroupBuy validatePost(Long id) {
         return groupBuyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다"));
     }
-
 }
