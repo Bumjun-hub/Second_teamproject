@@ -96,7 +96,7 @@ public class GroupBuyParticipationService {
 
     //내 신청목록만 보기
     public List<GroupBuyResponseDto> myParticipationList(Member member) {
-
+        
     }
 
 
