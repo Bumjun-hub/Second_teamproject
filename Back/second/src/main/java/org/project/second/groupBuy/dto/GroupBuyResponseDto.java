@@ -32,5 +32,6 @@ public class GroupBuyResponseDto {
     private Long likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<String> participants;
 
 }

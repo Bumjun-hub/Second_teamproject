@@ -123,6 +123,10 @@ public class GroupBuyParticipationService {
                             .map(GroupBuyImage::getId)
                             .collect(Collectors.toList());
 
+                    List<String> participants = post.getParticipations().stream()
+                            .map(p -> p.getMember().getUsername())
+                            .collect(Collectors.toList());
+
                     return new GroupBuyResponseDto(
                             post.getId(),
                             post.getStatus(),
@@ -143,7 +147,8 @@ public class GroupBuyParticipationService {
                             imageIds,
                             (long) post.getLikes().size(),
                             post.getCreatedAt(),
-                            post.getUpdatedAt()
+                            post.getUpdatedAt(),
+                            participants
                     );
                 })
                 .collect(Collectors.toList());

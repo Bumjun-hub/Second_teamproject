@@ -16,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,13 +136,16 @@ public class GroupBuyService {
                     .map(GroupBuyImage::getId)
                     .collect(Collectors.toList());
 
+
             return new GroupBuyResponseDto(
                     post.getId(), post.getStatus(), post.getMember().getUsername(),
                     post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                     post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
-                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
+                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
+                    Collections.emptyList()
+
             );
         }).collect(Collectors.toList());
     }
@@ -158,6 +162,9 @@ public class GroupBuyService {
                 .filter(img -> !img.getIsDeleted())
                 .map(GroupBuyImage::getId)
                 .collect(Collectors.toList());
+        List<String> participants = post.getParticipations().stream()
+                .map(participation -> participation.getMember().getUsername())
+                .collect(Collectors.toList());
 
         return new GroupBuyResponseDto(
                 post.getId(), post.getStatus(), post.getMember().getUsername(),
@@ -165,7 +172,8 @@ public class GroupBuyService {
                 post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                 post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                 post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
-                (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
+                (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
+                participants
         );
     }
 
@@ -186,7 +194,8 @@ public class GroupBuyService {
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                     post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
-                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt()
+                    (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
+                    Collections.emptyList()
             );
         }).collect(Collectors.toList());
     }

@@ -15,6 +15,7 @@ const GroupBuyWritePage = () => {
     productUrl: '',
     maxParticipants: 10,
     minParticipants: 1,
+    currentParticipants: 0,
     maxQuantity: 5,
     originalPrice: 20000,
     salePrice: 10000,
@@ -23,9 +24,9 @@ const GroupBuyWritePage = () => {
   });
 
   const [imageFiles, setImageFiles] = useState([]);
-  const [previewUrls, setPreviewUrls] = useState([]);
-  const [originalImageUrls, setOriginalImageUrls] = useState([]);
-  const [removedImages, setRemovedImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]); // 기존 이미지 (ID와 URL 포함)
+  const [newImagePreviews, setNewImagePreviews] = useState([]); // 새로 추가된 이미지 미리보기
+  const [deletedImageIds, setDeletedImageIds] = useState([]); // 삭제할 기존 이미지 ID들
 
   useEffect(() => {
     if (isEdit) {
@@ -39,16 +40,27 @@ const GroupBuyWritePage = () => {
             productUrl: data.productUrl,
             maxParticipants: data.maxParticipants,
             minParticipants: data.minParticipants,
+            currentParticipants: data.currentParticipants,
             maxQuantity: data.maxQuantity,
             originalPrice: data.originalPrice,
             salePrice: data.salePrice,
             deadline: data.deadline?.slice(0, 16),
             status: data.status
           });
-          if (data.imgUrls && data.imgUrls.length > 0) {
-            setOriginalImageUrls(data.imgUrls);
-            setPreviewUrls(data.imgUrls);
+
+          // 기존 이미지들을 ID와 URL로 매핑
+          if (data.imgUrls && data.imgIds && data.imgUrls.length > 0) {
+            const existingImgs = data.imgUrls.map((url, index) => ({
+              id: data.imgIds[index],
+              url: url,
+              isExisting: true
+            }));
+            setExistingImages(existingImgs);
           }
+        })
+        .catch(err => {
+          console.error('데이터 로드 실패:', err);
+          alert('게시글 정보를 불러오는데 실패했습니다.');
         });
     }
   }, [isEdit, id]);
@@ -60,22 +72,42 @@ const GroupBuyWritePage = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImageFiles(files);
-    const urls = files.map(file => URL.createObjectURL(file));
-    setPreviewUrls((prev) => [...prev, ...urls]);
+
+    // 새로운 파일들을 imageFiles에 추가
+    setImageFiles(prev => [...prev, ...files]);
+
+    // 새로운 미리보기 생성
+    const newPreviews = files.map(file => ({
+      file: file,
+      url: URL.createObjectURL(file),
+      isExisting: false
+    }));
+
+    setNewImagePreviews(prev => [...prev, ...newPreviews]);
   };
 
-  const handleImageRemove = (index) => {
-    const removedUrl = previewUrls[index];
-    if (originalImageUrls.includes(removedUrl)) {
-      setRemovedImages((prev) => [...prev, removedUrl]);
+  const handleExistingImageRemove = (imageId, index) => {
+    // 기존 이미지 삭제
+    setDeletedImageIds(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleNewImageRemove = (index) => {
+    // 새로 추가된 이미지 삭제
+    const removedPreview = newImagePreviews[index];
+
+    // 메모리 누수 방지를 위해 Object URL 해제
+    if (removedPreview && removedPreview.url) {
+      URL.revokeObjectURL(removedPreview.url);
     }
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const data = new FormData();
     data.append('status', formData.status);
     data.append('title', formData.title);
@@ -84,19 +116,22 @@ const GroupBuyWritePage = () => {
     data.append('productUrl', formData.productUrl);
     data.append('maxParticipants', formData.maxParticipants);
     data.append('minParticipants', formData.minParticipants);
+    data.append('currentParticipants', formData.currentParticipants);
     data.append('maxQuantity', formData.maxQuantity);
     data.append('originalPrice', formData.originalPrice);
     data.append('salePrice', formData.salePrice);
     data.append('deadline', formData.deadline);
 
+    // 새로운 이미지 파일들 추가
     imageFiles.forEach((file) => {
       data.append('images', file);
     });
 
-    if (isEdit) {
-      // 삭제 대상 이미지 ID만 추출하여 넘김 (URL -> ID 매핑 필요할 경우 백엔드 기준 따라야 함)
-      const deleteImageIds = removedImages.map((url, index) => index + 1); // 예시
-      deleteImageIds.forEach(id => data.append('deleteImageIds', id));
+    // 수정 모드에서 삭제할 이미지 ID들 추가
+    if (isEdit && deletedImageIds.length > 0) {
+      deletedImageIds.forEach(id => {
+        data.append('deleteImageIds', id);
+      });
     }
 
     const url = isEdit
@@ -113,6 +148,14 @@ const GroupBuyWritePage = () => {
 
       if (response.ok) {
         alert(isEdit ? '공동구매 글이 수정되었습니다!' : '공동구매 글이 등록되었습니다!');
+
+        // 메모리 정리
+        newImagePreviews.forEach(preview => {
+          if (preview.url) {
+            URL.revokeObjectURL(preview.url);
+          }
+        });
+
         navigate('/groupbuy');
       } else {
         const errorText = await response.text();
@@ -125,8 +168,25 @@ const GroupBuyWritePage = () => {
   };
 
   const handleCancel = () => {
+    // 메모리 정리
+    newImagePreviews.forEach(preview => {
+      if (preview.url) {
+        URL.revokeObjectURL(preview.url);
+      }
+    });
     navigate('/groupbuy');
   };
+
+  // 컴포넌트 언마운트 시 메모리 정리
+  useEffect(() => {
+    return () => {
+      newImagePreviews.forEach(preview => {
+        if (preview.url) {
+          URL.revokeObjectURL(preview.url);
+        }
+      });
+    };
+  }, []);
 
   return (
     <Section>
@@ -219,16 +279,46 @@ const GroupBuyWritePage = () => {
               onChange={handleChange}
               required
             />
+            
+            <label>현재 인원</label>
+            <input
+              name="currentParticipants"
+              type="number"
+              value={formData.currentParticipants}
+              disabled
+              readOnly
+            />
 
-            {previewUrls.length > 0 && (
+            {/* 기존 이미지들 표시 */}
+            {existingImages.length > 0 && (
               <div className="image-preview-area">
-                {previewUrls.map((url, idx) => (
-                  <div key={idx} className="image-preview-wrapper">
-                    <img src={url} alt={`첨부 이미지 ${idx + 1}`} />
+                <h4>기존 이미지</h4>
+                {existingImages.map((img, idx) => (
+                  <div key={`existing-${img.id}`} className="image-preview-wrapper">
+                    <img src={img.url} alt={`기존 이미지 ${idx + 1}`} />
                     <button
                       type="button"
                       className="remove-image-btn"
-                      onClick={() => handleImageRemove(idx)}
+                      onClick={() => handleExistingImageRemove(img.id, idx)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 새로 추가된 이미지들 표시 */}
+            {newImagePreviews.length > 0 && (
+              <div className="image-preview-area">
+                <h4>새로 추가된 이미지</h4>
+                {newImagePreviews.map((preview, idx) => (
+                  <div key={`new-${idx}`} className="image-preview-wrapper">
+                    <img src={preview.url} alt={`새 이미지 ${idx + 1}`} />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={() => handleNewImageRemove(idx)}
                     >
                       ×
                     </button>
