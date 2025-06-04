@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class RecipeRequest {
-    String recipeId;
-    String recipeName;
-    String imageUrl;
+    private String recipeId;
+    private String recipeName;
+    private String imageUrl;
 }

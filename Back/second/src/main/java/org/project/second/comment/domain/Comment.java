@@ -23,6 +23,7 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Column(name = "is_deleted", nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,5 +37,9 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = true)
     private Recipe recipe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "groupbuy_id", nullable = true)
+    private GroupBuy groupBuy;
 
 }
