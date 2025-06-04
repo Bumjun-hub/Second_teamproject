@@ -3,6 +3,7 @@ import './MyPage.css';
 import MyPageEditProfile from './MyPageEditProfile';
 import CheckPw from './CheckPw'; 
 import ChangePw from './ChangePw';
+import WishList  from './WishList';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch, deleteAccount } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -28,7 +29,6 @@ const MyPage = () => {
     address: '',
     profileImage: ''
   });
-  const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState('main'); 
   const [showPasswordCheck, setShowPasswordCheck] = useState(false); 
   const { user } = useAuth();
@@ -36,6 +36,19 @@ const MyPage = () => {
   // 컴포넌트 마운트 시 사용자 정보 가져오기
   useEffect(() => {
     fetchUserInfo();
+  }, []);
+
+  // 브라우저 뒤로가기 처리
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // 브라우저 뒤로가기 시 메인 화면으로 이동
+      setCurrentView('main');
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   // 프로필 이미지 URL 생성 함수
@@ -47,7 +60,7 @@ const MyPage = () => {
   // 사용자 정보 가져오기 (토큰 자동 갱신 포함)
   const fetchUserInfo = async () => {
     try {
-      setLoading(true);
+
       const response = await authenticatedFetch('http://localhost:8080/api/mypage', {
         method: 'GET',
       });
@@ -73,29 +86,36 @@ const MyPage = () => {
         alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
       }
     } finally {
-      setLoading(false);
+
     }
   };
-
   // 프로필 편집 버튼 클릭 시 - 비밀번호 확인 모달 표시
   const handleEditProfile = () => {
     setShowPasswordCheck(true);
   };
+  
   // 비밀번호 확인 완료 시 - 프로필 편집 페이지로 이동
   const handlePasswordVerified = () => {
     setShowPasswordCheck(false);
+    // 히스토리에 새 상태 추가
+    window.history.pushState({page: 'editProfile'}, '', window.location.pathname);
     setCurrentView('editProfile');
   };
-  // 비밀번호 확인 취소 시
+
   const handlePasswordCheckCancel = () => {
     setShowPasswordCheck(false);
   };
+  
+  const handleGoToWishList = () => {
+    window.history.pushState({page: 'wishlist'}, '', window.location.pathname);
+    setCurrentView('wishlist');
+  };
+  
   // 회원탈퇴 처리 (토큰 자동 갱신 포함)
   const handleDeleteAccount = async () => {
     if (window.confirm('정말로 회원탈퇴를 하시겠습니까?\n\n탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
       try {
         const result = await deleteAccount();
-        
         if (result.success) {
           alert('회원탈퇴가 완료되었습니다.');
         } else {
@@ -106,25 +126,21 @@ const MyPage = () => {
       }
     }
   };
-
-  if (loading) {
-    return (
-      <div className="mypage-container">
-        <div className="loading">
-          <div>로딩중...</div>
-          <div>사용자 정보를 가져오고 있습니다.</div>
-        </div>
-      </div>
-    );
-  }
+  
   // 프로필 편집 화면으로 전환
   if (currentView === 'editProfile') {
     return (
       <MyPageEditProfile 
-        onBack={() => {
-          setCurrentView('main');
-          fetchUserInfo(); // 돌아올 때 최신 정보로 업데이트
-        }}
+        // onBack 제거 - 브라우저 뒤로가기 사용
+      />
+    );
+  }
+
+  // 위시리스트 화면으로 전환
+  if (currentView === 'wishlist') {
+    return (
+      <WishList 
+        // onBack 제거 - 브라우저 뒤로가기 사용
       />
     );
   }
@@ -185,7 +201,7 @@ const MyPage = () => {
           <MenuItem 
             icon="💜" 
             text="위시리스트" 
-            onClick={() => console.log('위시리스트')}
+            onClick={handleGoToWishList}
           />
           <MenuItem 
             icon="🔖" 
@@ -225,6 +241,7 @@ const MyPage = () => {
     </div>
   );
 };
+
 // 메뉴 아이템 컴포넌트
 const MenuItem = ({ icon, text, onClick }) => {
   return (
