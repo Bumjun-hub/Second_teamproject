@@ -1,4 +1,4 @@
-package org.project.second.groupBuy.dto;
+package org.project.second.order.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,9 +1,10 @@
-package org.project.second.groupBuy.domain;
+package org.project.second.order.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.OrderStatus;
+import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
 
 @Entity

@@ -34,7 +34,7 @@ public class GroupBuyController {
             @RequestPart("description") String description,
             @RequestPart("maxParticipants") Integer maxParticipants,
             @RequestPart("minParticipants") Integer minParticipants,
-            @RequestPart("currentParticipants") Integer currentParticipants,
+       //     @RequestPart("currentParticipants") Integer currentParticipants,
             @RequestPart("maxQuantity") Integer maxQuantity,
             @RequestPart("originalPrice") Long originalPrice,
             @RequestPart("salePrice") Long salePrice,
