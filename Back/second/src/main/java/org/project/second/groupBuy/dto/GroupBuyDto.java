@@ -18,6 +18,7 @@ public class GroupBuyDto {
     private String title;
     private String description;
     private String content;
+    private String productUrl;              //제품링크
     private Integer maxParticipants;        //최대참여자
     private Integer minParticipants;        //최소참여자
     private Integer currentParticipants;    //현재참여자
