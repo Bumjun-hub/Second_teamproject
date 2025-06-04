@@ -126,6 +126,8 @@ const BoardInfoPage = () => {
                 <div className="meta-info">
                   <span><strong>작성자</strong> {item.username}</span>
                   <span><strong>작성일</strong> {new Date(item.createdAt).toISOString().slice(0, 10)}</span>
+                  
+
                   <span><strong>조회</strong> {item.viewCount}</span>
                   <span><strong>추천</strong> {likes}</span>
                 </div>
