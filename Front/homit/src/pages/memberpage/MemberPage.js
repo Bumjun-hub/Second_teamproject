@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AddressInput from './AddressInput'; // 새로 만든 컴포넌트 import
+import AddressInput from './AddressInput'; 
 import './MemberPage.css';
 
 const MemberPage = () => {
@@ -19,14 +19,32 @@ const MemberPage = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+    const { name, value } = e.target;
+    
+    if (name === 'phone') {
+        // 숫자만 추출
+        const numbersOnly = value.replace(/[^\d]/g, '');
+        
+        // 전화번호 포맷팅
+        let formattedPhone = '';
+        if (numbersOnly.length <= 3) {
+            formattedPhone = numbersOnly;
+        } else if (numbersOnly.length <= 7) {
+            formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3)}`;
+        } else {
+            formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3, 7)}-${numbersOnly.slice(7, 11)}`;
+        }
+        
+        setFormData(prev => ({
+            ...prev,
+            [name]: formattedPhone
+        }));
+    } else {
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
-        if (error) {
-            setError('');
-        }
+    }
     };
 
     const handleAgreementChange = (e) => {

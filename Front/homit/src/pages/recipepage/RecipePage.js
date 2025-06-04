@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import RecipeInfoPage from './RecipeInfoPage';
 import './RecipePage.css';
 import { BsFire,BsSearch } from "react-icons/bs";
-import { FaStar } from "react-icons/fa";
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight, 
          MdOutlineKeyboardDoubleArrowLeft, MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 
@@ -139,9 +138,6 @@ useEffect(() => {
                 <div className="recipe-meta">
                   <span className="recipe-category">{recipe.RCP_PAT2}</span>
                   {recipe.INFO_ENG && <span className="recipe-calories"><BsFire size={15}/> {recipe.INFO_ENG}kcal</span>}
-                </div>
-                <div className="recipe-rating">
-                  <span><FaStar size={13} color='d0d000'/> 4.5</span>
                 </div>
               </div>
             </div>
