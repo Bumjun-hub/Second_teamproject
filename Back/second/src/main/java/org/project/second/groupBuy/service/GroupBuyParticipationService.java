@@ -22,6 +22,7 @@ public class GroupBuyParticipationService {
     private final GroupBuyRepository groupBuyRepository;
     private final GroupBuyParticipationRepository groupBuyParticipationRepository;
 
+    //신청하기
     public void getApply(Long groupBuyId, Member member, int quantity) {
         //공동구매가 있는지
         GroupBuy groupBuy = validatepost(groupBuyId);
@@ -56,11 +57,9 @@ public class GroupBuyParticipationService {
         }
         // 날짜가 맞으면 closed해라
         if (groupBuy.getDeadline().isBefore(LocalDateTime.now()) &&
-        groupBuy.getStatus() == GroupBuyStatus.OPEN) {
+                groupBuy.getStatus() == GroupBuyStatus.OPEN) {
             groupBuy.setStatus(GroupBuyStatus.CLOSED);
         }
-
-
     }
 
     //신청한사람목록보기(관리자용)
@@ -72,11 +71,11 @@ public class GroupBuyParticipationService {
                 = groupBuyParticipationRepository.findByGroupBuy(groupBuy);
 
         return  participationList.stream().map(participation -> new GroupBuyParticipationDto(
-                participation.getMember().getId(),
-                participation.getMember().getUsername(),
-                participation.getQuantity(),
-                participation.getCreatedAt()
-        ))
+                        participation.getMember().getId(),
+                        participation.getMember().getUsername(),
+                        participation.getQuantity(),
+                        participation.getCreatedAt()
+                ))
                 .collect(Collectors.toList());
 
     }
@@ -96,17 +95,11 @@ public class GroupBuyParticipationService {
     }
 
     //내 신청목록만 보기
-    public List<GroupBuyResponseDto>pationList(Member member) {
-        List<GroupBuyParticipation> participationList
-                = groupBuyParticipationRepository.findByMember(member);
-
-        return participationList.stream().map(participation -> {
-            GroupBuy groupBuy = participation.getGroupBuy();
-            return GroupBuyResponseDto.from(groupBuy);
-        })
-
+    public List<GroupBuyResponseDto> myParticipationList(Member member) {
 
     }
+
+
 
 
 

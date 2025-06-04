@@ -2,6 +2,7 @@ package org.project.second.groupBuy.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.project.second.groupBuy.dto.GroupBuyParticipationDto;
+import org.project.second.groupBuy.dto.GroupBuyResponseDto;
 import org.project.second.groupBuy.service.GroupBuyParticipationService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
@@ -57,9 +58,8 @@ public class GroupBuyParticipationController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         Member member = userDetails.getMember();
-        List<GroupBuyParticipationDto> participationList
-                = groupBuyParticipationService.ParticipationList(member);
-
+        List<GroupBuyResponseDto> participationList
+                = groupBuyParticipationService.myParticipationList(member);
         return ResponseEntity.ok(participationList);
     }
 
