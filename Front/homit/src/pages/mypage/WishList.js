@@ -17,7 +17,6 @@ const WishList = () => {
     
     const totalPages = Math.ceil(wishlistItems.length / itemsPerPage);
 
-    // 위시리스트 조회
     const fetchWishlist = async () => {
         try {
             setLoading(true);
@@ -39,7 +38,7 @@ const WishList = () => {
         }
     };
 
-    // 위시리스트에서 상품 삭제
+    // 상품 삭제
     const removeFromWishlist = async (naverProductId, productName) => {
         if (!window.confirm(`"${productName}"을(를) 위시리스트에서 삭제하시겠습니까?`)) {
             return;
