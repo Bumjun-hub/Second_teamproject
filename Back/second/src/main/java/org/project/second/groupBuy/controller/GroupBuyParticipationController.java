@@ -53,8 +53,8 @@ public class GroupBuyParticipationController {
     }
 
     //내 신청목록만 보기
-    @GetMapping("/myPage")
-    public ResponseEntity<List<GroupBuyParticipationDto>> myParticipationList(
+    @GetMapping("/myPage/apply")
+    public ResponseEntity<List<GroupBuyResponseDto>> myParticipationList(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ){
         Member member = userDetails.getMember();
@@ -62,9 +62,6 @@ public class GroupBuyParticipationController {
                 = groupBuyParticipationService.myParticipationList(member);
         return ResponseEntity.ok(participationList);
     }
-
-
-    //내신청목록상세보기 + 신청취소
 
 
 }

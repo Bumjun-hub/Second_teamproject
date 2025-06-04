@@ -31,14 +31,25 @@ public class GroupBuyController {
             @RequestPart("title") String title,
             @RequestPart("content") String content,
             @RequestPart("description") String description,
-            @RequestPart("maxParticipants") Integer maxParticipants,
-            @RequestPart("minParticipants") Integer minParticipants,
-            @RequestPart("maxQuantity") Integer maxQuantity,
-            @RequestPart("originalPrice") Long originalPrice,
-            @RequestPart("salePrice") Long salePrice,
-            @RequestPart("deadline")LocalDateTime deadline,
+            @RequestPart("maxParticipants") String maxParticipantsStr,
+            @RequestPart("minParticipants") String minParticipantsStr,
+            @RequestPart("currentParticipants") String currentParticipantsStr,
+            @RequestPart("maxQuantity") String maxQuantityStr,
+            @RequestPart("originalPrice") String originalPriceStr,
+            @RequestPart("salePrice") String salePriceStr,
+            @RequestPart("deadline")String deadlineStr,
+
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // 파싱 처리 (Postman 테스트용)  Str 빼기
+        LocalDateTime deadline = LocalDateTime.parse(deadlineStr);
+ Integer maxParticipants = Integer.parseInt(maxParticipantsStr);
+    Integer minParticipants = Integer.parseInt(minParticipantsStr);
+    Integer currentParticipants = Integer.parseInt(currentParticipantsStr);
+        Integer maxQuantity = Integer.parseInt(maxQuantityStr);
+        Long originalPrice = Long.parseLong(originalPriceStr);
+        Long salePrice = Long.parseLong(salePriceStr);
 
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))

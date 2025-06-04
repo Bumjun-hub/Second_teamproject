@@ -1,9 +1,11 @@
 package org.project.second.groupBuy.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.domain.GroupBuyParticipation;
+import org.project.second.groupBuy.domain.GroupBuyImage;
 import org.project.second.groupBuy.dto.GroupBuyParticipationDto;
 import org.project.second.groupBuy.dto.GroupBuyResponseDto;
 import org.project.second.groupBuy.repository.GroupBuyParticipationRepository;
@@ -23,6 +25,7 @@ public class GroupBuyParticipationService {
     private final GroupBuyParticipationRepository groupBuyParticipationRepository;
 
     //신청하기
+    @Transactional
     public void getApply(Long groupBuyId, Member member, int quantity) {
         //공동구매가 있는지
         GroupBuy groupBuy = validatepost(groupBuyId);
@@ -63,6 +66,7 @@ public class GroupBuyParticipationService {
     }
 
     //신청한사람목록보기(관리자용)
+    @Transactional
     public List<GroupBuyParticipationDto> getApplyList(Long groupBuyId) {
         //게시글이 있는지
         GroupBuy groupBuy = validatepost(groupBuyId);
@@ -81,6 +85,7 @@ public class GroupBuyParticipationService {
     }
 
     //신청취소
+    @Transactional
     public void cancelApply(Long groupBuyId, Member member) {
         validateLogin(member);
         GroupBuy groupBuy = validatepost(groupBuyId);
@@ -95,8 +100,46 @@ public class GroupBuyParticipationService {
     }
 
     //내 신청목록만 보기
+    @Transactional
     public List<GroupBuyResponseDto> myParticipationList(Member member) {
-        
+        //신청내역 가져오기
+        List<GroupBuyParticipation> participationList
+                = groupBuyParticipationRepository.findByMember(member);
+
+        List<GroupBuy> Buys = participationList.stream()
+                .map(GroupBuyParticipation::getGroupBuy)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return Buys.stream()
+                .map(post -> {
+                    List<String> imageUrls = post.getGroupBuyImages().stream()
+                            .filter(img -> !img.getIsDeleted())
+                            .map(GroupBuyImage::getImgUrl)
+                            .collect(Collectors.toList());
+
+                    return new GroupBuyResponseDto(
+                            post.getId(),
+                            post.getStatus(),
+                            post.getTitle(),
+                            post.getMember().getUsername(),
+                            post.getDescription(),
+                            post.getContent(),
+                            post.getMaxParticipants(),
+                            post.getMinParticipants(),
+                            post.getCurrentParticipants(),
+                            post.getMaxQuantity(),
+                            post.getCurrentQuantity(),
+                            post.getOriginalPrice(),
+                            post.getSalePrice(),
+                            post.getDeadline(),
+                            imageUrls,
+                            (long) post.getLikes().size(),
+                            post.getCreatedAt(),
+                            post.getUpdatedAt()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 
