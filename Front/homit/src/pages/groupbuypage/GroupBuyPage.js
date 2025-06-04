@@ -82,7 +82,7 @@ const GroupBuyPage = () => {
                 <div className="Groupbuylist-inner">
                     {currentItems.map((item) => (
                         <div key={item.id} className="GroupbuyItem">
-                            <img src={item.imageUrls?.[0]} alt={item.title} className="item-image" />
+                            <img src={item.imgUrls?.[0]} alt={item.title} className="item-image" />
                             <h3>{item.title}</h3>
                             <p>{item.salePrice?.toLocaleString()}원</p>
                             <button

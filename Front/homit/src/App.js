@@ -28,6 +28,8 @@ function App() {
           <Route path="/groupbuy" element={<GroupBuyPage />} />
           <Route path="/groupbuy/info/:id" element={<GroupBuyInfoPage />} />
           <Route path="/groupbuy/write" element={<GroupBuyWritePage />} />
+          <Route path="/groupbuy/admin/edit/:id" element={<GroupBuyWritePage />} />
+
 
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/info/:category/:id" element={<BoardInfoPage />} />

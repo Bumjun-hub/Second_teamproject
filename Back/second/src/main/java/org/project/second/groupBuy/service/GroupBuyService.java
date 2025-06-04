@@ -139,10 +139,10 @@ public class GroupBuyService {
                             .collect(Collectors.toList());
 
                     return new GroupBuyResponseDto(
-                            post.getId(),
-                            post.getStatus(),
-                            post.getTitle(),
-                            post.getMember().getUsername(),
+                            post.getId(),                          // id
+                            post.getStatus(),                      // status
+                            post.getMember().getUsername(),        // ✅ username
+                            post.getTitle(),                       // ✅ title
                             post.getDescription(),
                             post.getContent(),
                             post.getProductUrl(),
@@ -174,10 +174,10 @@ public class GroupBuyService {
                 .collect(Collectors.toList());
 
         return new GroupBuyResponseDto(
-                post.getId(),
-                post.getStatus(),
-                post.getTitle(),
-                post.getMember().getUsername(),
+                post.getId(),                          // id
+                post.getStatus(),                      // status
+                post.getMember().getUsername(),        // ✅ username
+                post.getTitle(),                       // ✅ title
                 post.getDescription(),
                 post.getContent(),
                 post.getProductUrl(),
