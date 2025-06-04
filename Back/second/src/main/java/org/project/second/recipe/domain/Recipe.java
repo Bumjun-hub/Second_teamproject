@@ -5,8 +5,6 @@ import lombok.*;
 import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.favorite.domain.Favorite;
-import org.project.second.like.domain.Like;
-import org.project.second.viewHistory.domain.RecipeViewHistory;
 
 import java.util.List;
 
@@ -36,8 +34,5 @@ public class Recipe extends BaseEntity {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
-
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecipeViewHistory> viewHistories;
 
 }

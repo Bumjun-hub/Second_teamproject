@@ -3,14 +3,12 @@ package org.project.second.favorite.service;
 import lombok.RequiredArgsConstructor;
 import org.project.second.comment.repository.CommentRepository;
 import org.project.second.favorite.dto.FavoriteRequest;
-import org.project.second.like.repository.LikeRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.favorite.domain.Favorite;
 import org.project.second.recipe.domain.Recipe;
 import org.project.second.favorite.repository.FavoriteRepository;
 import org.project.second.recipe.repository.RecipeRepository;
 import org.project.second.recipe.service.RecipeService;
-import org.project.second.viewHistory.repository.ViewHisotryRepository;
 import org.project.second.wishlist.service.WishlistService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +20,7 @@ public class FavoriteService {
     private final WishlistService wishlistService;
     private final RecipeService recipeService;
     private final RecipeRepository recipeRepository;
-    private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final ViewHisotryRepository viewHisotryRepository;
 
     @Transactional
     public void addFavorite(Member m, FavoriteRequest request) {
@@ -66,8 +62,7 @@ public class FavoriteService {
 
         // Recipe 참조 확인 및 삭제
         if (!favoriteRepository.existsByRecipe_Id(recipe.getId()) &&
-                !commentRepository.existsByRecipe_Id(recipe.getId()) &&
-                !viewHisotryRepository.existsByRecipe_Id(recipe.getId())) {
+                !commentRepository.existsByRecipe_Id(recipe.getId())) {
             recipeRepository.deleteById(recipe.getId());
         }
     }
