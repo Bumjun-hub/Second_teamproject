@@ -30,9 +30,11 @@ public class GroupBuyController {
             @RequestPart("status") String status,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
+            @RequestPart("productUrl")String productUrl,
             @RequestPart("description") String description,
             @RequestPart("maxParticipants") Integer maxParticipants,
             @RequestPart("minParticipants") Integer minParticipants,
+            @RequestPart("currentParticipants") Integer currentParticipants,
             @RequestPart("maxQuantity") Integer maxQuantity,
             @RequestPart("originalPrice") Long originalPrice,
             @RequestPart("salePrice") Long salePrice,
@@ -44,6 +46,7 @@ public class GroupBuyController {
                 .status(GroupBuyStatus.valueOf(status))
                 .title(title)
                 .content(content)
+                .productUrl(productUrl)
                 .description(description)
                 .maxParticipants(maxParticipants)
                 .minParticipants(minParticipants)
@@ -65,6 +68,7 @@ public class GroupBuyController {
             @RequestPart("status") String status,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
+            @RequestPart("productUrl")String productUrl,
             @RequestPart("description") String description,
             @RequestPart("maxParticipants") Integer maxParticipants,
             @RequestPart("minParticipants") Integer minParticipants,
@@ -80,6 +84,7 @@ public class GroupBuyController {
                 .status(GroupBuyStatus.valueOf(status))
                 .title(title)
                 .content(content)
+                .productUrl(productUrl)
                 .description(description)
                 .maxParticipants(maxParticipants)
                 .minParticipants(minParticipants)
