@@ -9,9 +9,6 @@ const MyPageEditProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
   const [availableImages, setAvailableImages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     fetchProfile();
@@ -32,7 +29,6 @@ const MyPageEditProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      setLoading(true);
       const response = await fetch('/api/mypage', {
         method: 'GET',
         credentials: 'include',
@@ -51,13 +47,9 @@ const MyPageEditProfile = () => {
           detailAddress,
           imageUrl: data.imageUrl || '/static/profileimages/profile1.jpg'  
         });
-      } else {
-        setError(`서버 오류: ${response.status}`);
       }
     } catch (err) {
-      setError('네트워크 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      // 에러 처리 제거
     }
   };
 
@@ -74,47 +66,36 @@ const MyPageEditProfile = () => {
         setAvailableImages(images);
       }
     } catch (err) {
-      // 이미지 로드 실패는 UI에 영향 없음
+      // 에러 처리 제거
     }
   };
 
   const startEdit = () => {
     setEditData({ ...profile });
     setEditMode(true);
-    setError('');
-    setSuccess('');
   };
 
   const cancelEdit = () => {
     setEditMode(false);
     setEditData({});
-    setError('');
   };
 
   const handleInputChange = (field, value) => {
-  if (field === 'phone') {
-    const formattedPhone = formatPhoneNumber(value);
-    setEditData(prev => ({ ...prev, [field]: formattedPhone }));
-  } else {
+    if (field === 'phone') {
+      value = formatPhoneNumber(value);
+    }
     setEditData(prev => ({ ...prev, [field]: value }));
-  }
-};
-const formatPhoneNumber = (value) => {
-  const numbers = value.replace(/[^\d]/g, '');
-  // 길이에 따른 포맷팅
-  if (numbers.length <= 3) {
-    return numbers;
-  } else if (numbers.length <= 7) {
-    return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-  } else {
+  };
+
+  const formatPhoneNumber = (value) => {
+    const numbers = value.replace(/[^\d]/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
     return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
-  }
-};
+  };
 
   const updateProfile = async () => {
     try {
-      setLoading(true);
-      
       // 프로필 정보 업데이트
       const profileResponse = await fetch('/api/mypage/editProfile', {
         method: 'PUT',
@@ -128,9 +109,7 @@ const formatPhoneNumber = (value) => {
         })
       });
 
-      if (!profileResponse.ok) {
-        throw new Error('프로필 업데이트 실패');
-      }
+      if (!profileResponse.ok) return;
 
       // 프로필 이미지 업데이트
       let finalImageUrl = profile.imageUrl;
@@ -144,10 +123,9 @@ const formatPhoneNumber = (value) => {
           body: JSON.stringify({ profile_imageName: imageName })
         });
 
-        if (!imageResponse.ok) {
-          throw new Error('프로필 이미지 업데이트 실패');
+        if (imageResponse.ok) {
+          finalImageUrl = editData.imageUrl;
         }
-        finalImageUrl = editData.imageUrl;
       }
 
       // 성공 처리
@@ -162,14 +140,11 @@ const formatPhoneNumber = (value) => {
         detailAddress,
         imageUrl: finalImageUrl
       });
-      setSuccess('프로필이 성공적으로 업데이트되었습니다.');
       setEditMode(false);
       setEditData({});
 
     } catch (err) {
-      setError(err.message || '업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      // 에러 처리 제거
     }
   };
 
@@ -182,9 +157,6 @@ const formatPhoneNumber = (value) => {
             <button onClick={startEdit} className="edit-button1">편집</button>
           )}
         </div>
-
-        {error && <div className="alert error">{error}</div>}
-        {success && <div className="alert success">{success}</div>}
 
         <div className="profile-content">
           {/* 프로필 이미지 섹션 */}
@@ -241,7 +213,8 @@ const formatPhoneNumber = (value) => {
                 type="email"
                 value={editData.email || ''}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="이메일을 입력하세요"disabled
+                placeholder="이메일을 입력하세요"
+                disabled
               />
             ) : (
               <span>{profile.email || '설정되지 않음'}</span>
@@ -284,9 +257,7 @@ const formatPhoneNumber = (value) => {
         {editMode && (
           <div className="action-buttons">
             <button onClick={cancelEdit} className="cancel-button1">취소</button>
-            <button onClick={updateProfile} disabled={loading} className="save-button">
-              {loading ? '저장 중...' : '저장'}
-            </button>
+            <button onClick={updateProfile} className="save-button">저장</button>
           </div>
         )}
       </div>

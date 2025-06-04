@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './RecipeinfoPage.css';
+import { authenticatedFetch } from '../../utils/authUtils';
 
 const RecipeInfoPage = ({ recipe, onBackClick }) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const getCookingSteps = (recipe) => {
     const steps = [];
     for (let i = 1; i <= 20; i++) {
@@ -12,12 +15,43 @@ const RecipeInfoPage = ({ recipe, onBackClick }) => {
     return steps;
   };
 
+  const toggleFavorite = async () => {
+    try {
+      const url = isFavorite ? 'http://localhost:8080/api/favorite/remove' : 'http://localhost:8080/api/favorite/add';
+      const method = isFavorite ? 'DELETE' : 'POST';
+      const body = isFavorite 
+        ? { recipeId: recipe.RCP_SEQ }
+        : { 
+            recipeId: recipe.RCP_SEQ, 
+            recipeName: recipe.RCP_NM, 
+            imageUrl: recipe.ATT_FILE_NO_MAIN 
+          };
+
+      const response = await authenticatedFetch(url, {
+        method,
+        body: JSON.stringify(body)
+      });
+
+      if (response.ok) {
+        setIsFavorite(!isFavorite);
+        alert(isFavorite ? '즐겨찾기에서 삭제되었습니다.' : '즐겨찾기에 추가되었습니다.');
+      } else {
+        alert('요청 처리 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      alert('네트워크 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div className="recipe-info-page">
       {/* 헤더 */}
       <div className="info-header">
         <div className="info-header-container">
           <h1 className="recipe-title">{recipe.RCP_NM}</h1>
+          <button className="favorite-btn" onClick={toggleFavorite}>
+            {isFavorite ? '❤️' : '🤍'} {isFavorite ? '삭제' : '추가'}
+          </button>
         </div>
       </div>
       {/* 메인 컨텐츠 */}
