@@ -110,10 +110,11 @@ public class CommunityController {
     @GetMapping("/detail/{category}/{id}")
     public ResponseEntity<CommunityResponseDto> detailPost(
             @PathVariable CommunityCategory category,
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails // ✅ 로그인 유저 받기
     ) {
-
-        CommunityResponseDto post = communityService.detailPost(category, id);
+        Member loginUser = userDetails.getMember();
+        CommunityResponseDto post = communityService.detailPost(category, id, loginUser);
         return ResponseEntity.ok(post);
     }
 

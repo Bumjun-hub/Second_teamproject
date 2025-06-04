@@ -136,9 +136,11 @@ public class CommunityService {
                             post.getCreatedAt(),
                             post.getUpdatedAt(),
                             post.getViewCount(),
-                            (long) post.getLikes().size(),
+                            (long) post.getLikes().stream().filter(like -> like.getCommunity() != null).count(),
                             imageUrls,
-                            post.isNotice()
+                            post.isNotice(),
+                            false
+
 
                     );
                 })
@@ -148,7 +150,7 @@ public class CommunityService {
 
     //상세조회
     @Transactional
-    public CommunityResponseDto detailPost (CommunityCategory category, Long id){
+    public CommunityResponseDto detailPost (CommunityCategory category, Long id, Member loginUser){
         Community post = communityRepository.findByIdAndCategoryAndIsDeletedFalse(id, category);
 
         if (post == null) {
@@ -163,6 +165,11 @@ public class CommunityService {
                 .map(CommunityImage::getImgUrl)
                 .collect(Collectors.toList());
 
+        // ✅ 좋아요 여부 판단
+        boolean liked = post.getLikes().stream()
+                .filter(like -> like.getCommunity() != null) // 게시글 좋아요만 필터
+                .anyMatch(like -> like.getMember().getId().equals(loginUser.getId()));
+
         return new CommunityResponseDto(
                 post.getId(),
                 post.getMember().getUsername(),
@@ -172,9 +179,10 @@ public class CommunityService {
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 post.getViewCount(),
-                (long) post.getLikes().size(),
+                (long) post.getLikes().stream().filter(like -> like.getCommunity() != null).count(),
                 imageUrls,
-                post.isNotice()
+                post.isNotice(),
+                liked
         );
     }
 

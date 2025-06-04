@@ -7,15 +7,15 @@ const BoardPage = () => {
     const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 15;
 
     const [searchField, setSearchField] = useState('title');
     const [searchQuery, setSearchQuery] = useState('');
-
     const categories = ['전체', '자유게시판', '꿀팁', '공구후기', '요리후기'];
     const [selectedCategory, setSelectedCategory] = useState('전체');
+
+    const [thumbnail, setThumbnail] = useState({ visible: false, x: 0, y: 0, url: '' });
 
     const categoryMap = {
         '자유게시판': 'FREE',
@@ -74,10 +74,8 @@ const BoardPage = () => {
         setCurrentPage(1);
     };
 
-    // 공지글과 일반글 분리
     const noticePosts = filteredData.filter(item => item.notice === true);
     const normalPosts = filteredData.filter(item => item.notice !== true);
-
 
     const totalPages = Math.ceil(normalPosts.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -91,7 +89,6 @@ const BoardPage = () => {
                 </div>
             </div>
 
-            {/* 카테고리 필터 버튼 */}
             <div className="category-filter">
                 {categories.map((cat) => (
                     <button
@@ -121,12 +118,25 @@ const BoardPage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* 공지글 항상 맨 위 */}
                         {noticePosts.map((item) => (
                             <tr key={item.id} className="notice-row">
                                 <td>{item.notice === true ? "공지사항" : categoryLabelMap[item.category]}</td>
                                 <td>
-                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                    <a
+                                        onMouseEnter={(e) => {
+                                            if (item.imgUrls && item.imgUrls.length > 0) {
+                                                const rect = e.target.getBoundingClientRect();
+                                                setThumbnail({
+                                                    visible: true,
+                                                    x: e.clientX + 10,
+                                                    y: window.scrollY + rect.top - 160,
+                                                    url: item.imgUrls[0]
+                                                });
+                                            }
+                                        }}
+                                        onMouseLeave={() => setThumbnail({ visible: false, x: 0, y: 0, url: '' })}
+                                        onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}
+                                    >
                                         {item.title}
                                     </a>
                                 </td>
@@ -137,12 +147,25 @@ const BoardPage = () => {
                             </tr>
                         ))}
 
-                        {/* 일반글 - 페이지네이션 대상 */}
                         {currentItems.map((item) => (
                             <tr key={item.id}>
                                 <td>{categoryLabelMap[item.category]}</td>
                                 <td>
-                                    <a onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}>
+                                    <a
+                                        onMouseEnter={(e) => {
+                                            if (item.imgUrls && item.imgUrls.length > 0) {
+                                                const rect = e.target.getBoundingClientRect();
+                                                setThumbnail({
+                                                    visible: true,
+                                                    x: e.clientX + 10,
+                                                    y: window.scrollY + rect.top - 80,
+                                                    url: item.imgUrls[0]
+                                                });
+                                            }
+                                        }}
+                                        onMouseLeave={() => setThumbnail({ visible: false, x: 0, y: 0, url: '' })}
+                                        onClick={() => navigate(`/board/info/${item.category}/${item.id}`)}
+                                    >
                                         {item.title}
                                     </a>
                                 </td>
@@ -155,7 +178,6 @@ const BoardPage = () => {
                     </tbody>
                 </table>
 
-                {/* 페이지네이션 */}
                 <div className="board-pagination">
                     {Array.from({ length: totalPages }, (_, index) => (
                         <button
@@ -168,7 +190,6 @@ const BoardPage = () => {
                     ))}
                 </div>
 
-                {/* 검색창 */}
                 <div className="search-bar">
                     <select
                         value={searchField}
@@ -178,7 +199,6 @@ const BoardPage = () => {
                         <option value="title">제목</option>
                         <option value="writer">작성자</option>
                     </select>
-
                     <input
                         type="text"
                         placeholder="검색어를 입력하세요"
@@ -186,12 +206,19 @@ const BoardPage = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-
-                    <button className="search-button" onClick={handleSearch}>
-                        검색
-                    </button>
+                    <button className="search-button" onClick={handleSearch}>검색</button>
                 </div>
             </div>
+
+            {/* 썸네일 */}
+            {thumbnail.visible && (
+                <div
+                    className="thumbnail-tooltip"
+                    style={{ top: thumbnail.y, left: thumbnail.x, position: 'absolute' }}
+                >
+                    <img src={thumbnail.url} alt="썸네일" />
+                </div>
+            )}
         </Section>
     );
 };
