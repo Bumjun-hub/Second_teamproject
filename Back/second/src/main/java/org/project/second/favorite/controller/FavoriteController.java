@@ -2,6 +2,7 @@ package org.project.second.favorite.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.project.second.favorite.dto.FavoriteListResponse;
 import org.project.second.favorite.dto.FavoriteRemoveRequest;
 import org.project.second.favorite.dto.FavoriteRequest;
 import org.project.second.member.config.CustomUserDetails;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/favorite")
@@ -43,6 +46,13 @@ public class FavoriteController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new MessageResponse("서버 오류 발생"));
         }
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<FavoriteListResponse>> getFavorites(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Member m = userDetails.getMember();
+        List<FavoriteListResponse> list = favoriteService.getFavorite(m);
+        return ResponseEntity.ok(list);
     }
 
 }
