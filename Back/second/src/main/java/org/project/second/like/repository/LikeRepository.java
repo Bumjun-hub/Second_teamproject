@@ -15,4 +15,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     long countByCommunity_Id(Long postId);
 
     long countByGroupBuy_Id(Long postId);
+
 }

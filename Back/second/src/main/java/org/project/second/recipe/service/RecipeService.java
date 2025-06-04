@@ -13,20 +13,20 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
 
     public Recipe ensureRecipe(String recipe_Id, String recipe_Name, String image_Url) {
-        if (recipe_Id == null || recipe_Id.trim().isEmpty() || recipe_Name == null || recipe_Name.trim().isEmpty() || image_Url == null || image_Url.trim().isEmpty()) {
+        if (recipe_Id == null || recipe_Id.trim().isEmpty()
+            || recipe_Name == null || recipe_Name.trim().isEmpty()
+            || image_Url == null || image_Url.trim().isEmpty()) {
             throw new IllegalArgumentException("Invalid recipe data");
         }
 
-        Recipe existingRecipe = recipeRepository.findByRecipeId(recipe_Id);
-        if (existingRecipe != null) {
-            return existingRecipe;
-        }
-
-        Recipe recipe = Recipe.builder()
-                .recipeId(recipe_Id)
-                .recipeName(recipe_Name)
-                .imageUrl(image_Url)
-        .build();
-        return recipeRepository.save(recipe);
+        return recipeRepository.findByRecipeId(recipe_Id)
+                .orElseGet(() -> {
+                    Recipe recipe = Recipe.builder()
+                            .recipeId(recipe_Id)
+                            .recipeName(recipe_Name)
+                            .imageUrl(image_Url)
+                            .build();
+                    return recipeRepository.save(recipe);
+                });
     }
 }
