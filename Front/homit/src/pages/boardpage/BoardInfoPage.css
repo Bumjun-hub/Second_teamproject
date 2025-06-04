@@ -172,6 +172,50 @@
   cursor: pointer;
 }
 
+.comment-textarea[readonly] {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.comment-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-meta {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.3rem;
+}
+
+.comment-meta strong {
+  color: #333;
+  font-weight: bold;
+}
+
+.comment-content div:last-child {
+  font-size: 1rem;
+  color: #222;
+  line-height: 1.4;
+}
+
+
 .image-gallery {
   display: flex;
   flex-wrap: wrap;

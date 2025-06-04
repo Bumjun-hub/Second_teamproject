@@ -41,8 +41,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/signup", "/api/login").permitAll()
-                        .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**","/api/groupBuy/view/**", "/api/groupBuy/detail/**" ).permitAll()
-                        .requestMatchers("/uploads/**", "/static/**").permitAll() // ✅ 여기 추가
+                        .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**","/api/groupBuy/view/**", "/api/groupBuy/detail/**", "/api/comment/list/**" ).permitAll()
+                        .requestMatchers("/uploads/**", "/static/**","/profileimages/**").permitAll() // ✅ 여기 추가
                         .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**", "/api/likes/**").hasAnyRole("USER", "ADMIN")
 
 

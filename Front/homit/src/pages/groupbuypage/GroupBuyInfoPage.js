@@ -8,11 +8,16 @@ const GroupBuyInfoPage = () => {
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [currentUser, setCurrentUser] = useState("");
-
-    // 구매 신청 , 미신청 상태 
     const [isParticipated, setIsParticipated] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
 
 
+    const isPastDeadline = item && new Date(item.deadline) < new Date();
+    const isClosed = item && (
+        item.status === "CLOSED" ||
+        item.status === "COMPLETED" ||
+        isPastDeadline
+    );
 
     const fetchItem = async () => {
         try {
@@ -24,7 +29,7 @@ const GroupBuyInfoPage = () => {
             setItem(json);
 
             // 참여 여부 판단
-            const userRes = await fetch("/api/mypage", { credentials: "include" });
+            const userRes = await fetch("http://localhost:8080/api/mypage", { credentials: "include" });
             const userData = await userRes.json();
             setCurrentUser(userData.name);
 
@@ -37,12 +42,10 @@ const GroupBuyInfoPage = () => {
             alert("데이터를 불러오는데 실패했습니다.");
         }
     };
+
     useEffect(() => {
-
-
         if (id) fetchItem();
     }, [id]);
-
 
     const handleEdit = () => {
         if (item.username !== currentUser) {
@@ -73,46 +76,54 @@ const GroupBuyInfoPage = () => {
         }
     };
 
-    // 구매 참여 버튼 이벤트
+    // 구매 참여 버튼 이벤트 - URL 경로 수정
     const handleApply = async () => {
         try {
-            const res = await fetch(`/api/groupBuy/${id}/apply`, {
+            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/apply`, {
                 method: 'POST',
                 credentials: 'include',
             });
-            if (!res.ok) throw new Error('신청 실패');
 
-            alert("신청 완료!");
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || '신청 실패');
+            }
+
+            const successMessage = await res.text();
+            alert(successMessage || "신청 완료!");
             setIsParticipated(true);
 
             // 최신 데이터 다시 불러오기
             fetchItem();
         } catch (err) {
-            console.error(err);
-            alert("오류 발생");
+            console.error('신청 실패:', err);
+            alert(err.message || "신청 중 오류가 발생했습니다.");
         }
     };
 
     const handleCancel = async () => {
         try {
-            const res = await fetch(`/api/groupBuy/${id}/cancel`, {
+            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/cancel`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
-            if (!res.ok) throw new Error('취소 실패');
 
-            alert("신청이 취소되었습니다!");
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || '취소 실패');
+            }
+
+            const successMessage = await res.text();
+            alert(successMessage || "신청이 취소되었습니다!");
             setIsParticipated(false);
 
             // 최신 데이터 다시 불러오기
             fetchItem();
         } catch (err) {
-            console.error(err);
-            alert("오류 발생");
+            console.error('취소 실패:', err);
+            alert(err.message || "취소 중 오류가 발생했습니다.");
         }
     };
-
-
 
     if (!item) return <div>로딩 중...</div>;
 
@@ -170,9 +181,7 @@ const GroupBuyInfoPage = () => {
                                         }}
                                     ></div>
                                 </div>
-
                             </div>
-
 
                             <div className="info-box">
                                 <span className="info-label">마감일</span>
@@ -193,17 +202,20 @@ const GroupBuyInfoPage = () => {
                                         : `${item.salePrice ?? '-'}`}원
                                 </span>
                             </div>
-                            <button
-                                className="buy-button"
-                                onClick={isParticipated ? handleCancel : handleApply}
-                            >
-                                {isParticipated ? "신청 중 (취소)" : "구매 참여"}
-                            </button>
+                            {isClosed ? (
+                                <button className="buy-button" disabled>
+                                    마감 완료
+                                </button>
+                            ) : (
+                                <button
+                                    className="buy-button"
+                                    onClick={isParticipated ? handleCancel : handleApply}
+                                >
+                                    {isParticipated ? "신청 중 (취소)" : "구매 참여"}
+                                </button>
+                            )}
                         </div>
-
-
                     </div>
-
                 </div>
             </div>
         </Section>

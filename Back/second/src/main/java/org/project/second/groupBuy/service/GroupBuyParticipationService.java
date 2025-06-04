@@ -96,8 +96,12 @@ public class GroupBuyParticipationService {
             throw new IllegalArgumentException("마감일 이후에는 신청을 취소할 수 없습니다");
         }
 
+        // ✅ currentParticipants 수동 감소
+        groupBuy.setCurrentParticipants(groupBuy.getCurrentParticipants() - 1);
+
         groupBuyParticipationRepository.delete(participation);
     }
+
 
     //내 신청목록만 보기
     @Transactional

@@ -146,6 +146,7 @@ public class CommentService {
                         .content(comment.getContent())
                         .username(comment.getMember().getUsername())
                         .createdAt(comment.getCreatedAt())
+                        .profileImage(comment.getMember().getImageUrl()) 
                         .build())
                 .collect(Collectors.toList());
     }
