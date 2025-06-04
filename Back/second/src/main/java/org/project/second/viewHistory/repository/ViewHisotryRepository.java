@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ViewHisotryRepository extends JpaRepository<RecipeViewHistory, Long> {
+    boolean existsByRecipe_Id(Long id);
 }
