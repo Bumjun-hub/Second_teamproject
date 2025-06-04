@@ -125,6 +125,7 @@ public class GroupBuyParticipationService {
                             post.getMember().getUsername(),
                             post.getDescription(),
                             post.getContent(),
+                            post.getProductUrl(),
                             post.getMaxParticipants(),
                             post.getMinParticipants(),
                             post.getCurrentParticipants(),
@@ -141,10 +142,6 @@ public class GroupBuyParticipationService {
                 })
                 .collect(Collectors.toList());
     }
-
-
-
-
 
     public GroupBuy validatepost (Long groupBuyId) {
         return groupBuyRepository.findById(groupBuyId)

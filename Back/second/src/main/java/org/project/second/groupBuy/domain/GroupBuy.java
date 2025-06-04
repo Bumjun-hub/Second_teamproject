@@ -34,6 +34,9 @@ public class GroupBuy extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "product_url", length = 2000)
+    private String productUrl;
+
     @Column(name = "max_participants", nullable = false)
     private Integer maxParticipants;  //최대참여자
 

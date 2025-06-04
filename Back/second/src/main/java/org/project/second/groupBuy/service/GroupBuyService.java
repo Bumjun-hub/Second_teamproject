@@ -38,6 +38,7 @@ public class GroupBuyService {
         GroupBuy groupBuy = GroupBuy.builder()
                 .title(groupBuyDto.getTitle())
                 .content(groupBuyDto.getContent())
+                .productUrl(groupBuyDto.getProductUrl())
                 .description(groupBuyDto.getDescription())
                 .maxParticipants(groupBuyDto.getMaxParticipants())
                 .minParticipants(groupBuyDto.getMinParticipants())
@@ -80,6 +81,7 @@ public class GroupBuyService {
         post.setStatus(groupBuyDto.getStatus());
         post.setTitle(groupBuyDto.getTitle());
         post.setContent(groupBuyDto.getContent());
+        post.setProductUrl(groupBuyDto.getProductUrl());
         post.setDescription(groupBuyDto.getDescription());
         post.setMaxParticipants(groupBuyDto.getMaxParticipants());
         post.setMinParticipants(groupBuyDto.getMinParticipants());
@@ -143,6 +145,7 @@ public class GroupBuyService {
                             post.getMember().getUsername(),
                             post.getDescription(),
                             post.getContent(),
+                            post.getProductUrl(),
                             post.getMaxParticipants(),
                             post.getMinParticipants(),
                             post.getCurrentParticipants(),
@@ -177,6 +180,7 @@ public class GroupBuyService {
                 post.getMember().getUsername(),
                 post.getDescription(),
                 post.getContent(),
+                post.getProductUrl(),
                 post.getMaxParticipants(),
                 post.getMinParticipants(),
                 post.getCurrentParticipants(),
@@ -210,6 +214,7 @@ public class GroupBuyService {
                             post.getMember().getUsername(),
                             post.getDescription(),
                             post.getContent(),
+                            post.getProductUrl(),
                             post.getMaxParticipants(),
                             post.getMinParticipants(),
                             post.getCurrentParticipants(),
