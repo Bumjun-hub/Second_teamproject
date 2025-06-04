@@ -23,4 +23,5 @@ public class CommunityResponseDto {
     private List<String> imgUrls;
     private boolean isNotice;
     private boolean liked;  // 좋아요 여부
+
 }

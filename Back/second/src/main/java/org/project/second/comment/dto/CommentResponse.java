@@ -1,0 +1,20 @@
+package org.project.second.comment.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.project.second.common.enums.CommentEntityType;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Builder
+public class CommentResponse {
+    private Long id; // 댓글 PK
+    private CommentEntityType entityType; // 게시글 타입 (공구, 커뮤, 레시피)
+    private String postId; // 게시글 PK
+    private String content;
+    private String username;
+    private LocalDateTime createdAt;
+}
