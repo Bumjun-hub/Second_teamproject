@@ -27,8 +27,6 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    // 최대수량 표기
-
     @Column(nullable = false)
     private Integer quantity;
 
