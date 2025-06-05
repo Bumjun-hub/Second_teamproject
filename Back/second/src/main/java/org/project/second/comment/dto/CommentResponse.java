@@ -16,5 +16,6 @@ public class CommentResponse {
     private String postId; // 게시글 PK
     private String content;
     private String username;
+    private String profileImage; // // 프로필 이미지 받는거 추가
     private LocalDateTime createdAt;
 }

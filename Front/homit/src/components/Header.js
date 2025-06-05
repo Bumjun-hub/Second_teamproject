@@ -7,6 +7,7 @@ import { logout } from '../utils/authUtils';
 const Header = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userInfo, setUserInfo] = useState(null); // 사용자 정보 상태 추가
 
     // 인증 상태 확인
     const checkAuth = async () => {
@@ -16,14 +17,17 @@ const Header = () => {
             });
             
             if (response.ok) {
+                const userData = await response.json(); // 사용자 데이터 파싱
                 setIsLoggedIn(true);
+                setUserInfo(userData); // 사용자 정보 저장
             } else {
                 setIsLoggedIn(false);
+                setUserInfo(null);
             }
         } catch (error) {
             console.error('인증 확인 실패:', error);
             setIsLoggedIn(false);
-        } finally {
+            setUserInfo(null);
         }
     };
 
@@ -31,6 +35,7 @@ const Header = () => {
     const handleLogout = async () => {
         const success = await logout();
         if (success) {
+            setUserInfo(null); // 로그아웃 시 사용자 정보 초기화
         }
     };
 
@@ -57,59 +62,76 @@ const Header = () => {
     }, []);
 
     return (
-    <header className="Header">
-        <div className="header-left">
-            <Link to="/">Homit</Link>
-        </div>
-        
-        {/* 중앙 고정 네비게이션 */}
-        <nav className="header-center">
-            <Link to="/groupbuy">공동구매</Link>
-            <Link to="/board">게시판</Link>
-            <Link to="/recipe">요리레시피</Link>
-            <Link to="/popular">인기상품</Link>
-        </nav>
-        
-        <nav className="header-right">
-            {/* 로그인한 사용자만 알림 표시 */}
-            {isLoggedIn && (
-                <div className="notification-container">
-                    <button 
-                        className="notification-bell" 
-                        onClick={toggleNotifications}
-                    >
-                        <IoIosNotificationsOutline size={25} />
-                    </button>
-                    {showNotifications && (
-                        <div className="notification-dropdown">
-                            <div className="notification-header">알림</div>
-                            <div className="notification-empty">
-                                새로운 알림이 없습니다.
+        <header className="Header">
+            <div className="header-left">
+                <Link to="/">Homit</Link>
+            </div>
+            
+            {/* 중앙 고정 네비게이션 */}
+            <nav className="header-center">
+                <Link to="/groupbuy">공동구매</Link>
+                <Link to="/board">게시판</Link>
+                <Link to="/recipe">요리레시피</Link>
+                <Link to="/popular">인기상품</Link>
+            </nav>
+            
+            <nav className="header-right">
+                {/* 로그인한 사용자만 알림 표시 */}
+                {isLoggedIn && (
+                    <div className="notification-container">
+                        <button 
+                            className="notification-bell" 
+                            onClick={toggleNotifications}
+                        >
+                            <IoIosNotificationsOutline size={25} />
+                        </button>
+                        {showNotifications && (
+                            <div className="notification-dropdown">
+                                <div className="notification-header">알림</div>
+                                <div className="notification-empty">
+                                    새로운 알림이 없습니다.
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            )}
+                        )}
+                    </div>
+                )}
 
-            {/* 인증 상태에 따른 메뉴 분기 */}
-            {isLoggedIn ? (
-                // 로그인된 상태
-                <>
-                    <Link to="/mypage">마이페이지</Link>
-                    <button 
-                        className="header-right" 
-                        onClick={handleLogout}
-                    >
-                        로그아웃
-                    </button>
-                </>
-            ) : (
-                // 로그인되지 않은 상태
-                <Link to="/login">로그인</Link>
-            )}
-        </nav>
-    </header>
-);
+                {/* 인증 상태에 따른 메뉴 분기 */}
+                {isLoggedIn ? (
+                    // 로그인된 상태
+                    <>
+                        {/* 프로필 정보 표시 */}
+                        <div className="header-user-profile">
+                            {userInfo?.imageUrl ? (
+                                <img 
+                                    src={userInfo.imageUrl} 
+                                    alt="프로필" 
+                                    className="header-profile-image"
+                                />
+                            ) : (
+                                <div className="header-profile-placeholder">
+                                    {(userInfo?.username || userInfo?.name) ? (userInfo?.username || userInfo?.name).charAt(0).toUpperCase() : 'U'}
+                                </div>
+                            )}
+                            {(userInfo?.username || userInfo?.name) && (
+                                <span className="header-username">{userInfo?.username || userInfo?.name}님</span>
+                            )}
+                        </div>
+                        <Link to="/mypage">마이페이지</Link>
+                        <button 
+                            className="header-logout-btn" 
+                            onClick={handleLogout}
+                        >
+                            로그아웃
+                        </button>
+                    </>
+                ) : (
+                    // 로그인되지 않은 상태
+                    <Link to="/login">로그인</Link>
+                )}
+            </nav>
+        </header>
+    );
 };
 
 export default Header;

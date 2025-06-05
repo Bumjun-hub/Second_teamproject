@@ -1,26 +1,128 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { dummyGroupBuyData } from '../../data/dummyGroupBuyData';
 import './GroupBuyInfoPage.css';
 import Section from '../../components/Section';
 
 const GroupBuyInfoPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [item, setItem] = useState(null);
-    const [commentList, setCommentList] = useState([]);
-    const [commentInput, setCommentInput] = useState('');
+    const [currentUser, setCurrentUser] = useState("");
+    const [isParticipated, setIsParticipated] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+
+
+    const isPastDeadline = item && new Date(item.deadline) < new Date();
+    const isClosed = item && (
+        item.status === "CLOSED" ||
+        item.status === "COMPLETED" ||
+        isPastDeadline
+    );
+
+    const fetchItem = async () => {
+        try {
+            const res = await fetch(`http://localhost:8080/api/groupBuy/detail/${id}`, {
+                credentials: 'include',
+            });
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const json = await res.json();
+            setItem(json);
+
+            // 참여 여부 판단
+            const userRes = await fetch("http://localhost:8080/api/mypage", { credentials: "include" });
+            const userData = await userRes.json();
+            setCurrentUser(userData.name);
+
+            // 참여자 목록에 현재 유저가 있는지 확인
+            const participated = json.participants?.some(p => p === userData.name);
+            setIsParticipated(participated);
+
+        } catch (err) {
+            console.error("상세 조회 실패:", err);
+            alert("데이터를 불러오는데 실패했습니다.");
+        }
+    };
 
     useEffect(() => {
-        const found = dummyGroupBuyData.find((it) => String(it.id) === id);
-        setItem(found);
+        if (id) fetchItem();
     }, [id]);
 
-    const handleCommentSubmit = (e) => {
-        e.preventDefault();
-        if (!commentInput.trim()) return;
+    const handleEdit = () => {
+        if (item.username !== currentUser) {
+            alert("권한이 없습니다");
+            return;
+        }
+        navigate(`/groupBuy/admin/edit/${item.id}`);
+    };
 
-        setCommentList(prev => [...prev, commentInput.trim()]);
-        setCommentInput('');
+    const handleDelete = async () => {
+        if (item.username !== currentUser) {
+            alert("권한이 없습니다");
+            return;
+        }
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            try {
+                const res = await fetch(`http://localhost:8080/api/groupBuy/admin/delete/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if (!res.ok) throw new Error("삭제 실패");
+                alert("삭제가 완료되었습니다");
+                navigate('/groupbuy');
+            } catch (err) {
+                console.error("삭제 실패:", err);
+                alert("삭제 중 오류가 발생했습니다.");
+            }
+        }
+    };
+
+    // 구매 참여 버튼 이벤트 - URL 경로 수정
+    const handleApply = async () => {
+        try {
+            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/apply`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || '신청 실패');
+            }
+
+            const successMessage = await res.text();
+            alert(successMessage || "신청 완료!");
+            setIsParticipated(true);
+
+            // 최신 데이터 다시 불러오기
+            fetchItem();
+        } catch (err) {
+            console.error('신청 실패:', err);
+            alert(err.message || "신청 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handleCancel = async () => {
+        try {
+            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/cancel`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || '취소 실패');
+            }
+
+            const successMessage = await res.text();
+            alert(successMessage || "신청이 취소되었습니다!");
+            setIsParticipated(false);
+
+            // 최신 데이터 다시 불러오기
+            fetchItem();
+        } catch (err) {
+            console.error('취소 실패:', err);
+            alert(err.message || "취소 중 오류가 발생했습니다.");
+        }
     };
 
     if (!item) return <div>로딩 중...</div>;
@@ -28,61 +130,92 @@ const GroupBuyInfoPage = () => {
     return (
         <Section>
             <div className="info-container">
-
-                {/* 상단 수정/삭제 버튼 (카드 밖, 오른쪽 정렬) */}
                 <div className="top-buttons">
-                    <button className="edit-button">수정</button>
-                    <button className="delete-button">삭제</button>
+                    <button className="edit-button" onClick={handleEdit}>수정</button>
+                    <button className="delete-button" onClick={handleDelete}>삭제</button>
                 </div>
 
-                {/* 상품 카드 */}
                 <div className="product-card">
                     <div className="image-area">
-                        <img src={item.image} alt={item.title} />
+                        {item.imgUrls?.length > 0 && (
+                            <img src={item.imgUrls[0]} alt={item.title} />
+                        )}
                     </div>
 
                     <div className="details-area">
                         <div className="header-row">
-                            <h2>{item.name}</h2>
+                            <h2 className="main-title">{item.title}</h2>
                             <div className="actions">
-                                <a href={item.link} target="_blank" rel="noreferrer" className="detail-link">제품 상세보기</a>
+                                {item.productUrl && (
+                                    <a href={item.productUrl} target="_blank" rel="noreferrer" className="detail-link">
+                                        제품 상세보기
+                                    </a>
+                                )}
                                 <button className="heart-button">♡</button>
                             </div>
                         </div>
 
-                        <div className="middle-content">
-                            <p className="content">{item.content}</p>
+                        <div className="card-section">
+                            <div className="section-title">📝 상품 설명</div>
+                            <div className="section-content">{item.description}</div>
                         </div>
 
-                        <div className="bottom-fixed">
-                            <p className="goal">목표 인원 1 / 10</p>
-                            <div className="bottom-row">
-                                <span className="price">{item.price}</span>
-                                <button className="buy-button">구매 참여</button>
+                        <div className="card-section">
+                            <div className="section-title">📦 상세 내용</div>
+                            <div className="section-content">{item.content}</div>
+                        </div>
+
+                        <div className="info-footer">
+                            <div className="info-box">
+                                <span className="info-label">모집 인원</span>
+                                <span>{item.minParticipants} ~ {item.maxParticipants} 명</span>
+                            </div>
+
+                            <div className="info-box">
+                                <span className="info-label">참여자 수 : <strong>{item.currentParticipants}</strong> / {item.maxParticipants}명</span>
+                                <div className="progress-bar-wrapper">
+                                    <div
+                                        className="progress-bar-fill"
+                                        style={{
+                                            width: `${Math.min((item.currentParticipants / item.maxParticipants) * 100, 100)}%`,
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div className="info-box">
+                                <span className="info-label">마감일</span>
+                                <span>{item.deadline ? new Date(item.deadline).toLocaleString() : '-'}</span>
                             </div>
                         </div>
+
+                        <div className="bottom-row">
+                            <div className="price-wrapper">
+                                <span className="original-price">
+                                    {typeof item.originalPrice === 'number'
+                                        ? item.originalPrice.toLocaleString()
+                                        : `${item.originalPrice ?? '-'}`}원
+                                </span>
+                                <span className="sale-price">
+                                    {typeof item.salePrice === 'number'
+                                        ? item.salePrice.toLocaleString()
+                                        : `${item.salePrice ?? '-'}`}원
+                                </span>
+                            </div>
+                            {isClosed ? (
+                                <button className="buy-button" disabled>
+                                    마감 완료
+                                </button>
+                            ) : (
+                                <button
+                                    className="buy-button"
+                                    onClick={isParticipated ? handleCancel : handleApply}
+                                >
+                                    {isParticipated ? "신청 중 (취소)" : "구매 참여"}
+                                </button>
+                            )}
+                        </div>
                     </div>
-                </div>
-
-
-                {/* 댓글 영역 */}
-                <div className="comment-box">
-                    <h3>댓글</h3>
-                    <form onSubmit={handleCommentSubmit}>
-                        <textarea
-                            value={commentInput}
-                            onChange={(e) => setCommentInput(e.target.value)}
-                            placeholder="댓글을 입력하세요..."
-                            style={{ width: '100%', height: '80px', marginTop: '10px' }}
-                        />
-                        <button type="submit" style={{ marginTop: '10px' }}>댓글 등록</button>
-                    </form>
-
-                    <ul style={{ marginTop: '20px', paddingLeft: '20px' }}>
-                        {commentList.map((comment, index) => (
-                            <li key={index} style={{ marginBottom: '8px' }}>• {comment}</li>
-                        ))}
-                    </ul>
                 </div>
             </div>
         </Section>

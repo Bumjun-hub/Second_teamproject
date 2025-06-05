@@ -7,6 +7,7 @@ import org.project.second.groupBuy.dto.GroupBuyResponseDto;
 import org.project.second.groupBuy.service.GroupBuyService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -42,6 +44,22 @@ public class GroupBuyController {
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
+    @PostMapping(value = "admin/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> createPost(
+            @RequestParam("status") String status,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("productUrl") String productUrl,
+            @RequestParam("description") String description,
+            @RequestParam("maxParticipants") Integer maxParticipants,
+            @RequestParam("minParticipants") Integer minParticipants,
+            @RequestParam("maxQuantity") Integer maxQuantity,
+            @RequestParam("originalPrice") Long originalPrice,
+            @RequestParam("salePrice") Long salePrice,
+            @RequestParam("deadline") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadline,
+            @RequestParam(value = "images", required = false) MultipartFile imageFile,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
                 .status(GroupBuyStatus.valueOf(status))
                 .title(title)
@@ -57,26 +75,32 @@ public class GroupBuyController {
                 .build();
 
         Member loginUser = userDetails.getMember();
+
+        // 단일 파일 → 리스트로 변환
+        List<MultipartFile> imageFiles = imageFile != null ? List.of(imageFile) : List.of();
+
         groupBuyService.createPost(groupBuyDto, imageFiles, loginUser);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 작성되었습니다");
     }
 
+
     //수정
     @PutMapping(value = "admin/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> editPost (
+    public ResponseEntity<String> editPost(
             @PathVariable Long id,
-            @RequestPart("status") String status,
-            @RequestPart("title") String title,
-            @RequestPart("content") String content,
-            @RequestPart("productUrl")String productUrl,
-            @RequestPart("description") String description,
-            @RequestPart("maxParticipants") Integer maxParticipants,
-            @RequestPart("minParticipants") Integer minParticipants,
-            @RequestPart("maxQuantity") Integer maxQuantity,
-            @RequestPart("originalPrice") Long originalPrice,
-            @RequestPart("salePrice") Long salePrice,
-            @RequestPart("deadline")LocalDateTime deadline,
-            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
+            @RequestParam("status") String status,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("productUrl") String productUrl,
+            @RequestParam("description") String description,
+            @RequestParam("maxParticipants") Integer maxParticipants,
+            @RequestParam("minParticipants") Integer minParticipants,
+            @RequestParam("maxQuantity") Integer maxQuantity,
+            @RequestParam("originalPrice") Long originalPrice,
+            @RequestParam("salePrice") Long salePrice,
+            @RequestParam("deadline") LocalDateTime deadline,
+            @RequestParam(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
@@ -120,7 +144,7 @@ public class GroupBuyController {
     @GetMapping("/detail/{id}")
     public ResponseEntity<GroupBuyResponseDto> detailView(
             @PathVariable Long id
-    ){
+    ) {
         GroupBuyResponseDto post = groupBuyService.detailView(id);
         return ResponseEntity.ok(post);
     }
@@ -129,7 +153,7 @@ public class GroupBuyController {
     @GetMapping("/view/{status}")
     public ResponseEntity<List<GroupBuyResponseDto>> statusView(
             @PathVariable GroupBuyStatus status
-    ){
+    ) {
         List<GroupBuyResponseDto> post = groupBuyService.statusView(status);
         return ResponseEntity.ok(post);
     }

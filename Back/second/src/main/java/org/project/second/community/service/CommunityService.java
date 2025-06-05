@@ -165,10 +165,13 @@ public class CommunityService {
                 .map(CommunityImage::getImgUrl)
                 .collect(Collectors.toList());
 
-        // ✅ 좋아요 여부 판단
-        boolean liked = post.getLikes().stream()
-                .filter(like -> like.getCommunity() != null) // 게시글 좋아요만 필터
-                .anyMatch(like -> like.getMember().getId().equals(loginUser.getId()));
+        // ⭐ 로그인 여부에 따라 추천 상태 처리
+        boolean liked = false;
+        if (loginUser != null && loginUser.getId() != null) {
+            liked = post.getLikes().stream()
+                    .filter(like -> like.getCommunity() != null && like.getMember() != null)
+                    .anyMatch(like -> like.getMember().getId().equals(loginUser.getId()));
+        }
 
         return new CommunityResponseDto(
                 post.getId(),

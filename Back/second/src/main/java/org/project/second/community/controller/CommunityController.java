@@ -108,15 +108,19 @@ public class CommunityController {
 
     //게시글 상세조회
     @GetMapping("/detail/{category}/{id}")
-    public ResponseEntity<CommunityResponseDto> detailPost(
-            @PathVariable CommunityCategory category,
+    public ResponseEntity<CommunityResponseDto> getDetailPost(
+            @PathVariable String category,
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails // ✅ 로그인 유저 받기
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        Member loginUser = userDetails.getMember();
-        CommunityResponseDto post = communityService.detailPost(category, id, loginUser);
+        Member loginUser = (userDetails != null) ? userDetails.getMember() : null;
+
+        CommunityResponseDto post = communityService.detailPost(
+                CommunityCategory.valueOf(category), id, loginUser);
         return ResponseEntity.ok(post);
     }
+
+
 
 
 }

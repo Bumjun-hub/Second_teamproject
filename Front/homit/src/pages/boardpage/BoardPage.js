@@ -8,6 +8,10 @@ const BoardPage = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+
+    // 사용자 로그인 여부 확인
+    const [currentUser, setCurrentUser] = useState(null);
+
     const ITEMS_PER_PAGE = 15;
 
     const [searchField, setSearchField] = useState('title');
@@ -61,6 +65,27 @@ const BoardPage = () => {
         fetchData();
     }, [selectedCategory]);
 
+    useEffect(() => {
+        fetch("api/mypage", { credentials: "include" })
+            .then(res => {
+                if (res.ok) return res.json();
+                return null;
+            })
+            .then(data => {
+                if (data && data.name) setCurrentUser(data.name);
+            })
+            .catch(() => setCurrentUser(null));
+    }, []);
+
+    const handleWrite = () => {
+        if (!currentUser) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+        navigate("/board/write");
+    }
+
     const handleSearch = () => {
         let filtered = [...data];
 
@@ -102,7 +127,7 @@ const BoardPage = () => {
             </div>
 
             <div className="boardtable-container">
-                <button className="write-button" onClick={() => navigate("/board/write")}>
+                <button className="write-button" onClick={handleWrite}>
                     글쓰기
                 </button>
 
