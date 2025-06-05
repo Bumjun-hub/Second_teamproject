@@ -1,0 +1,166 @@
+.popular-recipes {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.popular-recipes h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 2rem;
+}
+
+.popular-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.popular-no-recipes {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.popular-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.popular-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  min-height: 12rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.popular-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.popular-rank-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.7rem;
+  z-index: 2;
+}
+
+.popular-recipe-image {
+  height: 140px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.popular-recipe-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.popular-no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  font-size: 3rem;
+  color: #dee2e6;
+}
+
+.popular-recipe-info {
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.popular-recipe-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem 0;
+  color: #333;
+  line-height: 1.3;
+  display: -webkit-box;
+  line-clamp: 2;
+  box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.popular-recipe-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.popular-category {
+  background: #f8f9fa;
+  color: #6c757d;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.popular-favorite-badge {
+  color: white;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .popular-recipes {
+    padding: 1rem;
+  }
+  
+  .popular-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .popular-recipe-image {
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .popular-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .popular-recipe-image {
+    height: 100px;
+  }
+  
+  .popular-recipe-info {
+    padding: 0.6rem;
+  }
+  
+  .popular-recipe-name {
+    font-size: 0.8rem;
+  }
+}

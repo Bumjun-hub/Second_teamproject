@@ -87,12 +87,6 @@
 .hashtag-content { color: #2563eb; font-weight: 500; line-height: 1.5; margin: 0; }
 .tip-content { color: #059669; font-size: 0.875rem; line-height: 1.5; margin: 0; }
 
-.info-header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-}
 
 .favorite-btn {
   padding: 10px 20px;
@@ -108,4 +102,35 @@
 .favorite-btn:hover {
   background: #ff6b6b;
   color: white;
+}
+
+.favorite-btn.delete-state {
+  background: #ff6b6b;
+  color: white;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: 200px;
+  margin-left: auto;
+}
+
+/* 즐겨찾기 개수 표시 - 카운터 스타일 */
+.recipe-favorite-count {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.recipe-favorite-count {
+  content: "👥";
+  font-size: 14px;
 }

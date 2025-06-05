@@ -161,14 +161,8 @@ const MyPage = () => {
                             alt="프로필"
                         />
                     ) : (
-                        <div style={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '100%',
-                            height: '100%'
-                        }}>
-                            <PiFinnTheHumanBold size={40}/>
+                        <div>
+                            <PiFinnTheHumanBold size={80}/>
                         </div>
                     )}
                 </div>
