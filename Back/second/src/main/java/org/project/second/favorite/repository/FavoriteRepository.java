@@ -15,4 +15,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     boolean existsByRecipe_Id(Long id);
 
     List<Favorite> findByMember_Id(Long id);
+
+    long countByRecipe_RecipeId(String recipeRecipeId);
 }

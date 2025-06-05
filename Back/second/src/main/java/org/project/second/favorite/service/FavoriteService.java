@@ -87,4 +87,11 @@ public class FavoriteService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public long getFavoriteCount(String recipeId) {
+        if (recipeId == null || recipeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("유효하지 않은 레시피 ID 입니다.");
+        }
+        return favoriteRepository.countByRecipe_RecipeId(recipeId);
+    }
 }
