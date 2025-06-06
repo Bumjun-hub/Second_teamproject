@@ -133,7 +133,7 @@ const CommentSection = ({ postId, currentUser }) => {
 
                             {editCommentId === comment.id ? (
                                 <>
-                                    <textarea
+                                    <textarea 
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
                                         className="comment-edit-textarea"

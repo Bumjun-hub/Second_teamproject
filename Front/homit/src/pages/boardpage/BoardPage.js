@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import Section from "../../components/Section";
 import { useState, useEffect } from "react";
 import './BoardPage.css';
+import { IoIosArrowUp } from "react-icons/io";
+import { IoIosArrowDown } from "react-icons/io";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 
 const BoardPage = () => {
     const navigate = useNavigate();
@@ -20,6 +23,8 @@ const BoardPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('전체');
 
     const [thumbnail, setThumbnail] = useState({ visible: false, x: 0, y: 0, url: '' });
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
     const categoryMap = {
         '자유게시판': 'FREE',
@@ -99,12 +104,48 @@ const BoardPage = () => {
         setCurrentPage(1);
     };
 
+    // 정렬 이벤트
+    const handleSort = (key) => {
+        setSortConfig(prev => {
+            if (prev.key === key) {
+                // 같은 버튼을 계속 누르면 asc → desc → 해제(null)
+                if (prev.direction === 'asc') return { key: null, direction: null };
+                if (prev.direction === 'desc') return { key, direction: 'asc' };
+            }
+            return { key, direction: 'desc' }; // 처음 누르면 asc로 시작
+        });
+    };
+
+    const getSortArrow = (key) => {
+        if (sortConfig.key !== key) return <FaSort/>; // 정렬 중이 아님
+        if (sortConfig.direction === 'asc') return <FaSortUp />;
+        if (sortConfig.direction === 'desc') return <FaSortDown/>;
+        return '';
+    };
+
+
     const noticePosts = filteredData.filter(item => item.notice === true);
     const normalPosts = filteredData.filter(item => item.notice !== true);
 
+    // 게시글 정렬
+    const sortedPosts = [...normalPosts]; // 원본 훼손 방지용 복사
+    if (sortConfig.key && sortConfig.direction) {
+        sortedPosts.sort((a, b) => {
+            const aValue = sortConfig.key === 'createdAt' ? new Date(a[sortConfig.key]) : a[sortConfig.key];
+            const bValue = sortConfig.key === 'createdAt' ? new Date(b[sortConfig.key]) : b[sortConfig.key];
+
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }
+
     const totalPages = Math.ceil(normalPosts.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = normalPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentItems = sortedPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+
+
 
     return (
         <Section>
@@ -137,9 +178,12 @@ const BoardPage = () => {
                             <th>카테고리</th>
                             <th>제목</th>
                             <th>작성자</th>
-                            <th>작성일</th>
-                            <th>조회</th>
-                            <th>추천</th>
+                            <th>작성일<button className="sort-button" onClick={() => handleSort('createdAt')}>
+                                {getSortArrow('createdAt')}</button></th>
+                            <th>조회수<button className="sort-button" onClick={() => handleSort('viewCount')}>
+                                {getSortArrow('viewCount')}</button></th>
+                            <th>추천수<button className="sort-button" onClick={() => handleSort('likes')}>
+                                {getSortArrow('likes')}</button></th>
                         </tr>
                     </thead>
                     <tbody>
