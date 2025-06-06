@@ -235,3 +235,12 @@ td a {
   height: auto;
   display: block;
 }
+
+.sort-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding-left: 4px;
+  color: white;
+}

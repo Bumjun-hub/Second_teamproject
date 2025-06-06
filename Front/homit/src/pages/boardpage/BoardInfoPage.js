@@ -3,30 +3,24 @@ import { useEffect, useState } from 'react';
 import './BoardInfoPage.css';
 import Section from "../../components/Section";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import PostContent from '../../components/PostContent';
+import CommentSection from '../../components/CommentSection';
 
 const BoardInfoPage = () => {
-  const { category, id } = useParams(); // URL 파라미터로 게시글 ID, 카테고리 추출
-  const [item, setItem] = useState(null); // 게시글 데이터
-  const [commentList, setCommentList] = useState([]); // 댓글 목록
-  const [commentInput, setCommentInput] = useState(''); // 댓글 입력값
-
+  const { category, id } = useParams();
+  const [item, setItem] = useState(null);
   const [likes, setLikes] = useState(0);
-  const [isLiked, setIsLiked] = useState(false); // 추천(하트) 여부
-
-  const [currentUser, setCurrentUser] = useState(""); // 현재 로그인 유저 이름
+  const [isLiked, setIsLiked] = useState(false);
+  const [currentUser, setCurrentUser] = useState("");
 
   const navigate = useNavigate();
 
-  // 현재 로그인한 유저 정보 가져오기
   useEffect(() => {
     fetch("/api/mypage", { credentials: "include" })
       .then(res => res.json())
-      .then(data => {
-        setCurrentUser(data.name);
-      });
+      .then(data => setCurrentUser(data.name));
   }, []);
 
-  // 게시글 정보 불러오기
   useEffect(() => {
     const fetchItem = async () => {
       try {
@@ -39,27 +33,9 @@ const BoardInfoPage = () => {
         console.error("게시글 상세 불러오기 실패", err);
       }
     };
-
     fetchItem();
   }, [category, id]);
 
-  // 게시글 ID에 해당하는 댓글 목록 불러오기
-  useEffect(() => {
-    if (!item) return;
-
-    fetch(`/api/comment/list/COMMUNITY/${item.id}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("댓글 응답:", data);
-        if (Array.isArray(data)) {
-          setCommentList(data); // 정상: 댓글 배열
-        } else {
-          setCommentList([]);   // 댓글 없음 or 에러 메시지 → 빈 배열로 처리
-        }
-      });
-  }, [item]);
-
-  // 게시글 추천 버튼 클릭 시
   const handleLikeClick = async () => {
     try {
       const res = await fetch(`/api/likes/COMMUNITY/${item.id}`, {
@@ -68,8 +44,8 @@ const BoardInfoPage = () => {
       });
 
       if (res.ok) {
-        setIsLiked(prev => !prev); // 하트 토글
-        setLikes(prev => isLiked ? prev - 1 : prev + 1); // 추천 수 업데이트
+        setIsLiked(prev => !prev);
+        setLikes(prev => isLiked ? prev - 1 : prev + 1);
       } else {
         alert("추천 실패");
       }
@@ -79,7 +55,6 @@ const BoardInfoPage = () => {
     }
   };
 
-  // 게시글 수정 버튼
   const handleEdit = () => {
     if (item.username !== currentUser) {
       alert("권한이 없습니다");
@@ -88,7 +63,6 @@ const BoardInfoPage = () => {
     navigate(`/board/edit/${item.category}/${item.id}`);
   };
 
-  // 게시글 삭제 버튼
   const handleDelete = async () => {
     if (item.username !== currentUser) {
       alert("권한이 없습니다");
@@ -110,41 +84,7 @@ const BoardInfoPage = () => {
     }
   };
 
-  // 댓글 등록 처리
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    if (!commentInput.trim()) return;
-
-    const res = await fetch("/api/comment/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        entityType: "COMMUNITY", // 고정 값
-        postId: item.id,
-        content: commentInput
-      })
-    });
-
-    if (res.ok) {
-      setCommentInput('');
-      // 댓글 목록 갱신
-      const updated = await fetch(`/api/comment/list/COMMUNITY/${item.id}`).then(res => res.json());
-      setCommentList(updated);
-    } else {
-      alert("댓글 등록 실패!");
-    }
-  };
-
-  // 로딩 처리
   if (!item) return <div>로딩 중...</div>;
-
-  // 게시글 본문 + 이미지 HTML 조합
-  const combinedContent = item.content + (
-    item.imgUrls?.length > 0
-      ? item.imgUrls.map(url => `<img src="${url}" alt="첨부 이미지" class="content-image" />`).join('')
-      : ''
-  );
 
   return (
     <Section>
@@ -177,47 +117,12 @@ const BoardInfoPage = () => {
             </div>
 
             <div className="middle-content">
-              <div
-                className="content-box"
-                dangerouslySetInnerHTML={{ __html: combinedContent }}
-              />
+              <PostContent content={item.content} imgUrls={item.imgUrls} />
             </div>
           </div>
         </div>
 
-        <div className="comment-box">
-          <h3>댓글</h3>
-          <form onSubmit={handleCommentSubmit}>
-            <textarea
-              className="comment-textarea"
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              placeholder={currentUser ? "댓글을 입력하세요..." : "로그인 후 작성하세요"}
-              readOnly={!currentUser} // ✅ 비로그인 시 입력 막기
-            />
-            {currentUser && (
-              <button type="submit" className="comment-submit-btn">댓글 등록</button>
-            )}
-          </form>
-
-
-          <ul className="comment-list">
-            {commentList.map((comment) => (
-              <li key={comment.id} className="comment-item">
-                <div className="comment-profile">
-                  <img src={comment.profileImage || "/profileimages/default.png"} alt="프로필" />
-                </div>
-                <div className="comment-content">
-                  <div className="comment-meta">
-                    <strong>{comment.username}</strong> • {new Date(comment.createdAt).toLocaleDateString()}
-                  </div>
-                  <div>{comment.content}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-        </div>
+        <CommentSection postId={item.id} currentUser={currentUser} />
       </div>
     </Section>
   );
