@@ -14,7 +14,7 @@ public class CommunityImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include //?
     private Long id;
 
     private String imgUrl; // filePath + "/" + fileName
