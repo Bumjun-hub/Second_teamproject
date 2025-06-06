@@ -66,6 +66,6 @@ public class Donation extends BaseEntity {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommunityImage> donationImages;
+    private List<DonationImage> donationImages;
 
 }
