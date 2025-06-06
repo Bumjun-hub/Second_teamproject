@@ -2,6 +2,7 @@ package org.project.second.favorite.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.project.second.favorite.dto.FavoriteListResponse;
 import org.project.second.favorite.dto.FavoriteRemoveRequest;
 import org.project.second.favorite.dto.FavoriteRequest;
@@ -53,6 +54,12 @@ public class FavoriteController {
         Member m = userDetails.getMember();
         List<FavoriteListResponse> list = favoriteService.getFavorite(m);
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/count/{recipeId}")
+    public ResponseEntity<Long> getFavoriteCount(@PathVariable String recipeId) {
+        long count = favoriteService.getFavoriteCount(recipeId);
+                return ResponseEntity.ok(count);
     }
 
 }
