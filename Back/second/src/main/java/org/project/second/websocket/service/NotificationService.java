@@ -1,0 +1,72 @@
+package org.project.second.websocket.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.project.second.common.enums.NotificationType;
+import org.project.second.community.domain.Community;
+import org.project.second.groupBuy.domain.GroupBuy;
+import org.project.second.member.domain.Member;
+import org.project.second.recipe.domain.Recipe;
+import org.project.second.websocket.domain.Notification;
+import org.project.second.websocket.dto.NotificationResponse;
+import org.project.second.websocket.repository.NotificationRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class NotificationService {
+    private final NotificationRepository notificationRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final MemberRepository memberRepository;
+
+    @Transactional
+    public void createAndSendNotification(Member m, NotificationType type, String content,
+                                          Community community, GroupBuy groupBuy, Recipe recipe) {
+        // DB에 저장
+        Notification notification = Notification.builder()
+                .member(m)
+                .type(type)
+                .content(content)
+                .community(community)
+                .groupBuy(groupBuy)
+                .recipe(recipe)
+                .build();
+        notificationRepository.save(notification);
+
+        NotificationResponse response = NotificationResponse.builder()
+                .id(notification.getId())
+                .type(notification.getType())
+                .content(notification.getContent())
+                .communityId(community != null ? community.getId() : null)
+                .groupBuyId(groupBuy != null ? groupBuy.getId() : null)
+                .recipeId(recipe != null ? recipe.getId() : null)
+                .isRead(notification.getIsRead())
+                .createdAt(notification.getCreatedAt())
+                .build();
+
+        // 사용자별 알람 전송
+        log.info("🔔 {}에게 알림 전송: {}", m.getUsername(), content);
+        messagingTemplate.convertAndSendToUser(
+                m.getEmail()
+                ,"/topic/notification"
+                ,response);
+    }
+
+    @Transactional
+    public void sendGruopBuyOpenToAll(GroupBuy groupBuy, String content) {
+        // 모든 회원 조회
+        List<Member> members = memberRepository.findAll();
+
+        // 사용자별 알람 전송
+        log.info("🔔 {}공동구매 오픈 알림 전송: {}", groupBuy.getTitle(), content);
+        for (Member member : members) {
+            createAndSendNotification(member, NotificationType.GROUP_BUY_OPEN, content, null, groupBuy, null);
+        }
+    }
+
+
+}
