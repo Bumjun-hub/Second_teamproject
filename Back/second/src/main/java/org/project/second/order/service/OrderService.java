@@ -1,5 +1,6 @@
 package org.project.second.order.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.OrderStatus;
 import org.project.second.groupBuy.domain.GroupBuy;
@@ -10,6 +11,7 @@ import org.project.second.order.domain.Order;
 import org.project.second.order.dto.OrderDto;
 import org.project.second.order.dto.OrderResponseDto;
 import org.project.second.order.repository.OrderRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,7 @@ public class OrderService {
     private final GroupBuyParticipationRepository groupBuyParticipationRepository;
 
     //구매order
+    @Transactional
     public void createOrder(Long groupBuyId, OrderDto orderDto, Member loginUser) {
         validateLogin(loginUser);
         GroupBuy groupBuy = validatepost(groupBuyId);
@@ -50,6 +53,7 @@ public class OrderService {
     }
 
     //주문자 조회
+    @Transactional
     public List<OrderResponseDto> getOrders(Long groupBuyId , OrderStatus status) {
         GroupBuy groupBuy = validatepost(groupBuyId);
 
@@ -75,7 +79,75 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    //상세조회(관리자)
+    @Transactional
+    public OrderResponseDto detailOrders(Long orderId) {
+        Order order = validateOrder(orderId);
 
+        return new OrderResponseDto(
+                order.getId(),
+                order.getGroupBuy().getId(),
+                order.getMember().getUsername(),
+                order.getQuantity(),
+                order.getTotalAmount(),
+                order.getAddress(),
+                order.getPhone(),
+                order.getPaymentName(),
+                order.getPaymentBank(),
+                order.getStatus()
+        );
+    }
+
+    //주문조회(사용자)
+    @Transactional
+    public List<OrderResponseDto> getMyOrder(Member loginUser) {
+        List<Order> orders = orderRepository.findByMember(loginUser);
+        return orders.stream().map(order -> new OrderResponseDto(
+                order.getId(),
+                order.getGroupBuy().getId(),
+                order.getMember().getUsername(),
+                order.getQuantity(),
+                order.getTotalAmount(),
+                order.getAddress(),
+                order.getPhone(),
+                order.getPaymentName(),
+                order.getPaymentBank(),
+                order.getStatus()
+        ))
+                .collect(Collectors.toList());
+    }
+
+    //상세조회(사용자)
+    @Transactional
+    public OrderResponseDto detailMyOrder(Long orderId, Member loginUser) {
+        Order order = validateOrder(orderId);
+        if (!order.getMember().getId().equals(loginUser.getId())) {
+            throw new AccessDeniedException("본인의 주문만 조회할 수 있습니다");
+        }
+        return new OrderResponseDto(
+                order.getId(),
+                order.getGroupBuy().getId(),
+                order.getMember().getUsername(),
+                order.getQuantity(),
+                order.getTotalAmount(),
+                order.getAddress(),
+                order.getPhone(),
+                order.getPaymentName(),
+                order.getPaymentBank(),
+                order.getStatus()
+        );
+    }
+
+    //주문상태변경
+    @Transactional
+    public void updateStatus(Long orderId, OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(()-> new IllegalArgumentException("주문을 찾을 수 없습니다"));
+        order.setStatus(status);
+    }
+
+
+    //예외처리
     public GroupBuy validatepost (Long groupBuyId) {
         return groupBuyRepository.findById(groupBuyId)
                 .orElseThrow(() -> new IllegalArgumentException("해당공동구매가 없습니다"));
@@ -103,5 +175,10 @@ public class OrderService {
         }
     }
 
+    //주문유무
+    public Order validateOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문이 존재하지 않습니다"));
+    }
 
 }

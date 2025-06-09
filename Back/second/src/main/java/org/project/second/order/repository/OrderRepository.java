@@ -14,4 +14,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     boolean existsByGroupBuyAndMember(GroupBuy groupBuy, Member member);
     List<Order> findByGroupBuy(GroupBuy groupBuy);
     List<Order> findByGroupBuyAndStatus(GroupBuy groupBuy, OrderStatus status);
+
+    List<Order> findByMember(Member loginUser);
 }
