@@ -8,8 +8,12 @@ import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.order.domain.Order;
 import org.project.second.order.dto.OrderDto;
+import org.project.second.order.dto.OrderResponseDto;
 import org.project.second.order.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +39,40 @@ public class OrderService {
                 .totalAmount(totalAmount)
                 .address(orderDto.getAddress())
                 .phone(orderDto.getPhone())
-                .virtualAccount(orderDto.getVirtualAccount())
-                .bankName(orderDto.getBankName())
+                .paymentName(orderDto.getPaymentName())
+                .paymentBank(orderDto.getPaymentBank())
+                .accountHolderName("homit")
+                .virtualAccount("1234-5678-9012")
+                .bankName("TestBank")
                 .status(OrderStatus.PENDING)
                 .build();
         orderRepository.save(orders);
+    }
+
+    //주문자 조회
+    public List<OrderResponseDto> getOrders(Long groupBuyId , OrderStatus status) {
+        GroupBuy groupBuy = validatepost(groupBuyId);
+
+        List<Order> orders;
+        if(status != null) {
+            orders = orderRepository.findByGroupBuyAndStatus(groupBuy, status);
+        } else {
+            orders = orderRepository.findByGroupBuy(groupBuy);
+        }
+
+        return orders.stream().map(order -> new OrderResponseDto(
+                order.getId(),
+                order.getGroupBuy().getId(),
+                order.getMember().getUsername(),
+                order.getQuantity(),
+                order.getTotalAmount(),
+                order.getAddress(),
+                order.getPhone(),
+                order.getPaymentName(),
+                order.getPaymentBank(),
+                order.getStatus()
+        ))
+                .collect(Collectors.toList());
     }
 
 
@@ -69,4 +102,6 @@ public class OrderService {
             throw new IllegalArgumentException("이미 주문을 완료했습니다");
         }
     }
+
+
 }

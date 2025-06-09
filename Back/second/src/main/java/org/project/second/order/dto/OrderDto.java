@@ -14,7 +14,6 @@ public class OrderDto {
     private Integer quantity;    //구매할갯수(최대넘으면안됨)
     private String address;      //주소
     private String phone;        //전화번호
-    private String virtualAccount = "1234-5678-9012";
-    private String bankName = "TestBank";
-
+    private String paymentName;  //입금자명(사용자)
+    private String paymentBank;  //입금음행(사용자)
 }

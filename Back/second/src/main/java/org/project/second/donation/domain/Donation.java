@@ -53,7 +53,7 @@ public class Donation extends BaseEntity {
     private String neighborhood; //동
 
     @Column(nullable = false)
-    private Long price;
+    private Long price;          //가격
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
