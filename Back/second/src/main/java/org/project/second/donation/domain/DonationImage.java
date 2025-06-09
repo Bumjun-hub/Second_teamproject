@@ -1,7 +1,8 @@
-package org.project.second.community.domain;
+package org.project.second.donation.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.project.second.community.domain.Community;
 
 @Entity
 @Getter
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
-public class CommunityImage {
+public class DonationImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +24,6 @@ public class CommunityImage {
     private Boolean isDeleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "community_id", nullable = true)
-    private Community community;
-
+    @JoinColumn(name = "donation_id", nullable = true)
+    private Donation donation;
 }

@@ -5,9 +5,9 @@ import lombok.*;
 import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.GroupBuyStatus;
-import org.project.second.community.domain.CommunityImage;
 import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
+import org.project.second.order.domain.Order;
 
 import java.time.LocalDateTime;
 import java.util.List;
