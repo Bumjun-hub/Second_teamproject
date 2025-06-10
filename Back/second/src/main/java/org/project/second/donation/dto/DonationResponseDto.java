@@ -7,14 +7,18 @@ import lombok.NoArgsConstructor;
 import org.project.second.common.enums.DonationCategory;
 import org.project.second.common.enums.DonationStatus;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DonationDto {
-
-    private DonationCategory category;
+public class DonationResponseDto {
     private Long id;
+    private DonationCategory category;
+    private DonationStatus status;
+    private String username;
     private String title;
     private String content;
     private String province;      //도
@@ -22,5 +26,12 @@ public class DonationDto {
     private  String district;     //구
     private String neighborhood;  //동
     private Long price;
-    private DonationStatus status;
+    private List<String> imgUrls;
+    private Long viewCount;
+    private Long likes;
+    private boolean liked;  // 좋아요 여부
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+
 }

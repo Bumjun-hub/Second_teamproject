@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.DonationCategory;
+import org.project.second.common.enums.DonationStatus;
 import org.project.second.donation.dto.DonationDto;
+import org.project.second.donation.dto.DonationResponseDto;
 import org.project.second.donation.service.DonationService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,9 +39,12 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart("price") Long price,
+            //@RequestPart("price") Long price,
+            @RequestPart("price") String priceStr,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
+
+        Long price = Long.parseLong(priceStr);
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
@@ -69,10 +73,13 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart("price") Long price,
+            //@RequestPart("price") Long price,
+            @RequestPart("price") String priceStr,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestPart(value = "removedImages", required = false) String removedImagesJson,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
+
+            Long price = Long.parseLong(priceStr);
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
@@ -101,6 +108,28 @@ public class DonationController {
 
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
     }
+
+    //삭제(소프트삭제)
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        Member loginUser = userDetails.getMember();
+        donationService.deletePost(id, loginUser);
+        return ResponseEntity.status(HttpStatus.OK).body("게시글이 삭제되었습니다");
+    }
+
+    //전체조회
+    @GetMapping("/view/{category}")
+    public ResponseEntity<List<DonationResponseDto>> getCategoryPost(
+            @PathVariable DonationCategory category
+    ){
+        List<DonationResponseDto> posts = donationService.getCategoryPost(category);
+        return ResponseEntity.ok(posts);
+    }
+
+
 
 
     
