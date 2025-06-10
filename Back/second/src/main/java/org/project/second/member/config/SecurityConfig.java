@@ -42,10 +42,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/signup", "/api/login").permitAll()
                         .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**","/api/groupBuy/view/**", "/api/groupBuy/detail/**", "/api/comment/list/**" ).permitAll()
-                        .requestMatchers("/uploads/**", "/static/**","/profileimages/**").permitAll() // ✅ 여기 추가
+                        .requestMatchers("/uploads/**", "/static/**","/profileimages/**").permitAll()
                         .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**", "/api/likes/**").hasAnyRole("USER", "ADMIN")
-
-
+                        .requestMatchers("/ws/**").authenticated()// 웹소켓 엔드포인트 허용
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

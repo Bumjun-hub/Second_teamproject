@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DonationImageRepository extends JpaRepository<DonationImage, Long> {
+
 }
