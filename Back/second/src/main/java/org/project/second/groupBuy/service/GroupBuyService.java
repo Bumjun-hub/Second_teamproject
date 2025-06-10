@@ -33,6 +33,7 @@ public class GroupBuyService {
     private final GroupBuyImageRepository groupBuyImageRepository;
     private final NotificationService notificationService;
 
+    //작성
     @Transactional
     public void createPost(GroupBuyDto groupBuyDto, List<MultipartFile> imageFiles, Member loginUser) {
         validateMember(loginUser);
@@ -117,6 +118,7 @@ public class GroupBuyService {
         log.info("공동구매 {} 마감 완료 및 알림 전송", groupBuyId);
     }
 
+    //수정
     @Transactional
     public void editPost(Long id, GroupBuyDto groupBuyDto, Member loginUser,
                          List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
@@ -167,6 +169,7 @@ public class GroupBuyService {
         }
     }
 
+    //삭제
     @Transactional
     public void deletePost(Long id, Member loginUser) {
         GroupBuy post = validatePost(id);
@@ -174,6 +177,8 @@ public class GroupBuyService {
         groupBuyRepository.delete(post);
     }
 
+
+    //전체보기
     public List<GroupBuyResponseDto> viewAll() {
         return groupBuyRepository.findAll().stream().map(post -> {
             List<String> imageUrls = post.getGroupBuyImages().stream()
@@ -199,6 +204,7 @@ public class GroupBuyService {
         }).collect(Collectors.toList());
     }
 
+    //상세보기
     public GroupBuyResponseDto detailView(Long id) {
         GroupBuy post = validatePost(id);
 
@@ -226,6 +232,7 @@ public class GroupBuyService {
         );
     }
 
+    //상태별보기
     public List<GroupBuyResponseDto> statusView(GroupBuyStatus status) {
         return groupBuyRepository.findByStatus(status).stream().map(post -> {
             List<String> imageUrls = post.getGroupBuyImages().stream()
@@ -249,6 +256,7 @@ public class GroupBuyService {
         }).collect(Collectors.toList());
     }
 
+    //예외
     public void validateMember(Member loginUser) {
         Member foundMember = memberRepository.findById(loginUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당사용자가 존재하지 않습니다"));
