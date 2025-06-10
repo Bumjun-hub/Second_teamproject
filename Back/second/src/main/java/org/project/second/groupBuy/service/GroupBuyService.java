@@ -2,6 +2,7 @@ package org.project.second.groupBuy.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.common.image.ImageService;
 import org.project.second.groupBuy.domain.GroupBuy;
@@ -12,6 +13,7 @@ import org.project.second.groupBuy.repository.GroupBuyImageRepository;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
+import org.project.second.websocket.service.NotificationService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +24,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GroupBuyService {
 
     private final GroupBuyRepository groupBuyRepository;
     private final MemberRepository memberRepository;
     private final ImageService imageService;
     private final GroupBuyImageRepository groupBuyImageRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void createPost(GroupBuyDto groupBuyDto, List<MultipartFile> imageFiles, Member loginUser) {
@@ -66,6 +70,51 @@ public class GroupBuyService {
                 }
             }
         }
+
+        // 공동구매 오픈 알림
+        String content = "🔔 \"" + groupBuy.getTitle() + "\" 새로운 공동구매가 OPEN 되었습니다!";
+        notificationService.sendGruopBuyOpenToAll(
+                groupBuy, content
+        );
+
+    }
+
+    @Transactional
+    public void closeGroupBuy(Long groupBuyId) {
+        GroupBuy groupBuy = groupBuyRepository.findById(groupBuyId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 공동구매 게시글 번호입니다."));
+
+        if (groupBuy.getStatus() == GroupBuyStatus.CLOSED) {
+            log.warn("공동구매 {}는 이미 인원 미달로 종료 되었습니다.", groupBuyId);
+            return;
+        }
+
+        groupBuy.setStatus(GroupBuyStatus.CLOSED);
+        groupBuyRepository.save(groupBuy);
+
+        String content = "🔔 \"" + groupBuy.getTitle() + "\" 공동구매가 인원미달로 종료 되었습니다.";
+        notificationService.sendGruopBuyCloseToParticipants(groupBuyId, content);
+
+        log.info("공동구매 {} 인원 미달 종료 및 알림 전송", groupBuyId);
+    }
+
+    @Transactional
+    public void completedGroupBuy(Long groupBuyId) {
+        GroupBuy groupBuy = groupBuyRepository.findById(groupBuyId)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 공동구매 게시글 번호입니다."));
+
+        if (groupBuy.getStatus() == GroupBuyStatus.COMPLETED) {
+            log.warn("공동구매 {}는 이미 마감되었습니다.", groupBuyId);
+            return;
+        }
+
+        groupBuy.setStatus(GroupBuyStatus.COMPLETED);
+        groupBuyRepository.save(groupBuy);
+
+        String content = "🔔 \"" + groupBuy.getTitle() + "\" 공동구매가 마감 되었습니다. 구매 신청을 진행해주세요!";
+        notificationService.sendGruopBuyCompletedToParticipants(groupBuyId, content);
+
+        log.info("공동구매 {} 마감 완료 및 알림 전송", groupBuyId);
     }
 
     @Transactional

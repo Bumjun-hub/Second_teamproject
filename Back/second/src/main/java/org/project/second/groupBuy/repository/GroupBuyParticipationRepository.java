@@ -6,6 +6,7 @@ import org.project.second.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,8 @@ public interface GroupBuyParticipationRepository extends JpaRepository<GroupBuyP
     Optional<GroupBuyParticipation> findByGroupBuyAndMember(GroupBuy groupBuy, Member member);
 
     List<GroupBuyParticipation> findByMember(Member member);
+
+    List<Member> findByGroupBuy_Id(Long groupBuyId);
+
+    List<GroupBuyParticipation> findByGroupBuyId(Long groupBuyId);
 }

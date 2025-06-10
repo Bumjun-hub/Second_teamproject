@@ -35,12 +35,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS(); // 브라우저가 WebSocket을 지원하지 않을 때 SockJS fallback 지원
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+    @Override //configureClientInboundChannel : 클라이언트가 서버로 보내는 메시지를 처리하는 채널을 설정하는 메서드
+    public void configureClientInboundChannel(ChannelRegistration registration) { //ChannelRegistration : 채널의 동작을 커스터마이징하는 설정 객체
+        registration.interceptors(new ChannelInterceptor() { // ChannelInterceptor : 메시지가 채널로 들어가기 전에 가로채서 원하는 작업(예: 인증 확인)을 수행
+            @Override // preSend : 서버에 들어가기 전에 호출
+            public Message<?> preSend(Message<?> message, MessageChannel channel) { // Message : 클라이언트가 서버로 보내는 메세지 객체, STOMP 메시지는 명령(CONNECT, SEND 등), 헤더, 본문을 포함
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message); // StompHeaderAccessor : 헤더 리딩, JWT 토큰 꺼낼 떄 사용
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String token = accessor.getFirstNativeHeader("Authorization");
                     if (token != null && token.startsWith("Bearer ")) {
@@ -52,7 +52,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                             accessor.setUser(authentication);
                         } else {
-                            throw new AccessDeniedException("Invalid JWT token");
+                            throw new AccessDeniedException("Invalid JWT token"); // 인증, 권한 없을 때 예외처리
                         }
                     } else {
                         throw new AccessDeniedException("JWT token required");
