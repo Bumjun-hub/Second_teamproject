@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -27,7 +26,6 @@ public class GroupBuyController {
     private final GroupBuyService groupBuyService;
 
     //작성
-
     @PostMapping(value = "admin/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createPost(
             @RequestParam("status") String status,

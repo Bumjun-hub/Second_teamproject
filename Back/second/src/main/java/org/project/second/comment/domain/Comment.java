@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.community.domain.Community;
+import org.project.second.donation.domain.Donation;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
 import org.project.second.recipe.domain.Recipe;
@@ -39,7 +40,11 @@ public class Comment extends BaseEntity {
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "groupbuy_id", nullable = true)
+    @JoinColumn(name = "groupBuy_id", nullable = true)
     private GroupBuy groupBuy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "donation_id", nullable = true)
+    private Donation donation;
 
 }
