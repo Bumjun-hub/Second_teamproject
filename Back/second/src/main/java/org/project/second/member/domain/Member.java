@@ -31,9 +31,9 @@ public class Member extends BaseEntity {
     private String phone; // 휴대폰번호
 
     @Enumerated(EnumType.STRING)
-    private SocialProvider socialProvider; // GOOGLE, KAKAO, NAVER
+    private SocialProvider socialProvider; // GOOGLE, KAKAO, NAVER (임시)
 
-    private String socialId; // 소셜 제공자의 고유 ID
+    private String socialId; // 소셜 제공자의 고유 ID (임시)
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
