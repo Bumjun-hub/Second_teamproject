@@ -24,7 +24,9 @@ const BoardPage = () => {
 
     const [thumbnail, setThumbnail] = useState({ visible: false, x: 0, y: 0, url: '' });
 
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    // 기본값 : 작성일 기준으로 내림차순
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc', });
+
 
     const categoryMap = {
         '자유게시판': 'FREE',
@@ -108,18 +110,18 @@ const BoardPage = () => {
     const handleSort = (key) => {
         setSortConfig(prev => {
             if (prev.key === key) {
-                // 같은 버튼을 계속 누르면 asc → desc → 해제(null)
-                if (prev.direction === 'asc') return { key: null, direction: null };
                 if (prev.direction === 'desc') return { key, direction: 'asc' };
+                if (prev.direction === 'asc') return { key: null, direction: null };
             }
-            return { key, direction: 'desc' }; // 처음 누르면 asc로 시작
+            return { key, direction: 'desc' }; // ★ 처음 누르면 desc부터 시작
         });
     };
 
+
     const getSortArrow = (key) => {
-        if (sortConfig.key !== key) return <FaSort/>; // 정렬 중이 아님
+        if (sortConfig.key !== key) return <FaSort />; // 정렬 중이 아님
         if (sortConfig.direction === 'asc') return <FaSortUp />;
-        if (sortConfig.direction === 'desc') return <FaSortDown/>;
+        if (sortConfig.direction === 'desc') return <FaSortDown />;
         return '';
     };
 

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './RecipeinfoPage.css';
 import { authenticatedFetch } from '../../utils/authUtils';
+import Section from '../../components/Section';
+import CommentSection from '../../components/CommentSection';
 
 const RecipeInfoPage = ({ recipe, onBackClick }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
+  const [currentUser, setCurrentUser] = useState("");
 
   // 컴포넌트 마운트 시 즐겨찾기 상태 확인
   useEffect(() => {
@@ -12,11 +15,17 @@ const RecipeInfoPage = ({ recipe, onBackClick }) => {
     fetchFavoriteCount();
   }, [recipe.RCP_SEQ]);
 
+  useEffect(() => {
+    fetch("/api/mypage", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => setCurrentUser(data.name));
+  }, []);
+
   // 현재 레시피가 즐겨찾기에 있는지 확인
   const checkFavoriteStatus = async () => {
     try {
       const response = await authenticatedFetch('http://localhost:8080/api/favorite/list');
-      
+
       if (response.ok) {
         const favorites = await response.json();
         const isAlreadyFavorite = favorites.some(fav => fav.recipeId === recipe.RCP_SEQ);
@@ -51,19 +60,19 @@ const RecipeInfoPage = ({ recipe, onBackClick }) => {
 
   const toggleFavorite = async () => {
     try {
-      const url = isFavorite 
-        ? 'http://localhost:8080/api/favorite/remove' 
+      const url = isFavorite
+        ? 'http://localhost:8080/api/favorite/remove'
         : 'http://localhost:8080/api/favorite/add';
-      
+
       const method = isFavorite ? 'DELETE' : 'POST';
-      
-      const body = isFavorite 
+
+      const body = isFavorite
         ? { recipeId: recipe.RCP_SEQ }
-        : { 
-            recipeId: recipe.RCP_SEQ, 
-            recipeName: recipe.RCP_NM, 
-            imageUrl: recipe.ATT_FILE_NO_MAIN 
-          };
+        : {
+          recipeId: recipe.RCP_SEQ,
+          recipeName: recipe.RCP_NM,
+          imageUrl: recipe.ATT_FILE_NO_MAIN
+        };
 
       const response = await authenticatedFetch(url, {
         method,
@@ -83,105 +92,127 @@ const RecipeInfoPage = ({ recipe, onBackClick }) => {
     }
   };
 
+
   return (
+
     <div className="recipe-info-page">
       {/* 헤더 */}
       <div className="info-header">
         <div className="info-header-container">
           <h1 className="recipe-title">{recipe.RCP_NM}</h1>
-            <div className="header-actions">
-              <div className="recipe-favorite-count">
-                {favoriteCount} LIKES
-              </div>
-              <button 
-                className={`favorite-btn ${isFavorite ? 'delete-state' : ''}`} 
-                onClick={toggleFavorite}
-              >
-                {isFavorite ? '❤️' : '🤍'} {isFavorite ? '삭제' : '추가'}
-              </button>
+          <div className="header-actions">
+            <div className="recipe-favorite-count">
+              {favoriteCount} LIKES
             </div>
+            <button
+              className={`favorite-btn ${isFavorite ? 'delete-state' : ''}`}
+              onClick={toggleFavorite}
+            >
+              {isFavorite ? '❤️' : '🤍'} {isFavorite ? '삭제' : '추가'}
+            </button>
+          </div>
         </div>
       </div>
+      <Section>
+        {/* 메인 컨텐츠 */}
+        <div className="info-container">
+          {/* 메인 이미지 */}
+          {recipe.ATT_FILE_NO_MAIN && (
+            <div className="main-image-container">
+              <img src={recipe.ATT_FILE_NO_MAIN} alt={recipe.RCP_NM} className="main-image" />
+            </div>
+          )}
 
-      {/* 메인 컨텐츠 */}
-      <div className="info-container">
-        {/* 메인 이미지 */}
-        {recipe.ATT_FILE_NO_MAIN && (
-          <div className="main-image-container">
-            <img src={recipe.ATT_FILE_NO_MAIN} alt={recipe.RCP_NM} className="main-image" />
-          </div>
-        )}
-        
-        {/* 기본 정보 그리드 */}
-        <div className="info-grid">
-          <div className="info-card">
-            <h3 className="info-title">기본 정보</h3>
-            <div className="info-content">
-              <p><strong>카테고리:</strong> {recipe.RCP_PAT2 || '정보 없음'}</p>
-              <p><strong>조리법:</strong> {recipe.RCP_WAY2 || '정보 없음'}</p>
-              {recipe.INFO_ENG && <p><strong>열량:</strong> {recipe.INFO_ENG}kcal</p>}
+          {/* 기본 정보 그리드 */}
+          <div className="info-grid">
+            <div className="info-card">
+              <h3 className="info-title">기본 정보</h3>
+              <div className="info-content">
+                <p><strong>카테고리:</strong> {recipe.RCP_PAT2 || '정보 없음'}</p>
+                <p><strong>조리법:</strong> {recipe.RCP_WAY2 || '정보 없음'}</p>
+                {recipe.INFO_ENG && <p><strong>열량:</strong> {recipe.INFO_ENG}kcal</p>}
+              </div>
+            </div>
+
+            <div className="info-card">
+              <h3 className="info-title">영양 정보</h3>
+              <div className="info-content">
+                {recipe.INFO_CAR && <p><strong>탄수화물:</strong> {recipe.INFO_CAR}g</p>}
+                {recipe.INFO_PRO && <p><strong>단백질:</strong> {recipe.INFO_PRO}g</p>}
+                {recipe.INFO_FAT && <p><strong>지방:</strong> {recipe.INFO_FAT}g</p>}
+                {recipe.INFO_NA && <p><strong>나트륨:</strong> {recipe.INFO_NA}mg</p>}
+              </div>
             </div>
           </div>
 
-          <div className="info-card">
-            <h3 className="info-title">영양 정보</h3>
-            <div className="info-content">
-              {recipe.INFO_CAR && <p><strong>탄수화물:</strong> {recipe.INFO_CAR}g</p>}
-              {recipe.INFO_PRO && <p><strong>단백질:</strong> {recipe.INFO_PRO}g</p>}
-              {recipe.INFO_FAT && <p><strong>지방:</strong> {recipe.INFO_FAT}g</p>}
-              {recipe.INFO_NA && <p><strong>나트륨:</strong> {recipe.INFO_NA}mg</p>}
+          {/* 재료 섹션 */}
+          {recipe.RCP_PARTS_DTLS && (
+            <div className="ingredients-section">
+              <h3 className="section-title">재료</h3>
+              <div className="ingredients-content">
+                <p>{recipe.RCP_PARTS_DTLS}</p>
+              </div>
             </div>
+          )}
+
+          {/* 조리 방법 */}
+          <div className="cooking-section">
+            <h3 className="section-title">조리 방법</h3>
+            {getCookingSteps(recipe).map((step, i) => (
+              <div key={i} className="cooking-step">
+                {step.image && (
+                  <div className="step-image-container">
+                    <img src={step.image} alt={`단계 ${step.step}`} className="step-image" />
+                  </div>
+                )}
+                <div className="step-content">
+                  <div className="step-number">단계 {step.step}</div>
+                  <p className="step-instruction">{step.instruction}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-        
-        {/* 재료 섹션 */}
-        {recipe.RCP_PARTS_DTLS && (
-          <div className="ingredients-section">
-            <h3 className="section-title">재료</h3>
-            <div className="ingredients-content">
-              <p>{recipe.RCP_PARTS_DTLS}</p>
-            </div>
-          </div>
-        )}
-        
-        {/* 조리 방법 */}
-        <div className="cooking-section">
-          <h3 className="section-title">조리 방법</h3>
-          {getCookingSteps(recipe).map((step, i) => (
-            <div key={i} className="cooking-step">
-              {step.image && (
-                <div className="step-image-container">
-                  <img src={step.image} alt={`단계 ${step.step}`} className="step-image" />
+
+          {/* 추가 정보 */}
+          {(recipe.HASH_TAG || recipe.RCP_NA_TIP) && (
+            <div className="additional-info">
+              {recipe.HASH_TAG && (
+                <div className="hashtag-section">
+                  <h3 className="section-title">해시태그</h3>
+                  <p className="hashtag-content">{recipe.HASH_TAG}</p>
                 </div>
               )}
-              <div className="step-content">
-                <div className="step-number">단계 {step.step}</div>
-                <p className="step-instruction">{step.instruction}</p>
-              </div>
+              {recipe.RCP_NA_TIP && (
+                <div className="tip-section">
+                  <h3 className="section-title">저감조리법 팁</h3>
+                  <p className="tip-content">{recipe.RCP_NA_TIP}</p>
+                </div>
+              )}
+
             </div>
-          ))}
+
+
+
+          )}
         </div>
-        
-        {/* 추가 정보 */}
-        {(recipe.HASH_TAG || recipe.RCP_NA_TIP) && (
-          <div className="additional-info">
-            {recipe.HASH_TAG && (
-              <div className="hashtag-section">
-                <h3 className="section-title">해시태그</h3>
-                <p className="hashtag-content">{recipe.HASH_TAG}</p>
-              </div>
-            )}
-            {recipe.RCP_NA_TIP && (
-              <div className="tip-section">
-                <h3 className="section-title">저감조리법 팁</h3>
-                <p className="tip-content">{recipe.RCP_NA_TIP}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+        <CommentSection
+          postId={recipe.RCP_SEQ}
+          currentUser={currentUser}
+          entityType="RECIPE"
+          recipeName={recipe.RCP_NM || "이름없음"}
+          imageUrl={recipe.ATT_FILE_NO_MAIN || "https://via.placeholder.com/150"}
+        />
+
+
+
+
+      </Section>
+
     </div>
+
+
   );
+
 };
 
 export default RecipeInfoPage;

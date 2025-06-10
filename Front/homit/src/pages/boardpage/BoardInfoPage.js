@@ -122,7 +122,8 @@ const BoardInfoPage = () => {
           </div>
         </div>
 
-        <CommentSection postId={item.id} currentUser={currentUser} />
+        <CommentSection postId={item.id} currentUser={currentUser} entityType="COMMUNITY" />
+
       </div>
     </Section>
   );

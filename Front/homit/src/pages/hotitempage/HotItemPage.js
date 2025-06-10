@@ -4,42 +4,91 @@ import './HotItemPage.css';
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 const HotItemPage = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 8;
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = items.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const [offset, setOffset] = useState(1); // ✅ 무한 스크롤용 offset 추가
+  const [loading, setLoading] = useState(false); // ✅ 중복 요청 방지용 로딩 상태
+  const [hasMore, setHasMore] = useState(true); // ✅ 더 이상 불러올 게 없을 경우 false
 
   const [wishlistIds, setWishlistIds] = useState(new Set());
 
-  // 검색 api 호출
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  // 카테고리
+  const categories = ['주방용품', '청소용품', '욕실용품', '생활용품', '가전제품', '뷰티/건강', '반려동물', '음식'];
+  const [selectedCategory, setSelectedCategory] = useState('주방도구');
+
+  // ✅ 아이템 추가 로딩 함수 (스크롤 하단 도달 시 호출)
+  const loadMoreItems = async () => {
+    if (loading || !hasMore) return;
+
+    // ✅ 최대 요청 제한
+    if (offset > 1000) {
+      console.warn("⛔️ offset 1000 초과 - 로딩 중단");
+      setHasMore(false);
+      return;
+    }
+
+    setLoading(true);
     try {
-      const encodeQuery = encodeURIComponent(searchQuery);
-      const res = await fetch(`http://localhost:8080/api/item/search?query=${encodeQuery}&display=30&start=1&sort=sim`);
+      const query = searchQuery.trim() || '주방도구';
+      const encodeQuery = encodeURIComponent(query);
+      const res = await fetch(`http://localhost:8080/api/item/search?query=${encodeQuery}&display=10&start=${offset}&sort=sim`);
       const data = await res.json();
-      setItems(data);
-      setCurrentPage(1);
+
+      // ✅ 배열 여부 확인
+      if (!Array.isArray(data)) {
+        console.error("❌ 배열이 아님:", data);
+        setHasMore(false);
+        setLoading(false);
+        return;
+      }
+
+      setItems(prev => {
+        const existingIds = new Set(prev.map(item => item.naverProductId));
+        const newItems = data.filter(item => !existingIds.has(item.naverProductId));
+        return [...prev, ...newItems];
+      });
+
+      setOffset(prev => prev + 10);
     } catch (e) {
-      console.error("검색실패 : ", e);
+      console.error("🔥 아이템 로딩 실패:", e);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchHotItems = async () => {
-    try {
-      const res = await fetch(`http://localhost:8080/api/item/search?query=주방도구&display=30&start=1&sort=sim`);
-      const data = await res.json();
-      setItems(data);
-    } catch (e) {
-      console.error('🔥 핫아이템 불러오기 실패:', e);
-    }
-  };
 
-  // useEffect에서 위시리스트 가져오기
+  // ✅ 초기 로딩 및 검색 시 재로딩
+  useEffect(() => {
+    setItems([]);
+    setOffset(1);
+    setHasMore(true);
+    loadMoreItems();
+    fetchWishlist();
+  }, [searchQuery]);
+
+  useEffect(() => {
+    console.log("📋 [전체 아이템 목록 갯수]:", items.length);
+    console.log("📋 [전체 아이템 ID 목록]:", items.map(i => i.naverProductId));
+  }, [items]);
+
+  // ✅ 스크롤 하단 감지 이벤트 등록
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 200 >=
+        document.documentElement.scrollHeight
+
+      ) {
+        loadMoreItems();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [offset, searchQuery]);
+
+  // ✅ 위시리스트 불러오기
   const fetchWishlist = async () => {
     try {
       const res = await fetch(`http://localhost:8080/api/wishlist/getlist`, {
@@ -48,13 +97,14 @@ const HotItemPage = () => {
       const data = await res.json();
       const ids = new Set(data.map(item => item.naverProductId));
       setWishlistIds(ids);
+
+
     } catch (err) {
-      console.error("위시리스트 불러오기 실패", err)
+      console.error("위시리스트 불러오기 실패", err);
     }
-  }
+  };
 
-  // 찜하기 api 호출
-
+  // ✅ 위시리스트 토글
   const handleWishlist = async (item) => {
     const id = item.naverProductId;
     const isWishlisted = wishlistIds.has(id);
@@ -97,12 +147,13 @@ const HotItemPage = () => {
     }
   };
 
+  // ✅ 검색 시 상태 초기화 (검색어만 바꾸면 자동 로딩됨)
+  const handleSearch = () => {
+    setItems([]);
+    setOffset(1);
+    setHasMore(true);
 
-
-  useEffect(() => {
-    fetchHotItems();
-    fetchWishlist();
-  }, []);
+  };
 
   return (
     <Section>
@@ -126,11 +177,25 @@ const HotItemPage = () => {
           </button>
         </div>
       </div>
+      <div className="category-filter">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={selectedCategory === cat ? "active" : ""}
+            onClick={() => {
+              setSearchQuery(cat); // 검색어 바꾸고
+              setSelectedCategory(cat); // 버튼 하이라이트용
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
 
       <div className="HotItemlist">
         <div className="HotItemlist-inner">
-          {currentItems.map((item, index) => (
+          {items.map((item, index) => (
             <div key={index} className="HotItem">
               <div className="image-container">
                 <img src={item.imageUrl} alt={item.name} className="item-image" />
@@ -149,30 +214,14 @@ const HotItemPage = () => {
                 상세 보기
               </button>
             </div>
-
           ))}
         </div>
       </div>
 
-      <div style={{ textAlign: "center", marginTop: "40px" }}>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentPage(index + 1)}
-            style={{
-              margin: "0 5px",
-              padding: "8px 16px",
-              backgroundColor: currentPage === index + 1 ? "#2668A7" : "#ddd",
-              color: currentPage === index + 1 ? "#fff" : "#000",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      {/* ✅ 로딩 중 메시지 */}
+      {loading && <p style={{ textAlign: 'center', margin: '20px 0' }}>로딩 중...</p>}
+
+
     </Section>
   );
 };

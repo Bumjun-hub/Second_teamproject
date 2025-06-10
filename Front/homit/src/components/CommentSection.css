@@ -32,3 +32,22 @@ width: 500px;
 height: auto;
   
 }
+
+.comment-pagination {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.comment-pagination button {
+  margin: 0 5px;
+  padding: 8px 16px;
+  background-color: #ddd;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment-pagination button.active {
+  background-color: #2668A7;
+  color: white;
+}
