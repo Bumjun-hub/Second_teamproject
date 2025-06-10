@@ -2,16 +2,27 @@
 import React, { useEffect, useState } from 'react';
 import './CommentSection.css';
 
-const CommentSection = ({ postId, currentUser }) => {
+const CommentSection = ({ postId, currentUser, entityType, recipeName, imageUrl }) => {
     const [commentList, setCommentList] = useState([]);
     const [commentInput, setCommentInput] = useState('');
     const [editCommentId, setEditCommentId] = useState(null); // 수정 중인 댓글 ID
     const [editContent, setEditContent] = useState(''); // 수정 중인 내용
+    const COMMENT_PER_PAGE = 10;
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const startIndex = (currentPage - 1) * COMMENT_PER_PAGE;
+    const currentComments = commentList.slice(startIndex, startIndex + COMMENT_PER_PAGE);
 
     // 댓글 불러오기
     const fetchComments = async () => {
-        const res = await fetch(`/api/comment/list/COMMUNITY/${postId}`);
+        const res = await fetch(`/api/comment/list/${entityType}/${postId}`);
         const data = await res.json();
+
+        if (Array.isArray(data)) {
+            // 최신순 정렬 (내림차순)
+            data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+            setCommentList(data);
+        }
         setCommentList(Array.isArray(data) ? data : []);
     };
 
@@ -23,24 +34,36 @@ const CommentSection = ({ postId, currentUser }) => {
         e.preventDefault();
         if (!commentInput.trim()) return;
 
+        const payload = {
+            entityType,
+            postId,
+            content: commentInput,
+        };
+
+        // RECIPE 타입일 경우 추가 필드 포함
+        if (entityType === "RECIPE") {
+            payload.recipeName = recipeName;
+            payload.imageUrl = imageUrl;
+
+        }
+
         const res = await fetch("/api/comment/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({
-                entityType: "COMMUNITY",
-                postId,
-                content: commentInput
-            })
+            body: JSON.stringify(payload)
         });
 
         if (res.ok) {
             setCommentInput('');
-            fetchComments(); // 댓글 다시 불러오기
+            fetchComments();
         } else {
+            const errorText = await res.text();
+            console.error("댓글 등록 실패:", errorText);
             alert("댓글 등록 실패");
         }
     };
+
 
     const handleDelete = async (id) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
@@ -105,7 +128,7 @@ const CommentSection = ({ postId, currentUser }) => {
             </form>
 
             <ul className="comment-list">
-                {commentList.map((comment) => (
+                {currentComments.map((comment) => (
                     <li key={comment.id} className="comment-item">
                         <div className="comment-profile">
                             <img src={comment.profileImage || "/profileimages/default.png"} alt="프로필" />
@@ -133,7 +156,7 @@ const CommentSection = ({ postId, currentUser }) => {
 
                             {editCommentId === comment.id ? (
                                 <>
-                                    <textarea 
+                                    <textarea
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
                                         className="comment-edit-textarea"
@@ -153,6 +176,18 @@ const CommentSection = ({ postId, currentUser }) => {
                     </li>
                 ))}
             </ul>
+            <div className="comment-pagination">
+                {Array.from({ length: Math.ceil(commentList.length / COMMENT_PER_PAGE) }, (_, index) => (
+                    <button
+                        key={index}
+                        className={currentPage === index + 1 ? 'active' : ''}
+                        onClick={() => setCurrentPage(index + 1)}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
+            </div>
+
 
         </div>
     );

@@ -6,6 +6,7 @@ import './RecipePage.css';
 import { BsFire, BsSearch } from "react-icons/bs";
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight, 
          MdOutlineKeyboardDoubleArrowLeft, MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
+import Section from '../../components/Section';
 
 const RecipePage = () => {
   const [recipes, setRecipes] = useState([]);
@@ -119,6 +120,7 @@ const RecipePage = () => {
 
   // 메인 페이지 표시
   return (
+    <Section>
     <div className="recipe-page">
       {/* 헤더 */}
       <div className="header">
@@ -245,6 +247,7 @@ const RecipePage = () => {
         </div>
       </div>
     </div>
+    </Section>
   );
 };
 
