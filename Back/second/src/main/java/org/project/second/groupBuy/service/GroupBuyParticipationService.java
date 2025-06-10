@@ -23,6 +23,7 @@ public class GroupBuyParticipationService {
 
     private final GroupBuyRepository groupBuyRepository;
     private final GroupBuyParticipationRepository groupBuyParticipationRepository;
+    private final GroupBuyService groupBuyService;
 
     //신청하기
     @Transactional
@@ -57,6 +58,7 @@ public class GroupBuyParticipationService {
         //신청인원이 max인원이 되면 completed 해라
         if (updateParticipations >= groupBuy.getMaxParticipants()) {
             groupBuy.setStatus(GroupBuyStatus.COMPLETED);
+            groupBuyService.completedGroupBuy(groupBuy.getId());
         }
         // 날짜가 맞으면 closed해라
         if (groupBuy.getDeadline().isBefore(LocalDateTime.now()) &&

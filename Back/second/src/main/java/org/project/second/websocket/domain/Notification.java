@@ -1,4 +1,4 @@
-package org.project.second.websocket.notification;
+package org.project.second.websocket.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,10 @@ import org.project.second.community.domain.Community;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
 import org.project.second.recipe.domain.Recipe;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications")
@@ -16,7 +20,8 @@ import org.project.second.recipe.domain.Recipe;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Notification extends BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,6 +50,11 @@ public class Notification extends BaseEntity {
     private Recipe recipe;
 
     @Column(name = "is_read", nullable = false)
+    @Builder.Default
     private Boolean isRead = false;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt; // 생성일
 
 }

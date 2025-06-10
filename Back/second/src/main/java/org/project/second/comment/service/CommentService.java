@@ -5,6 +5,7 @@ import org.project.second.comment.domain.Comment;
 import org.project.second.comment.dto.*;
 import org.project.second.comment.repository.CommentRepository;
 import org.project.second.common.enums.CommentEntityType;
+import org.project.second.common.enums.NotificationType;
 import org.project.second.community.domain.Community;
 import org.project.second.community.repository.CommunityRepository;
 import org.project.second.groupBuy.domain.GroupBuy;
@@ -13,6 +14,7 @@ import org.project.second.member.domain.Member;
 import org.project.second.recipe.domain.Recipe;
 import org.project.second.recipe.repository.RecipeRepository;
 import org.project.second.recipe.service.RecipeService;
+import org.project.second.websocket.service.NotificationService;
 import org.project.second.wishlist.service.WishlistService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class CommentService {
     private final GroupBuyRepository groupBuyRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
+    private final NotificationService notificationService;
 
     @Transactional
     public CommentResponse createComment(Member m, CommentRequest request) {
@@ -51,23 +54,49 @@ public class CommentService {
                 Community community = communityRepository.findById(communityId)
                         .orElseThrow(() -> new IllegalArgumentException("게시글 번호가 유효하지 않습니다."));
                 comment.setCommunity(community);
+                commentRepository.save(comment);
+
+                if (m.getId().equals(community.getMember().getId())) {
+                    String content = "🔔 \"" + community.getTitle() + "\" 게시물에 댓글이 등록되었습니다!";
+                    notificationService.createAndSendNotification(
+                            comment.getMember(),
+                            NotificationType.COMMENT,
+                            content,
+                            community,
+                            null,
+                            null
+                            );
+                }
                 break;
             case GROUPBUY:
                 Long groupBuyId = parseLong(request.getPostId());
                 GroupBuy groupBuy = groupBuyRepository.findById(groupBuyId)
                         .orElseThrow(() -> new IllegalArgumentException("공동구매 게시글 번호가 유효하지 않습니다."));
                 comment.setGroupBuy(groupBuy);
+                commentRepository.save(comment);
+
+                if (m.getId().equals(groupBuy.getMember().getId())) {
+                    String content = "🔔 \"" + groupBuy.getTitle() + "\" 공동구매 게시물에 댓글이 등록되었습니다!";
+                    notificationService.createAndSendNotification(
+                            comment.getMember(),
+                            NotificationType.COMMENT,
+                            content,
+                            null,
+                            groupBuy,
+                            null
+                    );
+                }
                 break;
             case RECIPE:
                 String recipeId = request.getPostId();
                 Recipe recipe = recipeRepository.findByRecipeId(recipeId)
                         .orElseGet(() -> recipeService.ensureRecipe(recipeId, request.getRecipeName(), request.getImageUrl()));
                 comment.setRecipe(recipe);
+                commentRepository.save(comment);
                 break;
                 default:
                     throw new IllegalArgumentException("게시글 타입이 유효하지 않습니다" + request.getEntityType());
         }
-        commentRepository.save(comment);
 
         return CommentResponse.builder()
                 .id(comment.getId())
