@@ -21,7 +21,7 @@ public class Donation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+    private Long id;
 
     @Column(nullable = false)
     private String title;
@@ -30,6 +30,7 @@ public class Donation extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Enumerated(EnumType.STRING)
@@ -38,7 +39,7 @@ public class Donation extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DonationCategory donationCategory;
+    private DonationCategory category;
 
     @Column(nullable = false)
     private String province;     //도
