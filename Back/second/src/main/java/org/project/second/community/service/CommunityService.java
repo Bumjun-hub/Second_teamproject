@@ -65,7 +65,6 @@ public class CommunityService {
     }
 
     //수정
-
     @Transactional
     public void editPost(Long id, CommunityDto communityDto, Member loginUser,
                          List<MultipartFile> imageFiles, List<String> deleteImageUrls) {
