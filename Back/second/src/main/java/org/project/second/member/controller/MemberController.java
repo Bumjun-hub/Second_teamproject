@@ -51,7 +51,7 @@ public class MemberController {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-        try {
+        try{
             Authentication authentication = authenticationManager.authenticate(token);
 
             // ✅ 인증 정보 SecurityContext에 저장
@@ -63,19 +63,12 @@ public class MemberController {
             String refreshToken = jwtProvider.generateRefreshToken(authentication);
             jwtProvider.setTokensInCookies(response, accessToken, refreshToken);
 
-            return ResponseEntity.ok(
-                    new LoginResponse(
-                            "로그인 성공",
-                            accessToken,
-                            authentication.getName()
-
-                    )
-            );
+            return ResponseEntity.ok(new LoginResponse("로그인 성공", authentication.getName()));
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(".이메일 또는 비밀번호가 유효하지 않습니다.", null,loginRequest.getEmail()));
+                    .body(new LoginResponse(".이메일 또는 비밀번호가 유효하지 않습니다.", loginRequest.getEmail()));
         }
     }
 
