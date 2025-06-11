@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { checkAuthStatus } from '../../utils/authUtils';
 import './LoginPage.css';
 import '../memberpage/MemberPage.css';
+import { accessToken } from './../../utils/notificationClient';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
@@ -67,6 +68,9 @@ const LoginPage = () => {
             const data = await response.json();
 
             if (response.ok) {
+                if(data.accessToken){
+                    localStorage.setItem('access_Token', data.accessToken);
+                }
                 console.log('로그인 성공:', data);
 
                 // 인증 상태 변경 이벤트 발생
