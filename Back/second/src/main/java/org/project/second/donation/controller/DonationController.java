@@ -3,9 +3,7 @@ package org.project.second.donation.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.usertype.CompositeUserType;
 import org.project.second.common.enums.DonationCategory;
-import org.project.second.common.enums.DonationStatus;
 import org.project.second.donation.dto.DonationDto;
 import org.project.second.donation.dto.DonationResponseDto;
 import org.project.second.donation.service.DonationService;
@@ -40,12 +38,9 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            //@RequestPart("price") Long price,
-            @RequestPart("price") String priceStr,
+            @RequestPart("price") Long price,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
-
-        Long price = Long.parseLong(priceStr);
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
@@ -74,13 +69,10 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            //@RequestPart("price") Long price,
-            @RequestPart("price") String priceStr,
+            @RequestPart("price") Long price,
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestPart(value = "removedImages", required = false) String removedImagesJson,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
-
-            Long price = Long.parseLong(priceStr);
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
