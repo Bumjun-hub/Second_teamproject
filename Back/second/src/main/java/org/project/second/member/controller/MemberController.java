@@ -51,7 +51,7 @@ public class MemberController {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-        try{
+        try {
             Authentication authentication = authenticationManager.authenticate(token);
 
             // ✅ 인증 정보 SecurityContext에 저장
@@ -63,11 +63,19 @@ public class MemberController {
             String refreshToken = jwtProvider.generateRefreshToken(authentication);
             jwtProvider.setTokensInCookies(response, accessToken, refreshToken);
 
-            return ResponseEntity.ok(new LoginResponse("로그인 성공", authentication.getName()));
+            return ResponseEntity.ok(
+                    new LoginResponse(
+                            "로그인 성공",
+                            accessToken,
+                            authentication.getName()
+
+                    )
+            );
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(".이메일 또는 비밀번호가 유효하지 않습니다.", loginRequest.getEmail()));
+                    .body(new LoginResponse(".이메일 또는 비밀번호가 유효하지 않습니다.", null,loginRequest.getEmail()));
         }
     }
 
@@ -92,7 +100,7 @@ public class MemberController {
         Member member = userDatails.getMember();
         member.setRefreshToken(null);
         memberRepository.save(member);
-        
+
         // 쿠키 삭제
         jwtProvider.clearTokensInCookies(response);
         return ResponseEntity.ok(new LogoutResponse("로그아웃 성공"));
@@ -108,8 +116,8 @@ public class MemberController {
 
     @PutMapping("changedPwd")
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                            @RequestBody ChangedPwdRequest pwdRequest,  HttpServletResponse response) {
-        try{
+                                            @RequestBody ChangedPwdRequest pwdRequest, HttpServletResponse response) {
+        try {
             Member member = userDetails.getMember();
             Member updatedMember = memberService.changedPwd(member, pwdRequest);
 
@@ -184,18 +192,18 @@ public class MemberController {
                     .body(new ErrorResponse("서버 오류가 발생했습니다."));
         }
     }
-    
+
     // 프로필 이미지 10개(선택용) 가져오기
     @GetMapping("/profile/getimages")
     public ResponseEntity<List<String>> getImages() throws IOException {
         List<String> images = memberService.getProfileImages();
         return ResponseEntity.ok(images);
     }
-    
+
     // 사진 업로드
     @PostMapping("/profile/upload")
     public ResponseEntity<?> uploadProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                     @RequestBody ProfileImageRequest profileImageRequest, HttpServletResponse response) {
+                                                @RequestBody ProfileImageRequest profileImageRequest, HttpServletResponse response) {
         try {
             Member m = userDetails.getMember();
             memberService.uploadProfileImage(profileImageRequest.getProfile_imageName(), m.getId());

@@ -12,12 +12,10 @@ const GroupBuyInfoPage = () => {
     const [isLiked, setIsLiked] = useState(false);
 
 
-    const isPastDeadline = item && new Date(item.deadline) < new Date();
-    const isClosed = item && (
-        item.status === "CLOSED" ||
-        item.status === "COMPLETED" ||
-        isPastDeadline
-    );
+
+    // 서버에서 내려주는 status값(OPEN, CLOSED, COMPLETED) 만으로 판별
+    const isCompleted = item?.status === "COMPLETED";
+    const isClosed = item?.status !== "OPEN";
 
     const fetchItem = async () => {
         try {
@@ -202,9 +200,9 @@ const GroupBuyInfoPage = () => {
                                         : `${item.salePrice ?? '-'}`}원
                                 </span>
                             </div>
-                            {isClosed ? (
+                              {isClosed ? (
                                 <button className="buy-button" disabled>
-                                    마감 완료
+                                    {isCompleted ? "마감 완료" : "마감 종료"}
                                 </button>
                             ) : (
                                 <button

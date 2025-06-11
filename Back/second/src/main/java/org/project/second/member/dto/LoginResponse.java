@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class LoginResponse {
     private String message;
+    private String accessToken;
     private String email;
 }
