@@ -9,7 +9,6 @@ import org.project.second.order.dto.OrderResponseDto;
 import org.project.second.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
