@@ -10,5 +10,7 @@ import java.util.List;
 @Repository
 public interface DonationRepository extends JpaRepository<Donation, Long> {
 
-    List<Donation> findByCategoryAndIsDeleteFalse(DonationCategory category);
+    List<Donation> findByCategoryAndIsDeletedFalse(DonationCategory category);
+
+    Donation findByIdAndCategoryAndIsDeletedFalse(Long id, DonationCategory donationCategory);
 }

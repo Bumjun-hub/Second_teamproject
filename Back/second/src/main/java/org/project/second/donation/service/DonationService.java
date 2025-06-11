@@ -120,8 +120,9 @@ public class DonationService {
     }
 
     //전체조회
+    @Transactional
     public List<DonationResponseDto> getCategoryPost(DonationCategory category) {
-        List<Donation> posts = donationRepository.findByCategoryAndIsDeleteFalse(category);
+        List<Donation> posts = donationRepository.findByCategoryAndIsDeletedFalse(category);
         return posts.stream().map(post -> {
             //이미지 url 리스트 만들기
             List<String> imageUrls = post.getDonationImages().stream()
@@ -131,35 +132,70 @@ public class DonationService {
 
             return new DonationResponseDto(
                     post.getId(),
-                    post.getCategory().name(),
-                    post.getStatus().name(),
+                    post.getCategory(),
+                    post.getStatus(),
                     post.getMember().getUsername(),
                     post.getTitle(),
                     post.getContent(),
                     post.getProvince(),
                     post.getCity(),
                     post.getDistrict(),
-                    post.getDistrict(),
                     post.getNeighborhood(),
                     post.getPrice(),
                     imageUrls,
                     post.getViewCount(),
+                    (long) post.getLikes().stream().filter(like -> like.getCommunity() != null).count(),
+                    false,
                     post.getCreatedAt(),
-                    post.getUpdatedAt(),
-                    false
-
-
-
-
-            )
-
-        })
+                    post.getUpdatedAt()
+            );
+        }).collect(Collectors.toList());
     }
 
-
-
     //상세조회
+    @Transactional
+    public DonationResponseDto getDetailPost(DonationCategory donationCategory, Long id, Member loginUser) {
+        Donation post = donationRepository.findByIdAndCategoryAndIsDeletedFalse(id, donationCategory);
 
+        if(post == null){
+            throw new IllegalArgumentException("해당 게시글은 존재하지 않습니다");
+        }
+        //조회수
+        post.setViewCount(post.getViewCount() == null ? 1 : post.getViewCount() + 1);
+
+        //이미지
+        List<String> imageUrls = post.getDonationImages().stream()
+                .filter(img -> !img.getIsDeleted())
+                .map(DonationImage::getImgUrl)
+                .collect(Collectors.toList());
+
+        //추천상태처리
+        boolean liked = false;
+        if (loginUser != null && loginUser.getId() != null) {
+            liked = post.getLikes().stream()
+                    .filter(like -> like.getCommunity() != null && like.getMember() != null)
+                    .anyMatch(like -> like.getMember().getId().equals(loginUser.getId()));
+        }
+        return new DonationResponseDto(
+                post.getId(),
+                post.getCategory(),
+                post.getStatus(),
+                post.getMember().getUsername(),
+                post.getTitle(),
+                post.getContent(),
+                post.getProvince(),
+                post.getCity(),
+                post.getDistrict(),
+                post.getNeighborhood(),
+                post.getPrice(),
+                imageUrls,
+                post.getViewCount(),
+                (long) post.getLikes().stream().filter(like -> like.getCommunity() != null).count(),
+                false,
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
 
 
 

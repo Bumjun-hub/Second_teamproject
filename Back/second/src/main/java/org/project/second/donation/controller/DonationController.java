@@ -3,6 +3,7 @@ package org.project.second.donation.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.usertype.CompositeUserType;
 import org.project.second.common.enums.DonationCategory;
 import org.project.second.common.enums.DonationStatus;
 import org.project.second.donation.dto.DonationDto;
@@ -127,6 +128,20 @@ public class DonationController {
     ){
         List<DonationResponseDto> posts = donationService.getCategoryPost(category);
         return ResponseEntity.ok(posts);
+    }
+
+    //상세조회
+    @GetMapping("/view/{category}/{id}")
+    public ResponseEntity<DonationResponseDto> getDetailPost(
+            @PathVariable String category,
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+            ){
+        Member loginUser = (userDetails != null) ? userDetails.getMember() : null;
+
+        DonationResponseDto post = donationService.getDetailPost(
+                DonationCategory.valueOf(category), id, loginUser);
+        return ResponseEntity.ok(post);
     }
 
 
