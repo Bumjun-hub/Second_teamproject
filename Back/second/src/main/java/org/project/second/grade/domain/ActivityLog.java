@@ -2,9 +2,10 @@ package org.project.second.grade.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.ActivityType;
 import org.project.second.member.domain.Member;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -12,7 +13,7 @@ import org.project.second.member.domain.Member;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ActivityLog extends BaseEntity {
+public class ActivityLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,5 +29,8 @@ public class ActivityLog extends BaseEntity {
 
     @Column(nullable = false)
     private int score;
+
+    @Column(nullable = false)
+    private LocalDate date;
 
 }
