@@ -8,7 +8,7 @@ const GroupBuyInfoPage = () => {
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [currentUser, setCurrentUser] = useState("");
-    const [isParticipated, setIsParticipated] = useState(false);
+    const [hasOrder, setHasOrder] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
 
 
@@ -31,9 +31,10 @@ const GroupBuyInfoPage = () => {
             const userData = await userRes.json();
             setCurrentUser(userData.name);
 
-            // 참여자 목록에 현재 유저가 있는지 확인
-            const participated = json.participants?.some(p => p === userData.name);
-            setIsParticipated(participated);
+            const ordersRes = await fetch(`/api/order/myPage/order`, { credentials: "include" });
+            const orders = await ordersRes.json();
+            const myOrder = orders.find(order => order.groupBuyId === Number(id));
+            setHasOrder(!!myOrder);
 
         } catch (err) {
             console.error("상세 조회 실패:", err);
@@ -75,33 +76,35 @@ const GroupBuyInfoPage = () => {
     };
 
     // 구매 참여 버튼 이벤트 - URL 경로 수정
-    const handleApply = async () => {
-        try {
-            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/apply`, {
-                method: 'POST',
-                credentials: 'include',
-            });
 
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText || '신청 실패');
-            }
+    const handleApply = () => {
+        // 팝업 창 크기와 옵션 설정(원하는 대로 조절 가능)
+        const popupWidth = 420;
+        const popupHeight = 720;
+        const left = window.screenX + (window.outerWidth - popupWidth) / 2;
+        const top = window.screenY + (window.outerHeight - popupHeight) / 2;
 
-            const successMessage = await res.text();
-            alert(successMessage || "신청 완료!");
-            setIsParticipated(true);
-
-            // 최신 데이터 다시 불러오기
-            fetchItem();
-        } catch (err) {
-            console.error('신청 실패:', err);
-            alert(err.message || "신청 중 오류가 발생했습니다.");
-        }
+        window.open(
+            `/payment/${id}`,
+            '_blank',
+            `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=no,scrollbars=yes`
+        );
     };
 
     const handleCancel = async () => {
         try {
-            const res = await fetch(`http://localhost:8080/api/groupBuy/${id}/cancel`, {
+            // 내 주문 내역에서 orderId를 가져와야 함!
+            const ordersRes = await fetch(`/api/order/myPage/order`, { credentials: "include" });
+            const ordersData = await ordersRes.json();
+            const orders = Array.isArray(ordersData) ? ordersData : []; // 배열 보장
+
+            const myOrder = orders.find(order => order.groupBuyId === Number(id));
+            if (!myOrder) {
+                alert("취소할 주문 내역이 없습니다.");
+                return;
+            }
+
+            const res = await fetch(`/api/order/${myOrder.id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
@@ -111,17 +114,16 @@ const GroupBuyInfoPage = () => {
                 throw new Error(errorText || '취소 실패');
             }
 
-            const successMessage = await res.text();
-            alert(successMessage || "신청이 취소되었습니다!");
-            setIsParticipated(false);
-
-            // 최신 데이터 다시 불러오기
-            fetchItem();
+            alert("신청이 취소되었습니다!");
+            setHasOrder(false);
+            fetchItem(); // 참여자수 및 버튼 즉시 갱신
         } catch (err) {
             console.error('취소 실패:', err);
             alert(err.message || "취소 중 오류가 발생했습니다.");
         }
     };
+
+
 
     if (!item) return <div>로딩 중...</div>;
 
@@ -170,7 +172,8 @@ const GroupBuyInfoPage = () => {
                             </div>
 
                             <div className="info-box">
-                                <span className="info-label">참여자 수 : <strong>{item.currentParticipants}</strong> / {item.maxParticipants}명</span>
+                                <span className="info-label">참여자 수 : <strong>{item.currentParticipants}</strong> / {item.maxParticipants}명
+                                    {hasOrder && <span> (참여중)</span>}</span>
                                 <div className="progress-bar-wrapper">
                                     <div
                                         className="progress-bar-fill"
@@ -200,18 +203,39 @@ const GroupBuyInfoPage = () => {
                                         : `${item.salePrice ?? '-'}`}원
                                 </span>
                             </div>
-                              {isClosed ? (
+
+                            {/* 버튼 조건 분기 */}
+
+                            {/* 마감 완료 상태일때 */}
+                            {item.status === "COMPLETED" ? (
+                                hasOrder ? (
+                                    <button className="buy-button" disabled>
+                                        신청 완료(구매대기)
+                                    </button>
+                                ) : (
+                                    <button className="buy-button" disabled>
+                                        마감 완료
+                                    </button>
+                                )
+                            ) : item.status !== "OPEN" ? (
                                 <button className="buy-button" disabled>
-                                    {isCompleted ? "마감 완료" : "마감 종료"}
+                                    마감 종료
                                 </button>
                             ) : (
-                                <button
-                                    className="buy-button"
-                                    onClick={isParticipated ? handleCancel : handleApply}
-                                >
-                                    {isParticipated ? "신청 중 (취소)" : "구매 참여"}
-                                </button>
+                                hasOrder ? (
+                                    // <button className="buy-button" disabled>
+                                    // 이미 신청함
+                                    // </button>
+                                    // 만약 취소 허용하려면
+                                    <button className="buy-button" onClick={handleCancel}>신청 취소</button>
+                                ) : (
+                                    <button className="buy-button" onClick={handleApply}>
+                                        구매 신청(결제)
+                                    </button>
+                                )
                             )}
+
+
                         </div>
                     </div>
                 </div>

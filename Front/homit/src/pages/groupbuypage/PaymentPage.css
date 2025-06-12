@@ -1,0 +1,121 @@
+.payment-page {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 24px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.payment-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 18px;
+    font-weight: bold;
+    letter-spacing: -1px;
+}
+
+.payment-info {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.payment-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.payment-info img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #f2f2f2;
+    margin-bottom: 10px;
+    background: #fafbfc;
+}
+
+.payment-info p {
+    margin-top: 6px;
+    font-size: 1rem;
+    color: #333;
+}
+
+/* 🔥 폼 중앙정렬 및 라벨-인풋 수직 쌍 맞춤 */
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* ← 전체 가운데! */
+    gap: 15px;
+    width: 100%;
+}
+
+.payment-form>div {
+    width: 100%;
+    /* 폼 각 라인 100% */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* 라벨-인풋 수직 정렬 */
+}
+
+/* 라벨은 왼쪽, 인풋은 꽉 차게 */
+.payment-form label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #222;
+    font-weight: 500;
+    padding-left: 4px;
+}
+
+.payment-form input,
+.payment-form select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f8fafc;
+    font-size: 1rem;
+    transition: border 0.2s;
+    box-sizing: border-box;
+    /* 폭 계산 문제 방지 */
+}
+
+.payment-form input:disabled {
+    background: #f1f5f9;
+    color: #8b8b8b;
+}
+
+.payment-submit-btn {
+    width: 100%;
+    padding: 12px 0;
+    border-radius: 6px;
+    background: #2668A7;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    margin-top: 10px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.payment-submit-btn:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+}
+
+.payment-divider {
+    border-top: 1.5px dashed #d1d5db;
+    margin: 16px 0 8px 0;
+}
+
+.payment-form input:disabled {
+    background: #f1f5f9;
+    color: #2668A7;
+    font-weight: bold;
+}

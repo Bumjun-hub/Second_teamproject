@@ -110,6 +110,14 @@ public class GroupBuyService {
             return;
         }
 
+        // ✅ 조건 추가
+        if (groupBuy.getCurrentParticipants() < groupBuy.getMinParticipants()) {
+            log.warn("공동구매 {}는 최소 인원을 만족하지 못해 COMPLETED 처리 불가", groupBuyId);
+            groupBuy.setStatus(GroupBuyStatus.CLOSED);
+            groupBuyRepository.save(groupBuy);
+            return;
+        }
+
         groupBuy.setStatus(GroupBuyStatus.COMPLETED);
         groupBuyRepository.save(groupBuy);
 
