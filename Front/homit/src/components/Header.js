@@ -4,7 +4,6 @@ import './Header.css';
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { logout } from '../utils/authUtils';
 import { connectNotification, disconnectNotification } from '../utils/notificationClient';
-import { getCookie } from '../utils/cookie';
 
 const Header = () => {
     const [showNotifications, setShowNotifications] = useState(false);
@@ -34,8 +33,6 @@ const Header = () => {
     };
 
     const handleLogout = async () => {
-        // ⭐️ 로그아웃 시 localStorage에서도 access_Token 삭제
-        localStorage.removeItem('access_Token');
         const success = await logout();
         if (success) {
             setUserInfo(null);
@@ -64,19 +61,11 @@ const Header = () => {
     }, []);
 
     useEffect(() => {
-        console.log('isLoggedIn:', isLoggedIn);
-        // ⭐️ localStorage에서 accessToken을 읽어서 WebSocket 연결에 사용
         if (isLoggedIn) {
-
-            const token = localStorage.getItem('access_Token');
-            console.log('token:', token); // 추가!
-            if (token) {
-                connectNotification(handleNotificationMessage, token);
-            }
+            connectNotification(handleNotificationMessage); // ✅ 토큰 인자 없이
         } else {
             disconnectNotification();
         }
-
         return () => disconnectNotification();
     }, [isLoggedIn]);
 
@@ -108,10 +97,28 @@ const Header = () => {
                                     <ul className="notification-list">
                                         {notifications.map((n, idx) => (
                                             <li key={idx} className="notification-item">
-                                                {n.message || JSON.stringify(n)}
+                                                <div className="noti-card">
+                                                    <div className="noti-header">
+                                                        <span className={`noti-type ${n.type?.toLowerCase()}`}>
+                                                            {n.type === "GROUP_BUY_OPEN" && "🛒 공동구매 오픈"}
+                                                            {n.type === "GROUP_BUY_COMPLETED" && "✅ 마감 완료"}
+                                                            {n.type === "GROUP_BUY_CLOSED" && "❌ 마감 실패"}
+                                                            {!["GROUP_BUY_OPEN", "GROUP_BUY_COMPLETED", "GROUP_BUY_CLOSED"].includes(n.type) && "🔔 알림"}
+                                                        </span>
+                                                        {n.createdAt && (
+                                                            <span className="noti-time">
+                                                                {new Date(n.createdAt).toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="noti-content">
+                                                        {n.content}
+                                                    </div>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
+
                                 )}
                             </div>
                         )}
