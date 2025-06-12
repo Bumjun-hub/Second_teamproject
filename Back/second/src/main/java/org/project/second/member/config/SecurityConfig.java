@@ -1,6 +1,7 @@
 package org.project.second.member.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.project.second.member.service.CustomUserDetailsService;
 import org.project.second.security.JwtAuthenticationEntryPoint;
 import org.project.second.security.JwtAuthenticationFilter;
@@ -22,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -45,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**", "/static/**","/profileimages/**").permitAll()
                         .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**", "/api/likes/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/ws/**").authenticated()// 웹소켓 엔드포인트 허용
+                        .requestMatchers("/login/oauth2/**", "/api/auth/**").permitAll() // social login api 허용
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
