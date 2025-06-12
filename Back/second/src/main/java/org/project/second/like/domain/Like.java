@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.community.domain.Community;
+import org.project.second.donation.domain.Donation;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
 import org.project.second.recipe.domain.Recipe;
@@ -36,6 +37,10 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = true)
     private Community community;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "donation_id", nullable = true)
+    private Donation donation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupBuy_id", nullable = true)

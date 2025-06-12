@@ -7,6 +7,7 @@ import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.DonationCategory;
 import org.project.second.common.enums.DonationStatus;
 import org.project.second.community.domain.CommunityImage;
+import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class Donation extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @Enumerated(EnumType.STRING)
@@ -38,7 +40,7 @@ public class Donation extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DonationCategory donationCategory;
+    private DonationCategory category;
 
     @Column(nullable = false)
     private String province;     //도
@@ -61,6 +63,9 @@ public class Donation extends BaseEntity {
     @Column(name = "view_count", columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default
     private Long viewCount = 0L;
+
+    @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
 
     @OneToMany(mappedBy = "donation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;

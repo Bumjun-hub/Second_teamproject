@@ -28,12 +28,12 @@ public class GroupBuyScheduler {
 
         for (GroupBuy groupBuy : expiredGroupBuys) {
             log.info("마감 처리: 공동구매 ID {}, 제목 {}", groupBuy.getId(), groupBuy.getTitle());
-
-            if(groupBuy.getCurrentParticipants() >= groupBuy.getMaxParticipants()) {
-                log.info("스케줄러 도중 이미 정원 도달된 공동구매 ID {} 발견", groupBuy.getId()); // 예외상황 검증 로직
-            } else if(groupBuy.getCurrentParticipants() >= groupBuy.getMinParticipants()) {
+            
+            if (groupBuy.getCurrentParticipants() >= groupBuy.getMaxParticipants()) {
+                log.info("스케줄러 도중 이미 정원 도달된 공동구매 ID {} 발견", groupBuy.getId());
+            } else if (groupBuy.getCurrentParticipants() >= groupBuy.getMinParticipants()) {
                 groupBuyService.completedGroupBuy(groupBuy.getId());
-                log.info("최소인원 충족으로 공동구매 ID {} Completed 처리 완료", groupBuy.getId());
+                log.info("최소인원 충족으로 공동구매 ID {} 제목 {} " +"Completed 처리 완료", groupBuy.getId(),groupBuy.getTitle());
             } else {
                 groupBuyService.closeGroupBuy(groupBuy.getId());
                 log.info("공동구매 CLOSED 처리 완료");

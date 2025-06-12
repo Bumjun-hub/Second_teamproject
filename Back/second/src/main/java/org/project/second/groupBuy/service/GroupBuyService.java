@@ -80,6 +80,7 @@ public class GroupBuyService {
 
     }
 
+    //수정
     @Transactional
     public void closeGroupBuy(Long groupBuyId) {
         GroupBuy groupBuy = groupBuyRepository.findById(groupBuyId)

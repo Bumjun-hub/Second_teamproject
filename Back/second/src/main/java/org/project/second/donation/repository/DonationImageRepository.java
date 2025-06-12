@@ -1,4 +1,10 @@
 package org.project.second.donation.repository;
 
-public interface DonationImageRepository {
+import org.project.second.donation.domain.DonationImage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DonationImageRepository extends JpaRepository<DonationImage, Long> {
+
 }
