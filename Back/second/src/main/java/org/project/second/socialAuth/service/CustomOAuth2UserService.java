@@ -1,6 +1,5 @@
 package org.project.second.socialAuth.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +8,8 @@ import org.project.second.common.role.Role;
 import org.project.second.common.role.RoleRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
-import org.project.second.security.JwtProvider;
 import org.project.second.socialAuth.dto.OAuthAttributesDto;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -35,9 +28,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final MemberRepository memberRepository;
-    private final JwtProvider jwtProvider;
-    private final AuthenticationManager authenticationManager;
-    private final HttpServletResponse response;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -55,21 +45,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         Member member = saveOrUpdate(attributes);
 
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(member.getEmail(), null,
-                        Collections.singleton(new SimpleGrantedAuthority(member.getRole().getName().name())));
-
-        Authentication authentication = authenticationManager.authenticate(token);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-
-        String accessToken = jwtProvider.generateAccessToken(authentication);
-        String refreshToken = jwtProvider.generateRefreshToken(authentication);
-        jwtProvider.setTokensInCookies(response, accessToken, refreshToken);
-
-        return new DefaultOAuth2User(
+        // 이 단계에서 이 정보를 스프링 시큐리티에 반환해주면 스프링 시큐리티에서 자동으로 DefaultOAuth2User 들어있는 정보를 기반으로 Context에 인증정보 저장
+        return new DefaultOAuth2User( // 보통 principle, credential, authority 순이지만 여기서는 security가 정한 authority, attributes, attributekey 순으로 넣어야함
                 Collections.singleton(new SimpleGrantedAuthority(member.getRole().getName().name())),
                 attributes.getAttributes(), // 사용자 정보
                 attributes.getNameAttributeKey() // 고유 ID

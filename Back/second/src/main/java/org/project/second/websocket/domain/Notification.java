@@ -2,7 +2,6 @@ package org.project.second.websocket.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.NotificationType;
 import org.project.second.community.domain.Community;
 import org.project.second.groupBuy.domain.GroupBuy;
@@ -10,7 +9,6 @@ import org.project.second.member.domain.Member;
 import org.project.second.recipe.domain.Recipe;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.LocalDateTime;
 
 @Entity
