@@ -95,10 +95,12 @@ export const AuthProvider = ({ children }) => {
             const data = await response.json();
 
             if (response.ok) {
-                // 상태 업데이트 전에 잠시 대기
-                await new Promise(resolve => setTimeout(resolve, 100));
-                await checkAuth(); // 로그인 후 사용자 정보 다시 가져오기
-                return { success: true, message: '로그인 성공' };
+                await checkAuth();
+                return {
+                    success: true,
+                    message: data.message,
+                    accessToken: data.accessToken // ✅ 로그인 결과로 받은 토큰 전달
+                };
             } else {
                 return { success: false, message: data.message || '로그인에 실패했습니다.' };
             }
@@ -107,6 +109,7 @@ export const AuthProvider = ({ children }) => {
             return { success: false, message: '서버 연결에 실패했습니다.' };
         }
     };
+
 
     // 로그아웃 함수
     const logout = async () => {
