@@ -1,6 +1,7 @@
 package org.project.second.websocket.config;
 import lombok.AllArgsConstructor;
 import org.project.second.security.JwtAuthenticationFilter;
+import org.project.second.security.JwtHandshakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -10,15 +11,16 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocketMessageBroker // WebSocket 메시지 브로커 활성화
 @AllArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 
 
     @Override
@@ -32,6 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws") // WebSocket *연결* endpoint
                 .setAllowedOriginPatterns("*") // 모든 출처(CORS) 허용
+                .addInterceptors(jwtHandshakeInterceptor)
                 .withSockJS(); // 브라우저가 WebSocket을 지원하지 않을 때 SockJS fallback 지원
     }
 
@@ -42,22 +45,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) { // Message : 클라이언트가 서버로 보내는 메세지 객체, STOMP 메시지는 명령(CONNECT, SEND 등), 헤더, 본문을 포함
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message); // StompHeaderAccessor : 헤더 리딩, JWT 토큰 꺼낼 떄 사용
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    String token = accessor.getFirstNativeHeader("Authorization");
-                    if (token != null && token.startsWith("Bearer ")) {
-                        token = token.substring(7);
-                        if (jwtAuthenticationFilter.getJwtProvider().validateAccessToken(token)) {
-                            String username = jwtAuthenticationFilter.getJwtProvider().getUsernameFromToken(token, true);
-                            UserDetails userDetails = jwtAuthenticationFilter.getUserDetailsService().loadUserByUsername(username);
-                            UsernamePasswordAuthenticationToken authentication =
-                                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                            accessor.setUser(authentication);
-                        } else {
-                            throw new AccessDeniedException("Invalid JWT token"); // 인증, 권한 없을 때 예외처리
-                        }
-                    } else {
-                        throw new AccessDeniedException("JWT token required");
+                    Authentication authentication = (Authentication) accessor.getSessionAttributes().get("user");
+                    if (authentication == null || !authentication.isAuthenticated()) {
+                        throw new AccessDeniedException("Authentication required");
                     }
-                }
+
+                    // ✅ 인증 객체를 SecurityContextHolder에 수동으로 설정
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authentication);
+                    SecurityContextHolder.setContext(context);
+                    accessor.setUser(authentication); //STOMP세션에 인증 설정
+                        }
                 return message;
             }
         });
