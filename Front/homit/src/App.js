@@ -6,6 +6,7 @@ import BoardPage from './pages/boardpage/BoardPage';
 import RecipePage from './pages/recipepage/RecipePage';
 import RecipeInfoPage from './pages/recipepage/RecipeInfoPage';
 import HotItemPage from './pages/hotitempage/HotItemPage';
+import DonationPage from './pages/donationpage/DonationPage';
 import LoginPage from './pages/loginpage/LoginPage';
 import MemberPage from './pages/memberpage/MemberPage';
 import Layout from './components/Layout';
@@ -43,6 +44,8 @@ function App() {
           <Route path="/member" element={<MemberPage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/editProfile" element={<EditProfile />} />
+
+          <Route path="/donation" element={<DonationPage />} />
         </Route>
 
         {/* 헤더/푸터 없는(단독) 페이지 */}

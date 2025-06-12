@@ -38,9 +38,17 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart("price") Long price,
+            @RequestPart("price") String priceStr, // String으로 받기
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
+
+        // String을 Long으로 변환
+        Long price;
+        try {
+            price = Long.parseLong(priceStr);
+        } catch (NumberFormatException e) {
+            price = 0L; // 파싱 실패 시 기본값 (나눔의 경우)
+        }
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
@@ -50,7 +58,7 @@ public class DonationController {
                 .neighborhood(neighborhood)
                 .title(title)
                 .content(content)
-                .price(price)
+                .price(price) // 변환된 Long 값 사용
                 .build();
 
         Member loginUser = userDetail.getMember();
