@@ -8,6 +8,7 @@ import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.CommunityCategory;
 import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
+import org.project.second.websocket.domain.Notification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +54,9 @@ public class Community extends BaseEntity {
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommunityImage> communityImages;
+
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 
     @Column(name = "is_notice", nullable = false)
     private boolean isNotice;

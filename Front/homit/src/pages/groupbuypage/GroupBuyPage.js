@@ -33,7 +33,7 @@ const GroupBuyPage = () => {
         const fetchGroupBuys = async () => {
             try {
                 const res = await fetch("http://localhost:8080/api/groupBuy/view");
-                
+
                 const json = await res.json();
                 console.log("✅ 서버 응답 확인:", json);
 
@@ -82,14 +82,35 @@ const GroupBuyPage = () => {
                 <div className="Groupbuylist-inner">
                     {currentItems.map((item) => (
                         <div key={item.id} className="GroupbuyItem">
-                            <img src={item.imgUrls?.[0]} alt={item.title} className="item-image" />
+                            <div className="image-wrapper">
+                                {item.status === 'COMPLETED' && (
+                                    <div className="diagonal-badge status-completed">모집 완료</div>
+                                )}
+                                {item.status === 'CLOSED' && (
+                                    <div className="diagonal-badge status-closed">모집 실패</div>
+                                )}
+                                <img src={item.imgUrls?.[0]} alt={item.title} className="item-image" />
+                            </div>
+
                             <h3>{item.title}</h3>
                             <p>{item.salePrice?.toLocaleString()}원</p>
+
                             <button
                                 className="apply-button"
-                                onClick={() => navigate(`/groupbuy/info/${item.id}`)}
+                                onClick={() => {
+                                    if (item.status === 'CLOSED') {
+                                        alert("모집 실패된 공동구매는 열람할 수 없습니다.");
+                                        return;
+                                    }
+                                    navigate(`/groupbuy/info/${item.id}`);
+                                }}
+                                disabled={item.status === 'CLOSED'}
                             >
-                                공동구매 신청
+                                {item.status === 'COMPLETED'
+                                    ? '마감 완료'
+                                    : item.status === 'CLOSED'
+                                        ? '모집 실패'
+                                        : '공동구매 신청'}
                             </button>
                         </div>
                     ))}

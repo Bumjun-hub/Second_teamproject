@@ -8,6 +8,7 @@ import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.like.domain.Like;
 import org.project.second.member.domain.Member;
 import org.project.second.order.domain.Order;
+import org.project.second.websocket.domain.Notification;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,5 +84,8 @@ public class GroupBuy extends BaseEntity {
 
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 
 }
