@@ -64,6 +64,7 @@ public class Member extends BaseEntity {
 
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Grade grade;  //등급
+
     // CASECADE 설정
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Notification> notifications;
@@ -82,9 +83,6 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Like> likes;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Recipe> recipes;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Favorite> favorites;
