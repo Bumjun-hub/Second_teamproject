@@ -25,6 +25,7 @@ public class GradeService {
         //날짜
         LocalDate today = LocalDate.now();
 
+        //오늘 날짜 기준으로 활동 조회
         Optional<ActivityLog> optionalLog = activityLogRepository
                 .findByMemberAndActivityTypeAndDate(member, activityType, today);
 
@@ -33,10 +34,11 @@ public class GradeService {
             ActivityLog log = optionalLog.get();
 
             int count = log.getScore() / activityType.getScore();
-
+            // limit이상하면 점수 X
             if (count >= activityType.getDailyLimit()) {
                 return new GradeResponseDto(false, null, null);
             }
+            // 새로운 활동이면 log만듬
             log.setScore(log.getScore() + activityType.getScore());
         } else {
             ActivityLog log = ActivityLog.builder()
