@@ -9,9 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
+import org.springframework.http.HttpHeaders;
+
 
 import java.security.Key;
 import java.util.Date;
@@ -56,13 +59,13 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
 
-        String token =  Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(refreshKey, SignatureAlgorithm.HS512)
                 .compact();
-        
+
         //DB에 저장
         Member member = memberRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
@@ -111,21 +114,52 @@ public class JwtProvider {
     }
 
     // 토큰을 쿠키에 저장
+    // JwtProvider.java의 setTokensInCookies 메서드 수정
     public void setTokensInCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        Cookie accessCookie = new Cookie("access_token", accessToken);
-        accessCookie.setHttpOnly(true); // 자바스크립트 접근 방지
-        accessCookie.setSecure(false); // HTTPS에서만 전송
-        accessCookie.setPath("/"); // 전체 경로에서 유효
-        accessCookie.setMaxAge((int) (accessTokenValidity / 1000)); // 쿠키 만료 시간
-        response.addCookie(accessCookie);
+        // ✅ 개발 환경용 설정 (HTTP + localhost)
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(false) // HTTP에서 사용
+                .sameSite("Strict") // ✅ Strict로 변경 (같은 도메인에서만)
+                .path("/")
+                .maxAge((int) (accessTokenValidity / 1000))
+                .build();
 
-        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false); // 실제 사용할떄는 true : https로만 가능 / http 불가
-        refreshCookie.setPath("/api/refresh"); // 리프레시 엔드포인트에서만 사용
-        refreshCookie.setMaxAge((int) (refreshTokenValidity / 1000));
-        response.addCookie(refreshCookie);
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict") // ✅ Strict로 변경
+                .path("/api/refresh")
+                .maxAge((int) (refreshTokenValidity / 1000))
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
+
+// ✅ 프로덕션 환경용 설정 예시 (HTTPS 사용 시)
+/*
+public void setTokensInCookiesForProduction(HttpServletResponse response, String accessToken, String refreshToken) {
+    ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+            .httpOnly(true)
+            .secure(true) // HTTPS에서만
+            .sameSite("None") // 크로스 도메인 허용
+            .path("/")
+            .maxAge((int) (accessTokenValidity / 1000))
+            .build();
+
+    ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/api/refresh")
+            .maxAge((int) (refreshTokenValidity / 1000))
+            .build();
+
+    response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+}
+*/
 
     // 쿠키에서 refresh 토큰 가져오기
     public String getRefreshTokenFromCookies(HttpServletRequest request) {
@@ -162,7 +196,7 @@ public class JwtProvider {
         return false;
 
         // catch (JwtException | IllegalArgumentException e) {
-            // return false; // 토큰이 유효하지 않거나 만료됨
+        // return false; // 토큰이 유효하지 않거나 만료됨
         //}
 
     }
