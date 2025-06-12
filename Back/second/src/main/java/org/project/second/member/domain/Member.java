@@ -5,6 +5,7 @@ import lombok.*;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.SocialProvider;
 import org.project.second.common.role.Role;
+import org.project.second.grade.domain.Grade;
 
 @Entity
 @Getter
@@ -44,4 +45,7 @@ public class Member extends BaseEntity {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Grade grade;  //등급
 }
