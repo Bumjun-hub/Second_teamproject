@@ -6,6 +6,7 @@ import ChangePw from './ChangePw';
 import WishList  from './WishList';
 import RecipeFavorite  from './RecipeFavorite';
 import RecipeInfoPage from '../recipepage/RecipeInfoPage'; 
+import MyPosts from './MyPosts';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch, deleteAccount } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -116,6 +117,12 @@ const MyPage = () => {
         setCurrentView('recipeFavorite');
     };
 
+    const handleGoToMyPost = () => {
+        window.history.pushState({page: 'myPosts'}, '', window.location.pathname);
+        setCurrentView('myPosts');
+    };
+
+
     const handleDeleteAccount = async () => {
         if (window.confirm('정말로 회원탈퇴를 하시겠습니까?\n\n탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
             try {
@@ -149,6 +156,10 @@ const MyPage = () => {
 
     if (currentView === 'recipeFavorite') {
         return <RecipeFavorite onRecipeClick={handleRecipeClick} />;
+    }
+
+    if (currentView === 'myPosts') {
+        return <MyPosts />;
     }
 
     return (
@@ -202,7 +213,7 @@ const MyPage = () => {
                     <MenuItem 
                         icon="📝" 
                         text="내가 쓴 글" 
-                        onClick={() => {}}
+                        onClick={handleGoToMyPost}
                     />
                 </div>
                 
