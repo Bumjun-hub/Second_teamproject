@@ -79,7 +79,7 @@ const GroupBuyInfoPage = () => {
 
     const handleApply = () => {
         // 팝업 창 크기와 옵션 설정(원하는 대로 조절 가능)
-        const popupWidth = 420;
+        const popupWidth = 520;
         const popupHeight = 720;
         const left = window.screenX + (window.outerWidth - popupWidth) / 2;
         const top = window.screenY + (window.outerHeight - popupHeight) / 2;
