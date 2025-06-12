@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.project.second.member.service.CustomUserDetailsService;
 import org.project.second.security.JwtAuthenticationEntryPoint;
 import org.project.second.security.JwtAuthenticationFilter;
+import org.project.second.socialAuth.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +23,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 @Slf4j
 @Configuration
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,29 +40,35 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/signup", "/api/login").permitAll()
                         .requestMatchers("/api/logout", "/api/community/**", "/api/item/search", "/api/recipe/**","/api/groupBuy/view/**", "/api/groupBuy/detail/**", "/api/comment/list/**" ).permitAll()
                         .requestMatchers("/uploads/**", "/static/**","/profileimages/**").permitAll()
+                        .requestMatchers("/api/refresh", "/api/mypage/**").authenticated() // ✅ 여기 수정!
                         .requestMatchers("/api/wishlist/**", "/api/refresh", "/api/roleinfo", "/api/mypage/**", "/api/favorite/**", "/api/likes/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/ws/**").authenticated()// 웹소켓 엔드포인트 허용
                         .requestMatchers("/login/oauth2/**", "/api/auth/**").permitAll() // social login api 허용
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)) // 커스텀 OAuth2 사용자 서비스
+                        .successHandler((request, response, authentication) -> {
+                            response.sendRedirect("/api/auth/login/success"); // 로그인 성공 후 리다이렉트
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            log.error("OAuth2 login failed: {}", exception.getMessage());
+                            response.sendError(HttpStatus.UNAUTHORIZED.value(), "OAuth2 login failed");
+                        })
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(customUserDetailsService); // 유저 조회 인터페이스 설정
-        return http.build();
-    }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return http.build();
     }
 
     @Bean //AuthenticationManager : 실제 유저 인증 처리, AuthenticationConfiguration : 상위 객체 // 자동 사용됨

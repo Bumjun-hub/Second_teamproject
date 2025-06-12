@@ -1,5 +1,6 @@
 package org.project.second.member.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
 import org.project.second.member.dto.*;
 import org.project.second.member.repository.MemberRepository;
+import org.project.second.socialAuth.dto.OAuthAttributesDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -186,4 +189,38 @@ public class MemberService {
        }
         return false;
     }
+
+    @Transactional
+    public Member saveOrUpdate(OAuthAttributesDto attributes) {
+        Optional<Member> opUser = memberRepository.findByEmailAndSocialProvider(attributes.getEmail(), attributes.getSocialProvider());
+        if (opUser.isPresent()) {
+            Member existingMember = opUser.get();
+            existingMember.setUsername(attributes.getName());
+            return memberRepository.save(existingMember);
+        } else {
+            if (memberRepository.existsByEmailAndSocialProvider(attributes.getEmail(), attributes.getSocialProvider())) {
+                throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
+            }
+
+            // String security : 유저네임 중복 체크
+            if (memberRepository.existsBySocialIdAndSocialProvider(attributes.getNameAttributeKey(), attributes.getSocialProvider())) {
+                throw new IllegalArgumentException("이미 존재하는 소셜 고유 ID 입니다.");
+            }
+
+            Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                    .orElseThrow(() -> new IllegalArgumentException("기본 USER 역할이 DB에 없습니다."));
+            String enPass = passwordEncoder.encode(UUID.randomUUID().toString());
+
+            Member newMember = Member.builder()
+                    .username(attributes.getName())
+                    .email(attributes.getEmail())
+                    .password(enPass)
+                    .socialProvider(attributes.getSocialProvider())
+                    .socialId(attributes.getNameAttributeKey())
+                    .role(userRole)
+                    .build();
+            return memberRepository.save(newMember);
+        }
+    }
+
 }
