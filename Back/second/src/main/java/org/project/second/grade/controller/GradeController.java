@@ -17,9 +17,9 @@ public class GradeController {
 
     private final GradeService gradeService;
 
-    /*@GetMapping("/myGrade")
+    @GetMapping("/myGrade")
     public ResponseEntity<String> getGrade(@AuthenticationPrincipal CustomUserDetails userDetails){
         Member loginUser = userDetails.getMember();
         return ResponseEntity.ok(gradeService.getGrade(loginUser));
-    }*/
+    }
 }

@@ -84,7 +84,7 @@ public class GradeService {
         );
     }
 
-    /*public String getGrade(Member loginUser) {
+    public String getGrade(Member loginUser) {
         Grade grade = gradeRepository.findByMember(loginUser);
-    }*/
+    }
 }
