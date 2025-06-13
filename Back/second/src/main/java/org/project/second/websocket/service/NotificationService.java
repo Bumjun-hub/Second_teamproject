@@ -53,6 +53,7 @@ public class NotificationService {
                 .communityId(community != null ? community.getId() : null)
                 .groupBuyId(groupBuy != null ? groupBuy.getId() : null)
                 .recipeId(recipe != null ? recipe.getId() : null)
+                .category(community != null ? String.valueOf(community.getCategory()) : null) // ✅ 이 줄 추가
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
                 .build();
