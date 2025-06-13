@@ -1,0 +1,183 @@
+/* 공통 컨테이너 */
+.payment-page {
+  max-width: 400px;
+  margin: 48px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(44,64,123,0.12), 0 1.5px 6px 0 rgba(44,64,123,0.06);
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+}
+
+/* 안내 STEP */
+.notice-step h2,
+.info-step h2,
+.bank-step h2 {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: bold;
+  margin-bottom: 22px;
+  color: #2668a7;
+}
+
+.notice-box {
+  background: #f5f7fb;
+  border-radius: 12px;
+  padding: 22px 20px 16px 20px;
+  margin-bottom: 20px;
+  font-size: 0.98rem;
+  color: #353e56;
+  line-height: 1.7;
+}
+
+.notice-box ul {
+  padding-left: 18px;
+}
+
+.notice-box li {
+  margin-bottom: 13px;
+}
+
+/* 안내 체크 */
+.check-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.next-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  background: #2668a7;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.next-btn:disabled {
+  background: #a6b8c9;
+  cursor: not-allowed;
+}
+
+/* 주문 정보 입력 STEP */
+.info-step {
+  margin: 0 auto;
+}
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.payment-form label {
+  display: block;
+  font-size: 0.98rem;
+  margin-bottom: 4px;
+  color: #2e3d55;
+}
+.payment-form input[type="text"],
+.payment-form input[type="number"] {
+  width: 100%;
+  font-size: 1rem;
+  padding: 9px 10px;
+  border: 1.5px solid #cfd8df;
+  border-radius: 7px;
+  outline: none;
+  background: #fafdff;
+  transition: border 0.2s;
+}
+.payment-form input:focus {
+  border: 1.5px solid #2668a7;
+  background: #fff;
+}
+
+/* 버튼 영역 */
+.payment-form > div:last-child {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.payment-form button {
+  flex: 1 1 0;
+  padding: 11px 0;
+  background: #2668a7;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-weight: bold;
+  font-size: 1.06rem;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.payment-form button:last-child {
+  margin-right: 0;
+}
+.payment-form button:disabled {
+  background: #a6b8c9;
+  cursor: not-allowed;
+}
+
+/* STEP3(입금안내) */
+.bank-step {
+  text-align: center;
+}
+.bank-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f5f7fb;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+  align-items: stretch;
+}
+.bank-info-box label {
+  font-size: 0.97rem;
+  color: #2e3d55;
+  margin-bottom: 2px;
+  text-align: left;
+  display: block;
+}
+.bank-info-box input {
+  font-size: 1.03rem;
+  border: 1px solid #cfd8df;
+  border-radius: 7px;
+  background: #fafdff;
+  padding: 8px 9px;
+  width: 100%;
+  text-align: left;
+}
+
+.bank-step button {
+  width: 48%;
+  padding: 12px 0;
+  margin: 0 1%;
+  background: #2668a7;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.bank-step button:disabled {
+  background: #a6b8c9;
+  cursor: not-allowed;
+}
+
+/* 반응형 */
+@media (max-width: 500px) {
+  .payment-page {
+    padding: 14px 2vw;
+    max-width: 98vw;
+  }
+  .notice-box,
+  .bank-info-box {
+    padding: 10px 5px;
+  }
+}

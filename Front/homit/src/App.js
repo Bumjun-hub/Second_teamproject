@@ -17,7 +17,7 @@ import BoardWritePage from './pages/boardpage/BoardWritePage';
 import MyPage from './pages/mypage/MyPage';
 import EditProfile from './pages/mypage/MyPageEditProfile';
 import { AuthProvider } from './utils/AuthProvider';
-import PaymentPage from './pages/groupbuypage/PaymentPage';
+import PaymentPage from './pages/paymentpage/PaymentPage';
 
 function App() {
   return (
