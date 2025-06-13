@@ -2,6 +2,7 @@ package org.project.second.socialAuth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.project.second.security.JwtProvider;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class SocialAuthController {
     @GetMapping("/login/success")
     public void handleLoginSuccess(Authentication authentication, HttpServletResponse response) throws IOException {
         if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("인증 실패: Null 이거나 비어있음");
             response.sendError(HttpStatus.UNAUTHORIZED.value(), "컨트롤러 authentication 인증 객체 추출 실패");
             return;
         }
@@ -44,14 +46,12 @@ public class SocialAuthController {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 유저입니다."));
 
-        // JWT 생성
-        String accessToken = jwtProvider.generateAccessTokenForSocial(authentication);
-        String refreshToken = jwtProvider.generateRefreshTokenForSocial(authentication);
-
-        // 쿠키 설정
+        String accessToken = jwtProvider.generateAccessToken(authentication);
+        String refreshToken = jwtProvider.generateRefreshToken(authentication);
         jwtProvider.setTokensInCookies(response, accessToken, refreshToken);
 
         // 리다이렉트
+        log.info("로그인 성공 이메일: {}, 리다이렉트 /", email);
         response.sendRedirect("http://localhost:3000");
     }
 
