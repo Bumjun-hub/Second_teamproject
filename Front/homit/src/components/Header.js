@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './Header.css';
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -10,7 +10,10 @@ const Header = () => {
     const [notifications, setNotifications] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0); // ✅ 종 옆에 표시할 안읽은 알림 수
+    const navigate = useNavigate();
 
+    // ✅ 사용자 인증 상태 확인
     const checkAuth = async () => {
         try {
             const response = await fetch('http://localhost:8080/api/mypage', {
@@ -32,6 +35,7 @@ const Header = () => {
         }
     };
 
+    // ✅ 로그아웃 처리
     const handleLogout = async () => {
         const success = await logout();
         if (success) {
@@ -39,35 +43,98 @@ const Header = () => {
         }
     };
 
+    // ✅ 종 버튼 클릭 시 알림창 열기/닫기
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
     };
 
+    // ✅ 알림 수신 시 호출되는 콜백
     const handleNotificationMessage = (message) => {
-        setNotifications((prev) => [message, ...prev]);
+        setNotifications((prev) => [message, ...prev]); // 최신 알림을 위에 추가
+        setUnreadCount((prev) => prev + 1);             // ✅ 안읽은 알림 수 +1
     };
 
+    // ✅ 알림 클릭 시 해당 상세 페이지로 이동
+    const handleNotificationClick = (notification) => {
+        if (notification.groupBuyId) {
+            navigate(`/groupbuy/info/${notification.groupBuyId}`);
+        } else if (notification.communityId && notification.category) {
+            navigate(`/board/info/${notification.category}/${notification.communityId}`);
+        } else if (notification.recipeId) {
+            navigate(`/recipe/${notification.recipeId}`);
+        }
+        setShowNotifications(false); // ✅ 클릭 후 알림창 닫기
+    };
+
+    // ✅ 마우스 오버 시 해당 알림 읽음 처리 (호버 기반)
+    const handleMarkAsRead = async (id) => {
+        try {
+            await fetch(`/api/notifications/${id}/read`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            setNotifications((prev) =>
+                prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+            );
+            setUnreadCount((prev) => Math.max(0, prev - 1));
+        } catch (e) {
+            console.error("읽음 처리 실패", e);
+        }
+    };
+
+
+    // 렌더링할때 모든 유저의 안읽은 알림 반환
+    useEffect(() => {
+  const fetchNotifications = async () => {
+    try {
+      const res = await fetch('/api/notifications/get', { credentials: 'include' });
+      const data = await res.json();
+      const unread = data.filter((n) => !n.isRead); // 읽지않은 알림만
+      setNotifications(unread); // ✅ 서버에서 받아온 알림으로 상태 초기화
+    } catch (err) {
+      console.error('알림 불러오기 실패', err);
+    }
+  };
+
+  if (isLoggedIn) {
+    fetchNotifications(); // ✅ 로그인된 경우에만 불러오기
+  }
+}, [isLoggedIn]);
+
+    // ✅ 알림 수 표시 초기값 불러오기
+    useEffect(() => {
+        const fetchUnreadCount = async () => {
+            const res = await fetch('/api/notifications/count/unread', { credentials: 'include' });
+            const count = await res.json();
+            setUnreadCount(count);
+        };
+        fetchUnreadCount();
+    }, []);
+
+    // ✅ 최초 로그인 상태 확인
     useEffect(() => {
         checkAuth();
     }, []);
 
-    useEffect(() => {
-        const handleAuthChange = () => {
-            checkAuth();
-        };
-
-        window.addEventListener('authChange', handleAuthChange);
-        return () => window.removeEventListener('authChange', handleAuthChange);
-    }, []);
-
+    // ✅ 로그인 상태 변경 시 알림 수신 연결/해제
     useEffect(() => {
         if (isLoggedIn) {
-            connectNotification(handleNotificationMessage); // ✅ 토큰 인자 없이
+            connectNotification(handleNotificationMessage);
         } else {
             disconnectNotification();
         }
         return () => disconnectNotification();
     }, [isLoggedIn]);
+
+    // ✅ 인증 변경 이벤트 감지
+    useEffect(() => {
+        const handleAuthChange = () => {
+            checkAuth();
+        };
+        window.addEventListener('authChange', handleAuthChange);
+        return () => window.removeEventListener('authChange', handleAuthChange);
+    }, []);
 
     return (
         <header className="Header">
@@ -88,6 +155,10 @@ const Header = () => {
                     <div className="notification-container">
                         <button className="notification-bell" onClick={toggleNotifications}>
                             <IoIosNotificationsOutline size={25} />
+                            {/* ✅ 종 옆 알림 수 뱃지 표시 */}
+                            {unreadCount > 0 && (
+                                <span className="notification-badge">{unreadCount}</span>
+                            )}
                         </button>
                         {showNotifications && (
                             <div className="notification-dropdown">
@@ -97,7 +168,13 @@ const Header = () => {
                                 ) : (
                                     <ul className="notification-list">
                                         {notifications.map((n, idx) => (
-                                            <li key={idx} className="notification-item">
+                                            <li
+                                                key={n.id || idx}
+                                                className={`notification-item ${n.isRead ? 'read' : ''}`}
+                                                onMouseEnter={() => !n.isRead && handleMarkAsRead(n.id)}
+                                                onClick={() => handleNotificationClick(n)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
                                                 <div className="noti-card">
                                                     <div className="noti-header">
                                                         <span className={`noti-type ${n.type?.toLowerCase()}`}>
@@ -119,7 +196,6 @@ const Header = () => {
                                             </li>
                                         ))}
                                     </ul>
-
                                 )}
                             </div>
                         )}
