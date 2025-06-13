@@ -77,6 +77,7 @@ public class GradeService {
             upgraded = true;
         }
         gradeRepository.save(grade);
+
         return new GradeResponseDto(
                 upgraded,
                 upgraded ? "등급이" + newGrade.getLabel() + "로 승급되었습니다!" : null,
@@ -84,7 +85,12 @@ public class GradeService {
         );
     }
 
+    //등급 보여주기
+    @Transactional
     public String getGrade(Member loginUser) {
-        Grade grade = gradeRepository.findByMember(loginUser);
+        Grade grade = gradeRepository.findByMember(loginUser)
+                .orElseThrow(() -> new IllegalArgumentException("등급 정보가 없습니다"));
+
+        return grade.getHomitGrade().getLabel();
     }
 }

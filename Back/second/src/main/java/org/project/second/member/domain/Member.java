@@ -61,7 +61,6 @@ public class Member extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Grade grade;  //등급
 
