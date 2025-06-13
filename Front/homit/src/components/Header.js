@@ -80,6 +80,7 @@ const Header = () => {
                 <Link to="/board">게시판</Link>
                 <Link to="/recipe">요리레시피</Link>
                 <Link to="/popular">인기상품</Link>
+                <Link to="/donation">동네톡</Link>
             </nav>
 
             <nav className="header-right">

@@ -115,7 +115,6 @@ const MainPage = () => {
                     </div>
                 </div>
         </Section>
-        
     )
 
 }

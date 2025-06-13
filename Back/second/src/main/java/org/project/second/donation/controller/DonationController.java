@@ -38,9 +38,17 @@ public class DonationController {
             @RequestPart("neighborhood") String neighborhood,
             @RequestPart("title") String title,
             @RequestPart("content") String content,
-            @RequestPart("price") Long price,
+            @RequestPart("price") String priceStr, // String으로 받기
             @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
+
+        // String을 Long으로 변환
+        Long price;
+        try {
+            price = Long.parseLong(priceStr);
+        } catch (NumberFormatException e) {
+            price = 0L; // 파싱 실패 시 기본값 (나눔의 경우)
+        }
 
         DonationDto donationDto = DonationDto.builder()
                 .category(DonationCategory.valueOf(category))
@@ -50,7 +58,7 @@ public class DonationController {
                 .neighborhood(neighborhood)
                 .title(title)
                 .content(content)
-                .price(price)
+                .price(price) // 변환된 Long 값 사용
                 .build();
 
         Member loginUser = userDetail.getMember();
@@ -62,44 +70,58 @@ public class DonationController {
     @PutMapping(value = "/edit/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> editPost(
             @PathVariable Long id,
-            @RequestPart("category") String category,
-            @RequestPart("province") String province,
-            @RequestPart("city") String city,
-            @RequestPart("district") String district,
-            @RequestPart("neighborhood") String neighborhood,
-            @RequestPart("title") String title,
-            @RequestPart("content") String content,
-            @RequestPart("price") Long price,
-            @RequestPart(value = "images", required = false) List<MultipartFile> imageFiles,
-            @RequestPart(value = "removedImages", required = false) String removedImagesJson,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "province", required = false) String province,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "district", required = false) String district,
+            @RequestParam(value = "neighborhood", required = false) String neighborhood,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "content", required = false) String content,
+            @RequestParam(value = "price", required = false) String priceStr,
+            @RequestParam(value = "images", required = false) List<MultipartFile> imageFiles,
+            @RequestParam(value = "removedImages", required = false) String removedImagesJson,
             @AuthenticationPrincipal CustomUserDetails userDetail) {
 
-        DonationDto donationDto = DonationDto.builder()
-                .category(DonationCategory.valueOf(category))
-                .province(province)
-                .city(city)
-                .district(district)
-                .neighborhood(neighborhood)
-                .title(title)
-                .content(content)
-                .price(price)
-                .build();
-
-        Member loginUser = userDetail.getMember();
-
-        List<String> removedUrls = List.of();
-        if (removedImagesJson != null && !removedImagesJson.isEmpty()) {
+        try {
+            // String을 Long으로 변환
+            Long price;
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                removedUrls = objectMapper.readValue(removedImagesJson, new TypeReference<List<String>>() {
-                });
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 삭제 목록 파싱 실패");
+                price = Long.parseLong(priceStr);
+            } catch (NumberFormatException e) {
+                price = 0L; // 파싱 실패 시 기본값
             }
-        }
-        donationService.editPost(id, donationDto, loginUser, imageFiles, removedUrls);
 
-        return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
+            DonationDto donationDto = DonationDto.builder()
+                    .category(DonationCategory.valueOf(category))
+                    .province(province)
+                    .city(city)
+                    .district(district)
+                    .neighborhood(neighborhood)
+                    .title(title)
+                    .content(content)
+                    .price(price)
+                    .build();
+
+            Member loginUser = userDetail.getMember();
+            // 삭제할 이미지 URL 파싱
+            List<String> removedUrls = List.of();
+            if (removedImagesJson != null && !removedImagesJson.isEmpty()) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    removedUrls = objectMapper.readValue(removedImagesJson, new TypeReference<List<String>>() {});
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 삭제 목록 파싱 실패");
+                }
+            }
+
+            donationService.editPost(id, donationDto, loginUser, imageFiles, removedUrls);
+
+            return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("게시글 수정 실패: " + e.getMessage());
+        }
     }
 
     //삭제(소프트삭제)
