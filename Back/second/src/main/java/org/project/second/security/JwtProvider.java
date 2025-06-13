@@ -9,8 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -38,10 +42,21 @@ public class JwtProvider {
 
     // 액세스 토큰 생성
     public String generateAccessToken(Authentication authentication) {
-        String username = authentication.getName(); // 인증된 사용자의 이름(로그인 시 인증수단 == 이메일)
+        Object principal = authentication.getPrincipal();
+        String username; // 인증된 사용자의 이름(로그인 시 인증수단 == 이메일)
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername(); // 기본 로그인: email
+        } else if (principal instanceof OAuth2User) {
+            username = ((OAuth2User) principal).getAttribute("email"); // 소셜 로그인: email
+        } else {
+            throw new IllegalArgumentException("Unknown principal type: " + principal.getClass().getName());
+        }
+
         Date now = new Date(); // 현재 시간
         Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
 
+        //.claim("type", principal instanceof OAuth2User ? "social" : "local") 타입 구별 넣어도 됨
         return Jwts.builder()
                 .setSubject(username) // 토큰의 주체(사용자 이름)
                 .setIssuedAt(now) // 발행 시간
@@ -52,7 +67,17 @@ public class JwtProvider {
 
     // 리프레시 토큰 생성
     public String generateRefreshToken(Authentication authentication) {
-        String username = authentication.getName();
+        Object principal = authentication.getPrincipal();
+        String username;
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername(); // 기본 로그인: email
+        } else if (principal instanceof OAuth2User) {
+            username = ((OAuth2User) principal).getAttribute("email"); // 소셜 로그인: email
+        } else {
+            throw new IllegalArgumentException("Unknown principal type: " + principal.getClass().getName());
+        }
+
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
 
@@ -72,59 +97,81 @@ public class JwtProvider {
         return token;
     }
 
-    // 소셜 로그인 전용 액세스 토큰 생성
-    public String generateAccessTokenForSocial(Authentication authentication) {
-        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        String username = oAuth2User.getAttribute("email");
-        Date now = new Date(); // 현재 시간
-        Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
-
-        return Jwts.builder()
-                .setSubject(username) // 토큰의 주체(사용자 이름)
-                .setIssuedAt(now) // 발행 시간
-                .setExpiration(expiryDate) // 만료 시간
-                .signWith(accessKey, SignatureAlgorithm.HS512) // 서명 (HS512 알고리즘)
-                .compact(); // 토큰 생성
-    }
-
-    // 소셜 로그인 전용 리프레시 토큰 생성
-    public String generateRefreshTokenForSocial(Authentication authentication) {
-        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-        String username = oAuth2User.getAttribute("email");
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
-
-        String token =  Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(refreshKey, SignatureAlgorithm.HS512)
-                .compact();
-
-        //DB에 저장
-        Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
-        member.setRefreshToken(token);
-        memberRepository.save(member);
-
-        return token;
-    }
+//    // 소셜 로그인 전용 액세스 토큰 생성
+//    public String generateAccessTokenForSocial(Authentication authentication) {
+//        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+//        String username = oAuth2User.getAttribute("email");
+//        Date now = new Date(); // 현재 시간
+//        Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
+//
+//        return Jwts.builder()
+//                .setSubject(username) // 토큰의 주체(사용자 이름)
+//                .setIssuedAt(now) // 발행 시간
+//                .setExpiration(expiryDate) // 만료 시간
+//                .signWith(accessKey, SignatureAlgorithm.HS512) // 서명 (HS512 알고리즘)
+//                .compact(); // 토큰 생성
+//    }
+//
+//    // 소셜 로그인 전용 리프레시 토큰 생성
+//    public String generateRefreshTokenForSocial(Authentication authentication) {
+//        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
+//        String username = oAuth2User.getAttribute("email");
+//        Date now = new Date();
+//        Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
+//
+//        String token =  Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(now)
+//                .setExpiration(expiryDate)
+//                .signWith(refreshKey, SignatureAlgorithm.HS512)
+//                .compact();
+//
+//        //DB에 저장
+//        Member member = memberRepository.findByEmail(username)
+//                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+//        member.setRefreshToken(token);
+//        memberRepository.save(member);
+//
+//        return token;
+//    }
 
     // 토큰을 쿠키에 저장
     public void setTokensInCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-        Cookie accessCookie = new Cookie("access_token", accessToken);
-        accessCookie.setHttpOnly(true); // 자바스크립트 접근 방지
-        accessCookie.setSecure(false); // HTTPS에서만 전송
-        accessCookie.setPath("/"); // 전체 경로에서 유효
-        accessCookie.setMaxAge((int) (accessTokenValidity / 1000)); // 쿠키 만료 시간
-        response.addCookie(accessCookie);
+        // ✅ 개발 환경용 설정 (HTTP + localhost)
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(false) // HTTP에서 사용
+                .sameSite("Strict") // ✅ Strict로 변경 (같은 도메인에서만)
+                .path("/")
+                .maxAge((int) (accessTokenValidity / 1000))
+                .build();
 
-        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false); // 실제 사용할떄는 true : https로만 가능 / http 불가
-        refreshCookie.setPath("/api/refresh"); // 리프레시 엔드포인트에서만 사용
-        refreshCookie.setMaxAge((int) (refreshTokenValidity / 1000));
-        response.addCookie(refreshCookie);
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken) // from : 초기값 세팅, 빌더개념
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict") // ✅ Strict로 변경
+                .path("/api/refresh")
+                .maxAge((int) (refreshTokenValidity / 1000))
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString()); //samesite 설정이 필요한 경우에는 SET-COOKIE에 문자열로 넣어줘야 함.
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        //  Java EE 표준 쿠키 클래스라서 SameSite 같은 최신 쿠키 속성을 설정 불가
+        // Samesite설정을 할려면 SET_COOKIE, 헤더를 따로 문자열로 적어서 만들어줘야함) = 번거로움
+//        Cookie accessCookie = new Cookie("access_token", accessToken);
+//        accessCookie.setHttpOnly(true); // 자바스크립트 접근 방지
+//        accessCookie.setSecure(false); // HTTPS에서만 전송
+//        accessCookie.setPath("/"); // 전체 경로에서 유효
+//        accessCookie.setMaxAge((int) (accessTokenValidity / 1000)); // 쿠키 만료 시간
+//        response.addCookie(accessCookie);
+//
+//        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
+//        refreshCookie.setHttpOnly(true);
+//        refreshCookie.setSecure(false); // 실제 사용할떄는 true : https로만 가능 / http 불가
+//        refreshCookie.setPath("/api/refresh"); // 리프레시 엔드포인트에서만 사용
+//        refreshCookie.setMaxAge((int) (refreshTokenValidity / 1000));
+//        response.addCookie(refreshCookie);
     }
 
     // 쿠키에서 refresh 토큰 가져오기
