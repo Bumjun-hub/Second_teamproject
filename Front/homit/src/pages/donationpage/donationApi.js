@@ -4,8 +4,7 @@ import { authenticatedFetch, checkAuthStatus } from '../../utils/authUtils';
 // donationApi.js
 const BASE_URL = 'http://localhost:8080/api/donation';
 
-// 최종 수정된 createPost 함수
-// 최종 수정된 createPost 함수
+
 export const createPost = async (postData) => {
   try {
     console.log('🚀 createPost 시작');
@@ -193,105 +192,69 @@ export const createPostXHR = async (postData) => {
 };
 
 // 2. 게시글 수정
-export const updatePost = async (id, postData, imageFiles, removedImages = []) => {
-    try {
-        // 로그인 상태 확인
-        const authStatus = checkAuthStatus();
-        if (!authStatus.isLoggedIn) {
-            throw new Error('로그인이 필요합니다.');
-        }
-
-        const formData = new FormData();
-        
-        // 카테고리 매핑 (프론트 → 백엔드)
-        const categoryMap = {
-            '나눔': 'FREE',
-            '팝니다': 'SELL',
-            '삽니다': 'BUY',
-            '동네 생활': 'LOCAL_ACTIVITY'
-        };
-        
-        // 가격 처리: 문자열에서 숫자 추출
-        let priceValue = 0;
-        if (postData.price !== '나눔') {
-            // 쉼표 제거 후 숫자 변환
-            const cleanPrice = postData.price.toString().replace(/[^0-9]/g, '');
-            priceValue = parseInt(cleanPrice) || 0;
-        }
-        
-        // 텍스트 데이터 추가
-        formData.append('category', categoryMap[postData.category] || postData.category);
-        formData.append('province', postData.region.province);
-        formData.append('city', postData.region.city);
-        formData.append('district', postData.region.district);
-        formData.append('neighborhood', postData.region.neighborhood || '');
-        formData.append('title', postData.title);
-        formData.append('content', postData.content);
-        formData.append('price', priceValue.toString());
-        
-        // 새 이미지 파일 추가
-        if (imageFiles && imageFiles.length > 0) {
-            imageFiles.forEach(file => {
-                formData.append('images', file);
-            });
-        }
-        
-        // 삭제할 이미지 URL 목록 추가
-        if (removedImages.length > 0) {
-            formData.append('removedImages', JSON.stringify(removedImages));
-        }
-
-        // XMLHttpRequest 사용 (인증 헤더 추가)
-        const response = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            
-            xhr.open('PUT', `${BASE_URL}/edit/${id}`, true);
-            xhr.withCredentials = true;
-            
-            // 인증 헤더 추가
-            if (authStatus.token) {
-                const token = authStatus.token.startsWith('Bearer ') 
-                    ? authStatus.token 
-                    : `Bearer ${authStatus.token}`;
-                xhr.setRequestHeader('Authorization', token);
-            }
-            
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve({
-                        ok: true,
-                        status: xhr.status,
-                        text: () => Promise.resolve(xhr.responseText)
-                    });
-                } else {
-                    resolve({
-                        ok: false,
-                        status: xhr.status,
-                        text: () => Promise.resolve(xhr.responseText)
-                    });
-                }
-            };
-            
-            xhr.onerror = function() {
-                reject(new Error('Network error'));
-            };
-            
-            xhr.send(formData);
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.');
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.text();
-        return { success: true, message: result };
-    } catch (error) {
-        console.error('게시글 수정 실패:', error);
-        throw error;
+export const updatePost = async (id, postData) => {
+  try {
+    console.log('📤 게시글 수정 요청 시작 - ID:', id);
+    console.log('📤 전송할 데이터:', postData);
+    
+    const formData = new FormData();
+    
+    // 각 필드 추가하면서 로그 출력
+    console.log('FormData 추가 중...');
+    formData.append('title', String(postData.title));
+    console.log('✓ title 추가:', postData.title);
+    
+    formData.append('content', String(postData.content));
+    console.log('✓ content 추가:', postData.content);
+    
+    formData.append('category', String(postData.category));
+    console.log('✓ category 추가:', postData.category);
+    
+    formData.append('price', String(postData.price));
+    console.log('✓ price 추가:', postData.price);
+    
+    formData.append('province', String(postData.region.province));
+    console.log('✓ province 추가:', postData.region.province);
+    
+    formData.append('city', String(postData.region.city));
+    console.log('✓ city 추가:', postData.region.city);
+    
+    formData.append('district', String(postData.region.district));
+    console.log('✓ district 추가:', postData.region.district);
+    
+    formData.append('neighborhood', String(postData.region.neighborhood || ''));
+    console.log('✓ neighborhood 추가:', postData.region.neighborhood);
+    
+    // FormData 전체 내용 확인
+    console.log('📋 FormData 최종 내용:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`  ${key}: "${value}" (타입: ${typeof value}, 길이: ${String(value).length})`);
     }
+    
+    console.log('📤 요청 전송 시작...');
+    
+    const response = await fetch(`/api/donation/edit/${id}`, {
+      method: 'PUT',
+      body: formData
+      // Content-Type 헤더는 설정하지 않음 (브라우저가 자동 설정)
+    });
+    
+    console.log('📥 응답 수신:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ 에러 응답:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+    
+    const result = await response.text();
+    console.log('✅ 성공 응답:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ updatePost 에러:', error);
+    throw error;
+  }
 };
 
 // 3. 게시글 삭제

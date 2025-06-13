@@ -294,11 +294,6 @@ const DonationPage = () => {
 
   return (
     <div className="donation-container">
-      <div className="donation-header">
-        <h1>동네 나눔터</h1>
-        <p>우리 동네에서 나누고 거래해요</p>
-      </div>
-
       {/* 인증 에러 표시 */}
       {error && error.includes('로그인') && (
         <div className="auth-error-banner">
