@@ -2,6 +2,7 @@ package org.project.second.donation.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.DonationCategory;
 import org.project.second.common.enums.DonationStatus;
 import org.project.second.common.image.ImageService;
@@ -11,6 +12,7 @@ import org.project.second.donation.dto.DonationDto;
 import org.project.second.donation.dto.DonationResponseDto;
 import org.project.second.donation.repository.DonationImageRepository;
 import org.project.second.donation.repository.DonationRepository;
+import org.project.second.grade.service.GradeService;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,6 +31,7 @@ public class DonationService {
     private final DonationImageRepository donationImageRepository;
     private final MemberRepository memberRepository;
     private final ImageService imageService;
+    private final GradeService gradeService;
 
     //작성
     @Transactional
@@ -65,6 +68,7 @@ public class DonationService {
                 }
             }
         }
+        gradeService.addScore(loginUser, ActivityType.DONATION);
     }
 
     //수정

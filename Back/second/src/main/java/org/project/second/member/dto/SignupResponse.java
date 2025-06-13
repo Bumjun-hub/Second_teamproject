@@ -10,5 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class SignupResponse {
-    String email;
+    private String email;
 }

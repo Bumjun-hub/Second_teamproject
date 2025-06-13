@@ -4,9 +4,13 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.project.second.common.enums.ActivityType;
+import org.project.second.common.enums.HomitGrade;
 import org.project.second.common.enums.RoleName;
 import org.project.second.common.role.Role;
 import org.project.second.common.role.RoleRepository;
+import org.project.second.grade.domain.Grade;
+import org.project.second.grade.service.GradeService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
 import org.project.second.member.dto.*;
@@ -34,6 +38,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final GradeService gradeService;
 
     @Value("${file.profile-images-dir}")
     private String profileImagesDir;
@@ -72,6 +77,13 @@ public class MemberService {
                 .phone(signupRequest.getPhone())
                 .role(userRole)
                 .build();
+
+        Grade grade = Grade.builder()
+                .member(member)
+                .totalScore(0)
+                .homitGrade(HomitGrade.EXPERIENCE)
+                .build();
+        member.setGrade(grade);
 
         Member savedMember = memberRepository.save(member);
 
@@ -196,6 +208,8 @@ public class MemberService {
         if (opUser.isPresent()) {
             Member existingMember = opUser.get();
             existingMember.setUsername(attributes.getName());
+
+            gradeService.addScore(existingMember, ActivityType.DAILY_LOGIN);  //등급
             return memberRepository.save(existingMember);
         } else {
             if (memberRepository.existsByEmailAndSocialProvider(attributes.getEmail(), attributes.getSocialProvider())) {
@@ -219,7 +233,9 @@ public class MemberService {
                     .socialId(attributes.getNameAttributeKey())
                     .role(userRole)
                     .build();
-            return memberRepository.save(newMember);
+            Member savedMember = memberRepository.save(newMember);
+            gradeService.addScore(savedMember, ActivityType.DAILY_LOGIN);
+            return savedMember;
         }
     }
 
