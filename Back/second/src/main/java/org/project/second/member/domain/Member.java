@@ -6,6 +6,8 @@ import org.project.second.comment.domain.Comment;
 import org.project.second.common.domain.BaseEntity;
 import org.project.second.common.enums.SocialProvider;
 import org.project.second.common.role.Role;
+import org.project.second.grade.domain.Grade;
+
 import org.project.second.community.domain.Community;
 import org.project.second.donation.domain.Donation;
 import org.project.second.favorite.domain.Favorite;
@@ -18,6 +20,7 @@ import org.project.second.websocket.domain.Notification;
 import org.project.second.wishlist.domain.Wishlist;
 
 import java.util.List;
+
 
 @Entity
 @Getter
@@ -57,6 +60,9 @@ public class Member extends BaseEntity {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Grade grade;  //등급
 
     // CASECADE 설정
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)

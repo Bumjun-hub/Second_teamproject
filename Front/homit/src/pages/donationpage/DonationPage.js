@@ -124,57 +124,14 @@ const DonationPage = () => {
     }
   };
 
-  // 초기 샘플 데이터 (백엔드 연결 실패 시 폴백)
-  const loadSampleData = () => {
-    const samplePosts = [
-      {
-        id: 1,
-        title: '아이 장난감 나눔해요',
-        content: '안 쓰는 장난감들 나눔합니다. 직거래 선호해요.',
-        category: '나눔',
-        price: '나눔',
-        region: { province: '서울특별시', city: '강남구', district: '역삼동' },
-        province: '서울특별시',
-        city: '강남구', 
-        district: '역삼동',
-        neighborhood: '',
-        author: '사용자1',
-        username: '사용자1',
-        createdAt: new Date('2025-06-10').toISOString(),
-        viewCount: 25,
-        likes: 3,
-        imgUrls: []
-      },
-      {
-        id: 2,
-        title: '자전거 팝니다',
-        content: '성인용 자전거 판매합니다. 상태 양호해요.',
-        category: '팝니다',
-        price: '50,000원',
-        region: { province: '서울특별시', city: '마포구', district: '홍대동' },
-        province: '서울특별시',
-        city: '마포구',
-        district: '홍대동', 
-        neighborhood: '',
-        author: '사용자2',
-        username: '사용자2',
-        createdAt: new Date('2025-06-11').toISOString(),
-        viewCount: 12,
-        likes: 1,
-        imgUrls: []
-      }
-    ];
-    setPosts(samplePosts);
-  };
-
   // 초기 로드
   useEffect(() => {
     const initializeData = async () => {
       try {
         await loadPosts();
       } catch (error) {
-        console.warn('백엔드 연결 실패, 샘플 데이터 사용:', error);
-        loadSampleData();
+        console.warn('백엔드 연결 실패', error);
+
       }
     };
     
@@ -320,14 +277,6 @@ const DonationPage = () => {
         loading={loading}
         onRefresh={handleRefresh}
       />
-
-      {/* 로딩 상태 */}
-      {loading && (
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>게시글을 불러오는 중...</p>
-        </div>
-      )}
 
       <PostList 
         posts={filteredPosts}
