@@ -17,49 +17,51 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocketMessageBroker // WebSocket 메시지 브로커 활성화
+@EnableWebSocketMessageBroker
 @AllArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // /topic으로 구독하는 메시지를 보냄
-        config.setApplicationDestinationPrefixes("/app"); // 클라이언트 *요청* prefix (메세지 접두사)
-        config.setUserDestinationPrefix("/topic/user"); // 사용자별 메시지
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user"); // ✅ /topic/user → /user로 변경
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws") // WebSocket *연결* endpoint
-                .setAllowedOriginPatterns("*") // 모든 출처(CORS) 허용
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:3000") // ✅ 구체적인 Origin 설정
                 .addInterceptors(jwtHandshakeInterceptor)
-                .withSockJS(); // 브라우저가 WebSocket을 지원하지 않을 때 SockJS fallback 지원
+                .withSockJS();
+
+        // ✅ Native WebSocket용 엔드포인트도 추가
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:3000")
+                .addInterceptors(jwtHandshakeInterceptor);
     }
 
-    @Override //configureClientInboundChannel : 클라이언트가 서버로 보내는 메시지를 처리하는 채널을 설정하는 메서드
-    public void configureClientInboundChannel(ChannelRegistration registration) { //ChannelRegistration : 채널의 동작을 커스터마이징하는 설정 객체
-        registration.interceptors(new ChannelInterceptor() { // ChannelInterceptor : 메시지가 채널로 들어가기 전에 가로채서 원하는 작업(예: 인증 확인)을 수행
-            @Override // preSend : 서버에 들어가기 전에 호출
-            public Message<?> preSend(Message<?> message, MessageChannel channel) { // Message : 클라이언트가 서버로 보내는 메세지 객체, STOMP 메시지는 명령(CONNECT, SEND 등), 헤더, 본문을 포함
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message); // StompHeaderAccessor : 헤더 리딩, JWT 토큰 꺼낼 떄 사용
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     Authentication authentication = (Authentication) accessor.getSessionAttributes().get("user");
                     if (authentication == null || !authentication.isAuthenticated()) {
                         throw new AccessDeniedException("Authentication required");
                     }
 
-                    // ✅ 인증 객체를 SecurityContextHolder에 수동으로 설정
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     context.setAuthentication(authentication);
                     SecurityContextHolder.setContext(context);
-                    accessor.setUser(authentication); //STOMP세션에 인증 설정
-                        }
+                    accessor.setUser(authentication);
+                }
                 return message;
             }
         });
     }
-
-
 }

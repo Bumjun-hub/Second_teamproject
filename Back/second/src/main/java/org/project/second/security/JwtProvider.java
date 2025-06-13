@@ -9,13 +9,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
+import org.springframework.http.HttpHeaders;
+
 
 import java.security.Key;
 import java.util.Date;
@@ -81,13 +81,13 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
 
-        String token =  Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(refreshKey, SignatureAlgorithm.HS512)
                 .compact();
-        
+
         //DB에 저장
         Member member = memberRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
@@ -97,45 +97,8 @@ public class JwtProvider {
         return token;
     }
 
-//    // 소셜 로그인 전용 액세스 토큰 생성
-//    public String generateAccessTokenForSocial(Authentication authentication) {
-//        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-//        String username = oAuth2User.getAttribute("email");
-//        Date now = new Date(); // 현재 시간
-//        Date expiryDate = new Date(now.getTime() + accessTokenValidity); // 만료 시간
-//
-//        return Jwts.builder()
-//                .setSubject(username) // 토큰의 주체(사용자 이름)
-//                .setIssuedAt(now) // 발행 시간
-//                .setExpiration(expiryDate) // 만료 시간
-//                .signWith(accessKey, SignatureAlgorithm.HS512) // 서명 (HS512 알고리즘)
-//                .compact(); // 토큰 생성
-//    }
-//
-//    // 소셜 로그인 전용 리프레시 토큰 생성
-//    public String generateRefreshTokenForSocial(Authentication authentication) {
-//        DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-//        String username = oAuth2User.getAttribute("email");
-//        Date now = new Date();
-//        Date expiryDate = new Date(now.getTime() + refreshTokenValidity);
-//
-//        String token =  Jwts.builder()
-//                .setSubject(username)
-//                .setIssuedAt(now)
-//                .setExpiration(expiryDate)
-//                .signWith(refreshKey, SignatureAlgorithm.HS512)
-//                .compact();
-//
-//        //DB에 저장
-//        Member member = memberRepository.findByEmail(username)
-//                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
-//        member.setRefreshToken(token);
-//        memberRepository.save(member);
-//
-//        return token;
-//    }
-
     // 토큰을 쿠키에 저장
+    // JwtProvider.java의 setTokensInCookies 메서드 수정
     public void setTokensInCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         // ✅ 개발 환경용 설정 (HTTP + localhost)
         ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
@@ -209,7 +172,7 @@ public class JwtProvider {
         return false;
 
         // catch (JwtException | IllegalArgumentException e) {
-            // return false; // 토큰이 유효하지 않거나 만료됨
+        // return false; // 토큰이 유효하지 않거나 만료됨
         //}
 
     }
