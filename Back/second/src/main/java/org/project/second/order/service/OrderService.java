@@ -2,8 +2,10 @@ package org.project.second.order.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.common.enums.OrderStatus;
+import org.project.second.grade.service.GradeService;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
@@ -23,6 +25,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final GroupBuyRepository groupBuyRepository;
+    private final GradeService gradeService;
 
     // 주문(=신청)
     @Transactional
@@ -59,6 +62,9 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .build();
         orderRepository.save(order);
+
+        // 등급점수추가
+        gradeService.addScore(loginUser, ActivityType.ORDER);
 
         // 참여자수 증가 & 상태 변경
         groupBuy.setCurrentParticipants(groupBuy.getCurrentParticipants() + 1);

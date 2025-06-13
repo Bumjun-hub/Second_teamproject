@@ -1,5 +1,6 @@
 package org.project.second.grade.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.HomitGrade;
@@ -21,6 +22,7 @@ public class GradeService {
     private final GradeRepository gradeRepository;
     private final ActivityLogRepository activityLogRepository;
 
+    @Transactional
     public GradeResponseDto addScore(Member member, ActivityType activityType){
         //날짜
         LocalDate today = LocalDate.now();
@@ -82,4 +84,7 @@ public class GradeService {
         );
     }
 
+    /*public String getGrade(Member loginUser) {
+        Grade grade = gradeRepository.findByMember(loginUser);
+    }*/
 }

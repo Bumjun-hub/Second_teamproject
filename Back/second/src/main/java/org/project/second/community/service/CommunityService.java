@@ -2,6 +2,7 @@ package org.project.second.community.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.CommunityCategory;
 import org.project.second.common.image.ImageService;
 import org.project.second.community.domain.Community;
@@ -10,6 +11,7 @@ import org.project.second.community.dto.CommunityDto;
 import org.project.second.community.dto.CommunityResponseDto;
 import org.project.second.community.repository.CommunityImageRepository;
 import org.project.second.community.repository.CommunityRepository;
+import org.project.second.grade.service.GradeService;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,6 +30,7 @@ public class CommunityService {
     private final MemberRepository memberRepository;
     private final ImageService imageService;
     private final CommunityImageRepository communityImageRepository;
+    private final GradeService gradeService;
 
 
     //작성
@@ -62,6 +65,7 @@ public class CommunityService {
                 }
             }
         }
+        gradeService.addScore(loginUser, ActivityType.COMMUNITY);
     }
 
     //수정

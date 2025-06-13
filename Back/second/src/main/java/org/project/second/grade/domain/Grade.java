@@ -3,7 +3,6 @@ package org.project.second.grade.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.project.second.common.domain.BaseEntity;
-import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.HomitGrade;
 import org.project.second.member.domain.Member;
 
