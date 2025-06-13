@@ -258,14 +258,12 @@
 }
 
 .noti-content {
-    font-size: 14px;
-    color: #333;
-    white-space: pre-line;
-    line-height: 1.4;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 0;
-  margin: 0;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;           /* 줄바꿈 금지 */
+  overflow: hidden;              /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;       /* 말줄임표 (...) */
+  line-height: 1.4;
 }
 
 .notification-item {

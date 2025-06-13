@@ -1,15 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './Header.css';
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { logout } from '../utils/authUtils';
 import { connectNotification, disconnectNotification } from '../utils/notificationClient';
 
+
+
 const Header = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
+    const navigate = useNavigate();
 
     const checkAuth = async () => {
         try {
@@ -46,6 +49,17 @@ const Header = () => {
     const handleNotificationMessage = (message) => {
         setNotifications((prev) => [message, ...prev]);
     };
+
+    const handleNotificationClick = (notification) => {
+        if (notification.groupBuyId) {
+            navigate(`/groupbuy/info/${notification.groupBuyId}`);
+        } else if (notification.communityId) {
+            navigate(`/board/info/${notification.communityId}`);
+        } else if (notification.recipeId) {
+            navigate(`/recipe/${notification.recipeId}`);
+        }
+    };
+
 
     useEffect(() => {
         checkAuth();
@@ -96,7 +110,7 @@ const Header = () => {
                                 ) : (
                                     <ul className="notification-list">
                                         {notifications.map((n, idx) => (
-                                            <li key={idx} className="notification-item">
+                                            <li key={idx} className="notification-item" onClick={() => handleNotificationClick(n)} style={{ cursor: 'pointer' }}>
                                                 <div className="noti-card">
                                                     <div className="noti-header">
                                                         <span className={`noti-type ${n.type?.toLowerCase()}`}>
