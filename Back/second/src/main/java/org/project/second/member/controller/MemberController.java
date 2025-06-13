@@ -221,5 +221,12 @@ public class MemberController {
         return memberService.getRoleInfo(m);
     }
 
+    @GetMapping("/type")
+    public ResponseEntity<LoginTypeResponse> getTypeInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Member m = userDetails.getMember();
+        LoginTypeResponse type = memberService.getTypeInfo(m);
+        return ResponseEntity.ok(type);
+    }
+
 
 }

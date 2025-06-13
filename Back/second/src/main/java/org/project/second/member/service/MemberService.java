@@ -223,4 +223,12 @@ public class MemberService {
         }
     }
 
+    public LoginTypeResponse getTypeInfo(Member m) {
+            if (m == null) {
+                throw new IllegalArgumentException("인증되지 않은 사용자입니다.");
+            }
+
+            String type = (m.getSocialProvider() == null) ? "LOCAL" : m.getSocialProvider().name();
+            return new LoginTypeResponse(type);
+    }
 }
