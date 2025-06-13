@@ -120,16 +120,6 @@ const FilterSection = ({
           <span className="icon">✏️</span>
           <span>글쓰기</span>
         </button>
-        
-        <button
-          onClick={onRefresh}
-          className="refresh-btn"
-          disabled={loading}
-          title="새로고침"
-        >
-          <span className="icon">🔄</span>
-          <span>새로고침</span>
-        </button>
       </div>
     </div>
   );

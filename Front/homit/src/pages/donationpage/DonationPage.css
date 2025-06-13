@@ -257,7 +257,6 @@
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 1rem;
 }
 
@@ -339,22 +338,22 @@
   font-weight: 500;
 }
 
-.category-badge.나눔 {
+.category-badge.FREE {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.category-badge.팝니다 {
+.category-badge.SELL {
   background-color: #dbeafe;
   color: #1e40af;
 }
 
-.category-badge.삽니다 {
+.category-badge.BUY {
   background-color: #fed7aa;
   color: #ea580c;
 }
 
-.category-badge.동네생활 {
+.category-badge.LOCAL_ACTIVITY {
   background-color: #e9d5ff;
   color: #7c3aed;
 }
