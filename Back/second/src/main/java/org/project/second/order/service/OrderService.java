@@ -7,6 +7,8 @@ import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.common.enums.OrderStatus;
 import org.project.second.grade.service.GradeService;
 import org.project.second.groupBuy.domain.GroupBuy;
+import org.project.second.groupBuy.domain.GroupBuyParticipation;
+import org.project.second.groupBuy.repository.GroupBuyParticipationRepository;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.order.domain.Order;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private final GroupBuyParticipationRepository groupBuyParticipationRepository;
     private final OrderRepository orderRepository;
     private final GroupBuyRepository groupBuyRepository;
     private final GradeService gradeService;
@@ -66,6 +69,16 @@ public class OrderService {
         // 등급점수추가
         gradeService.addScore(loginUser, ActivityType.ORDER);
 
+        // 참여자 저장
+
+        GroupBuyParticipation participation = GroupBuyParticipation.builder()
+                .groupBuy(groupBuy)
+                .member(loginUser)
+                .quantity(orderDto.getQuantity())
+                .build();
+        groupBuyParticipationRepository.save(participation);
+
+
         // 참여자수 증가 & 상태 변경
         groupBuy.setCurrentParticipants(groupBuy.getCurrentParticipants() + 1);
         if (groupBuy.getCurrentParticipants() >= groupBuy.getMaxParticipants()) {
@@ -84,7 +97,11 @@ public class OrderService {
             throw new AccessDeniedException("본인의 주문만 취소할 수 있습니다.");
         }
 
+
+
         GroupBuy groupBuy = order.getGroupBuy();
+
+        groupBuyParticipationRepository.deleteByGroupBuyAndMember(groupBuy, loginUser);
 
         // 주문 삭제 (또는 status=OrderStatus.CANCELLED로 변경해도 무방)
         orderRepository.delete(order);

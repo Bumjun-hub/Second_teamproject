@@ -1,5 +1,6 @@
 package org.project.second.common.enums;
 
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,4 +15,5 @@ public enum HomitGrade {
 
     private final String label;
     private final int upGread;
+
 }

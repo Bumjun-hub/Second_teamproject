@@ -23,4 +23,10 @@ public interface GroupBuyParticipationRepository extends JpaRepository<GroupBuyP
     List<Member> findByGroupBuy_Id(Long groupBuyId);
 
     List<GroupBuyParticipation> findByGroupBuyId(Long groupBuyId);
+
+    void deleteByGroupBuyAndMember(GroupBuy groupBuy, Member member);
+
+
 }
+
+

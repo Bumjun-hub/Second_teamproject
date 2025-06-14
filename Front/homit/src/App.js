@@ -6,6 +6,7 @@ import BoardPage from './pages/boardpage/BoardPage';
 import RecipePage from './pages/recipepage/RecipePage';
 import RecipeInfoPage from './pages/recipepage/RecipeInfoPage';
 import HotItemPage from './pages/hotitempage/HotItemPage';
+import DonationPage from './pages/donationpage/DonationPage';
 import LoginPage from './pages/loginpage/LoginPage';
 import MemberPage from './pages/memberpage/MemberPage';
 import Layout from './components/Layout';
@@ -17,6 +18,7 @@ import MyPage from './pages/mypage/MyPage';
 import EditProfile from './pages/mypage/MyPageEditProfile';
 import { AuthProvider } from './utils/AuthProvider';
 import PaymentPage from './pages/paymentpage/PaymentPage';
+import DashBoard from './pages/admin/DashBoard';
 
 function App() {
   return (
@@ -43,10 +45,13 @@ function App() {
           <Route path="/member" element={<MemberPage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/editProfile" element={<EditProfile />} />
+
+          <Route path="/donation" element={<DonationPage />} />
         </Route>
 
         {/* 헤더/푸터 없는(단독) 페이지 */}
         <Route path="/payment/:id" element={<PaymentPage />} />
+        <Route path="/admin/dashboard" element={<DashBoard/>}/>
       </Routes>
     </AuthProvider>
   );
