@@ -34,6 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional         // OAuth2UserRequest : OAuth2 로그인 성공한 후 받아온 요청객체(ClientRegistration, AccessToken) / spring security가 자동전달
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("loadUser 호출");
         OAuth2User oAuth2User = super.loadUser(userRequest); // 부모의 기존 loadUser 메서드 : userRequest를 이용해 구글 api에 사용자 정보 요청
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // OAuth 공급자 확인 (yml : google)
         String userNameAttributeName = userRequest.getClientRegistration() // yml에 설정한 공급자 정보

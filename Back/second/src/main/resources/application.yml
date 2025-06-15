@@ -57,3 +57,8 @@ naver:
     client-id: ${NAVER_API_CLIENT_ID}
     client-secret: ${NAVER_API_CLIENT_SECRET}
     search-url: ${NAVER_API_SEARCH_URL}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web.filter: DEBUG
