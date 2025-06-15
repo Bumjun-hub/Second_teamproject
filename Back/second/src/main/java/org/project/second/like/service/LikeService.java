@@ -1,8 +1,10 @@
 package org.project.second.like.service;
 
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.ActivityType;
 import org.project.second.community.domain.Community;
 import org.project.second.community.repository.CommunityRepository;
+import org.project.second.grade.service.GradeService;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.like.domain.Like;
@@ -19,6 +21,7 @@ public class LikeService {
     private final MemberRepository memberRepository;
     private final CommunityRepository communityRepository;
     private final GroupBuyRepository groupBuyRepository;
+    private final GradeService gradeService;
 
     @Transactional
     public void toggleLike(Member m, String type, Long postId) {
@@ -37,6 +40,8 @@ public class LikeService {
                                     .community(community)
                                 .build();
                     likeRepository.save(like);
+                    Member author = community.getMember();
+                    gradeService.addScore(author, ActivityType.LIKE);
                 }
                 break;
             case "GROUPBUY" :

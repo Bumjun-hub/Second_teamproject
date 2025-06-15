@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.project.second.comment.domain.Comment;
 import org.project.second.comment.dto.*;
 import org.project.second.comment.repository.CommentRepository;
+import org.project.second.common.enums.ActivityType;
 import org.project.second.common.enums.CommentEntityType;
 import org.project.second.common.enums.NotificationType;
 import org.project.second.community.domain.Community;
 import org.project.second.community.repository.CommunityRepository;
+import org.project.second.grade.service.GradeService;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
@@ -34,6 +36,7 @@ public class CommentService {
     private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
     private final NotificationService notificationService;
+    private final GradeService gradeService;
 
     @Transactional
     public CommentResponse createComment(Member m, CommentRequest request) {
@@ -97,6 +100,8 @@ public class CommentService {
                 default:
                     throw new IllegalArgumentException("게시글 타입이 유효하지 않습니다" + request.getEntityType());
         }
+
+        gradeService.addScore(m, ActivityType.COMMENT);  //점수저장!
 
         return CommentResponse.builder()
                 .id(comment.getId())

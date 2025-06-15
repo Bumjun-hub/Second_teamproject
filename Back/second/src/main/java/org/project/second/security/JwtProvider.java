@@ -137,6 +137,30 @@ public class JwtProvider {
 //        response.addCookie(refreshCookie);
     }
 
+// ✅ 프로덕션 환경용 설정 예시 (HTTPS 사용 시)
+/*
+public void setTokensInCookiesForProduction(HttpServletResponse response, String accessToken, String refreshToken) {
+    ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+            .httpOnly(true)
+            .secure(true) // HTTPS에서만
+            .sameSite("None") // 크로스 도메인 허용
+            .path("/")
+            .maxAge((int) (accessTokenValidity / 1000))
+            .build();
+
+    ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/api/refresh")
+            .maxAge((int) (refreshTokenValidity / 1000))
+            .build();
+
+    response.setHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+}
+*/
+
     // 쿠키에서 refresh 토큰 가져오기
     public String getRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

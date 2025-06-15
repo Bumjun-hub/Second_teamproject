@@ -4,6 +4,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.project.second.common.enums.ActivityType;
+import org.project.second.grade.domain.Grade;
+import org.project.second.grade.service.GradeService;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
 import org.project.second.member.dto.*;
@@ -34,6 +37,7 @@ public class MemberController {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;  // JWT 생성 및 검증 유틸
     private final MemberRepository memberRepository;
+    private final GradeService gradeService; // 등급관련
 
     //Valid : null 값 유효성 체크 자동
     @PostMapping("/signup")
@@ -53,6 +57,11 @@ public class MemberController {
 
         try{
             Authentication authentication = authenticationManager.authenticate(token);
+
+            //로그인시 등급점수 추가
+            Member member = memberRepository.findByEmail(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+            gradeService.addScore(member, ActivityType.DAILY_LOGIN);
 
             // ✅ 인증 정보 SecurityContext에 저장
             SecurityContext context = SecurityContextHolder.createEmptyContext();
