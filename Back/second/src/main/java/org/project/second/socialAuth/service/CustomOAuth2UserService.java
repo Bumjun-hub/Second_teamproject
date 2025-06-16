@@ -41,8 +41,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                         .getProviderDetails() // 토큰, 유저정보, provider 상세정보
                                         .getUserInfoEndpoint() // 사용자 정보 요청 엔드포인트
                                         .getUserNameAttributeName(); // 유저 고유 ID
+
         OAuthAttributesDto attributes = OAuthAttributesDto.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-        log.info("OAuth2 attributes: {}", attributes.getAttributes());
         log.info("Processing Google login for email: {}", attributes.getEmail());
 
         Member member = saveOrUpdate(attributes);
