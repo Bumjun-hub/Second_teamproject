@@ -1,6 +1,5 @@
 package org.project.second.common.enums;
 
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
