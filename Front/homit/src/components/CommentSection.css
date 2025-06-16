@@ -1,44 +1,163 @@
-.comment-meta {
+.cmt-meta {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
   color: #333;
-  justify-content: space-between;
 }
 
-.comment-icon-buttons {
+
+/* 댓글 영역 전체 박스 */
+.cmt-box {
+  margin-top: 40px;
+  padding: 24px;
+  background-color: #fdfdfd;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 댓글 입력창 */
+.cmt-textarea {
+  width: 100%;
+  height: 80px;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* 댓글 등록 버튼 */
+.cmt-submit-btn {
+  margin-top: 8px;
+  background-color: #2668A7;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  float: right;
+}
+
+/* 댓글 리스트 항목 */
+.cmt-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  background-color: #fafafa;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 프로필 이미지 */
+.cmt-profile img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  margin-right: 1rem;
+}
+
+/* 댓글 본문 */
+.cmt-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+
+.cmt-meta-left {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+
+
+
+.cmt-icon-btn:hover {
+  opacity: 0.7;
+}
+
+/* 댓글 편집 textarea */
+.cmt-edit-textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* 편집 버튼 영역 */
+.cmt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cmt-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+
+.cmt-save-btn,
+.cmt-cancel-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cmt-save-btn {
+  background-color: #28c840;
+  color: white;
+}
+
+.cmt-cancel-btn {
+  background-color: #ccc;
+  color: white;
+}
+
+.cmt-icon-buttons {
   margin-left: auto;
   display: flex;
   gap: 6px;
 }
 
-.icon-btn {
+.cmt-icon-btn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 14px;
-  padding: 2px;
+  padding: 4px;
   transition: opacity 0.2s ease;
 }
 
-.icon-btn:hover {
+.cmt-icon-btn:hover {
   opacity: 0.7;
 }
 
-.comment-edit-textarea{
-width: 500px;
-height: auto;
-  
-}
 
-.comment-pagination {
+
+.cmt-pagination {
   margin-top: 30px;
   text-align: center;
 }
 
-.comment-pagination button {
+.cmt-pagination button {
   margin: 0 5px;
   padding: 8px 16px;
   background-color: #ddd;
@@ -47,7 +166,7 @@ height: auto;
   cursor: pointer;
 }
 
-.comment-pagination button.active {
+.cmt-pagination button.active {
   background-color: #2668A7;
   color: white;
 }

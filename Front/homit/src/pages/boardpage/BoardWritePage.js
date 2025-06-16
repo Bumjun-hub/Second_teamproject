@@ -160,9 +160,9 @@ const BoardWritePage = () => {
 
   return (
     <Section>
-      <div className="write-wrapper">
-        <div className="write-container">
-          <form id="writeForm" className="input-form" onSubmit={handleSubmit}>
+      <div className="bpw-wrapper">
+        <div className="bpw-container">
+          <form id="writeForm" className="bpw-input-form" onSubmit={handleSubmit}>
             <h2>{isEdit ? "게시글 수정" : "게시글 작성"}</h2>
 
             <label>제목</label>
@@ -200,11 +200,11 @@ const BoardWritePage = () => {
             />
 
             {previewUrls.length > 0 && (
-              <div className="image-preview-area">
+              <div className="bpw-image-preview-area">
                 {previewUrls.map((url, idx) => (
-                  <div key={idx} className="image-preview-wrapper">
+                  <div key={idx} className="bpw-image-preview-wrapper">
                     <img src={url} alt={`첨부 이미지 ${idx + 1}`} />
-                    <button type="button" className="remove-image-btn" onClick={() => handleImageRemove(idx)}>
+                    <button type="button" className="bpw-remove-image-btn" onClick={() => handleImageRemove(idx)}>
                       ×
                     </button>
                   </div>
@@ -212,9 +212,9 @@ const BoardWritePage = () => {
               </div>
             )}
 
-            <div className="form-bottom">
-              <div className="button-area">
-                <label className="upload-button">
+            <div className="bpw-form-bottom">
+              <div className="bpw-button-area">
+                <label className="bpw-upload-button">
                   첨부 이미지
                   <input
                     type="file"
@@ -225,15 +225,15 @@ const BoardWritePage = () => {
                   />
                 </label>
 
-                <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
-                <button type="submit" className="submit-button">{isEdit ? "수정" : "등록"}</button>
+                <button type="button" className="bpw-cancel-button" onClick={handleCancel}>취소</button>
+                <button type="submit" className="bpw-submit-button">{isEdit ? "수정" : "등록"}</button>
               </div>
 
               {role === "ROLE_ADMIN" && (
                 <label>
                   <input
-                    type="checkbox"
-                    className="checkbox"
+                    type="bpw-checkbox"
+                    className="bpw-checkbox"
                     checked={formData.isNotice}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, isNotice: e.target.checked }))

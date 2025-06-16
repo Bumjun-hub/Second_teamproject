@@ -88,27 +88,27 @@ const BoardInfoPage = () => {
 
   return (
     <Section>
-      <div className="info-container">
+      <div className="bpi-container">
+        <div className="bpi-card">
+          <div className="bpi-top-buttons">
+            <button className="bpi-edit-button" onClick={handleEdit}>수정</button>
+            <button className="bpi-delete-button" onClick={handleDelete}>삭제</button>
+          </div>
 
-        <div className="top-buttons">
-          <button className="edit-button" onClick={handleEdit}>수정</button>
-          <button className="delete-button" onClick={handleDelete}>삭제</button>
-        </div>
 
-        <div className="product-card">
-          <div className="details-area">
-            <div className="header-row">
-              <h2 className="title">{item.title}</h2>
-              <div className="divider-line"></div>
-              <div className="meta-bar">
-                <div className="meta-info">
+          <div className="bpi-details">
+            <div className="bpi-header-row">
+              <h2 className="bpi-title">{item.title}</h2>
+              <div className="bpi-divider-line"></div>
+              <div className="bpi-meta-bar">
+                <div className="bpi-meta-info">
                   <span><strong>작성자</strong> {item.username}</span>
                   <span><strong>작성일</strong> {new Date(item.createdAt).toISOString().slice(0, 10)}</span>
                   <span><strong>조회</strong> {item.viewCount}</span>
                   <span><strong>추천</strong> {likes}</span>
                 </div>
-                <div className="like-area">
-                  <button onClick={handleLikeClick} className="like-button">{isLiked
+                <div className="bpi-like-area">
+                  <button onClick={handleLikeClick} className="bpi-like-button">{isLiked
                     ? <AiFillHeart size={17} color="red" />
                     : <AiOutlineHeart size={17} color="white" />}
                     <span style={{ marginLeft: "6px", color: "#fff" }}>추천</span></button>

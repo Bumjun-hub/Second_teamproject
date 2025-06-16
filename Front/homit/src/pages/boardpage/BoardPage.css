@@ -1,10 +1,10 @@
-.board-header {
+.bp-header {
   position: relative;
   margin-bottom: 20px;
   padding: 20px 0;
 }
 
-.board-title {
+.bp-title {
   text-align: center;
   font-size: 24px;
   opacity: 70%;
@@ -12,14 +12,14 @@
 }
 
 
-.category-filter {
+.bp-category-filter {
   display: flex;
   justify-content: center;
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.category-filter button {
+.bp-category-filter button {
   padding: 8px 16px;
   border: 1px solid #ccc;
   background-color: white;
@@ -29,12 +29,12 @@
   transition: background-color 0.2s, color 0.2s;
 }
 
-.category-filter button:hover {
+.bp-category-filter button:hover {
   background-color: #2668A7;
   color: white;
 }
 
-.category-filter button.active {
+.bp-category-filter button.active {
   background-color: #2668A7;
   color: white;
   font-weight: bold;
@@ -42,7 +42,7 @@
 
 
 
-.write-button {
+.bp-write-button {
   background-color: #2668A7;
   float: right;
   color: white;
@@ -55,7 +55,7 @@
 }
 
 
-.Pageinfo {
+.bp-pageinfo {
   width: 100%;
   text-align: center;
   opacity: 70%;
@@ -64,7 +64,7 @@
   /* 추가 */
 }
 
-.Pageinfo h2 {
+.bp-pageinfo h2 {
   margin: 0;
   font-size: 24px;
 }
@@ -82,14 +82,14 @@ td a {
 
 }
 
-.boardtable-container {
+.bp-table-container {
   padding: 40px;
 
 
 }
 
 
-.board-table {
+.bp-table {
   width: 100%;
   table-layout: fixed;
   /* ✅ 추가 */
@@ -102,7 +102,7 @@ td a {
 
 
 
-.board-table th {
+.bp-table th {
   background-color: #2668A7;
   color: white;
   padding: 12px 16px;
@@ -111,7 +111,7 @@ td a {
   font-size: 14px;
 }
 
-.board-table td {
+.bp-table td {
   padding: 12px 16px;
   text-align: center;
   border-top: 1px solid #ddd;
@@ -120,14 +120,14 @@ td a {
 }
 
 /* 카테고리 */
-.board-table th:nth-child(1),
-.board-table td:nth-child(1) {
+.bp-table th:nth-child(1),
+.bp-table td:nth-child(1) {
   width: 60px;
 }
 
 /* 제목 (조금 넓게) */
-.board-table th:nth-child(2),
-.board-table td:nth-child(2) {
+.bp-table th:nth-child(2),
+.bp-table td:nth-child(2) {
   width: 400px;
   white-space: nowrap;
   overflow: hidden;
@@ -135,46 +135,46 @@ td a {
 }
 
 /* 작성자 */
-.board-table th:nth-child(3),
-.board-table td:nth-child(3) {
+.bp-table th:nth-child(3),
+.bp-table td:nth-child(3) {
   width: 40px;
 }
 
 /* 작성일 */
-.board-table th:nth-child(4),
-.board-table td:nth-child(4) {
+.bp-table th:nth-child(4),
+.bp-table td:nth-child(4) {
   width: 120px;
 }
 
 /* 조회 */
-.board-table th:nth-child(5),
-.board-table td:nth-child(5) {
+.bp-table th:nth-child(5),
+.bp-table td:nth-child(5) {
   width: 80px;
 }
 
 /* 추천 */
-.board-table th:nth-child(6),
-.board-table td:nth-child(6) {
+.bp-table th:nth-child(6),
+.bp-table td:nth-child(6) {
   width: 80px;
 }
 
 
-.board-table tr:hover {
+.bp-table tr:hover {
   background-color: #f0f8ff;
 }
 
-.notice-row {
+.bp-notice-row {
   background-color: #f0f0f0;
   font-weight: bold;
 }
 
 
-.board-pagination {
+.bp-pagination {
   margin-top: 30px;
   text-align: center;
 }
 
-.board-pagination button {
+.bp-pagination button {
   margin: 0 5px;
   padding: 8px 16px;
   background-color: #ddd;
@@ -183,13 +183,13 @@ td a {
   cursor: pointer;
 }
 
-.board-pagination button.active {
+.bp-pagination button.active {
   background-color: #2668A7;
   color: white;
 }
 
 
-.search-bar {
+.bp-search-bar {
   border: 1px;
   display: flex;
   justify-content: center;
@@ -197,19 +197,19 @@ td a {
   margin: 20px 0;
 }
 
-.search-select,
-.search-input {
+.bp-search-select,
+.bp-search-input {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
 }
 
-.search-input {
+.bp-search-input {
   width: 50%;
 }
 
-.search-button {
+.bp-search-button {
   padding: 8px 16px;
   background-color: #2668A7;
   color: white;
@@ -218,7 +218,7 @@ td a {
   cursor: pointer;
 }
 
-.thumbnail-tooltip {
+.bp-thumbnail-tooltip {
   position: absolute;
   z-index: 500;
   background: #fff;
@@ -230,13 +230,13 @@ td a {
   border-radius: 4px;
 }
 
-.thumbnail-tooltip img {
+.bp-thumbnail-tooltip img {
   width: 100%;
   height: auto;
   display: block;
 }
 
-.sort-button {
+.bp-sort-button {
   border: none;
   background: none;
   cursor: pointer;
