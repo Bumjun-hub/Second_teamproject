@@ -6,7 +6,7 @@ const DashBoard = () => {
   const [groupBuyId, setGroupBuyId] = useState('');
   const [applyList, setApplyList] = useState([]);
   const [orderList, setOrderList] = useState([]);
-  const [role,setRole] = useState(null);
+  const [role, setRole] = useState(null);
 
   const navigate = useNavigate();
 
@@ -74,20 +74,21 @@ const DashBoard = () => {
         const res = await fetch("http://localhost:8080/api/roleinfo", {
           credentials: "include",
         });
-        const text = await res.text();
-        console.log("🎯 현재 사용자 권한:", text);
-        setRole(text);
-        if (!role === "ROLE_ADMIN") {
+        const data = await res.json();
+        console.log("🎯 현재 사용자 권한:", data.role);
+        setRole(data.role);
+        if (data.role !== "ROLE_ADMIN") {
           alert('접근 권한이 없습니다.');
           navigate('/');
 
         }
       } catch (e) {
         console.error("roleinfo 요청 실패:", e);
+        navigate("/");
       }
     };
     fetchRole();
-  }, []);
+  }, [navigate]);
 
 
 

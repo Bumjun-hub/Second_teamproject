@@ -112,39 +112,43 @@ const CommentSection = ({ postId, currentUser, entityType, recipeName, imageUrl 
 
 
     return (
-        <div className="comment-box">
+        <div className="cmt-box">
             <h3>댓글</h3>
             <form onSubmit={handleSubmit}>
                 <textarea
-                    className="comment-textarea"
+                    className="cmt-textarea"
                     value={commentInput}
                     onChange={(e) => setCommentInput(e.target.value)}
                     placeholder={currentUser ? "댓글을 입력하세요..." : "로그인 후 작성하세요"}
                     readOnly={!currentUser}
                 />
                 {currentUser && (
-                    <button type="submit" className="comment-submit-btn">댓글 등록</button>
+
+                    <div className="cmt-form-actions">
+                        <button type="submit" className="cmt-submit-btn">댓글 등록</button>
+                    </div>
+
                 )}
             </form>
 
-            <ul className="comment-list">
+            <ul className="cmt-list">
                 {currentComments.map((comment) => (
-                    <li key={comment.id} className="comment-item">
-                        <div className="comment-profile">
+                    <li key={comment.id} className="cmt-item">
+                        <div className="cmt-profile">
                             <img src={comment.profileImage || "/profileimages/default.png"} alt="프로필" />
                         </div>
 
-                        <div className="comment-content">
-                            <div className="comment-meta">
-                                <div className='comment-meta-left'>
+                        <div className="cmt-content">
+                            <div className="cmt-meta">
+                                <div className='cmt-meta-left'>
                                     <strong>{comment.username}</strong> • {new Date(comment.createdAt).toLocaleDateString()}
                                 </div>
 
-                                <div className="comment-icon-buttons">
+                                <div className="cmt-icon-buttons">
                                     {currentUser === comment.username ? (
                                         <>
-                                            <button onClick={() => startEdit(comment)} className="icon-btn">✏️</button>
-                                            <button onClick={() => handleDelete(comment.id)} className="icon-btn">❌</button>
+                                            <button onClick={() => startEdit(comment)} className="cmt-icon-btn">✏️</button>
+                                            <button onClick={() => handleDelete(comment.id)} className="cmt-icon-btn">❌</button>
                                         </>
 
                                     ) : (
@@ -159,11 +163,11 @@ const CommentSection = ({ postId, currentUser, entityType, recipeName, imageUrl 
                                     <textarea
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
-                                        className="comment-edit-textarea"
+                                        className="cmt-edit-textarea"
                                     />
-                                    <div className="comment-actions">
-                                        <button onClick={handleUpdate} className="comment-save-btn">저장</button>
-                                        <button onClick={cancelEdit} className="comment-cancel-btn">취소</button>
+                                    <div className="cmt-actions">
+                                        <button onClick={handleUpdate} className="cmt-save-btn">저장</button>
+                                        <button onClick={cancelEdit} className="cmt-cancel-btn">취소</button>
                                     </div>
                                 </>
                             ) : (
@@ -176,7 +180,7 @@ const CommentSection = ({ postId, currentUser, entityType, recipeName, imageUrl 
                     </li>
                 ))}
             </ul>
-            <div className="comment-pagination">
+            <div className="cmt-pagination">
                 {Array.from({ length: Math.ceil(commentList.length / COMMENT_PER_PAGE) }, (_, index) => (
                     <button
                         key={index}
