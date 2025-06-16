@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './MyPage.css';
 import MyPageEditProfile from './MyPageEditProfile';
 import CheckPw from './CheckPw'; 
@@ -8,7 +9,7 @@ import RecipeFavorite  from './RecipeFavorite';
 import RecipeInfoPage from '../recipepage/RecipeInfoPage'; 
 import MyPosts from './MyPosts';
 import { PiFinnTheHumanBold } from "react-icons/pi";
-import { authenticatedFetch, deleteAccount } from '../../utils/authUtils';
+import { authenticatedFetch } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
 
 const MyPage = () => {
@@ -22,13 +23,50 @@ const MyPage = () => {
         address: '',
         profileImage: ''
     });
+    const [updateKey, setUpdateKey] = useState(0); // ✅ 강제 리렌더링용
     const [currentView, setCurrentView] = useState('main'); 
     const [showPasswordCheck, setShowPasswordCheck] = useState(false); 
     const { user } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchUserInfo();
     }, []);
+
+    // ✅ 프로필 업데이트 이벤트 감지
+    useEffect(() => {
+        const handleProfileUpdate = () => {
+            console.log('MyPage: 프로필 업데이트 이벤트 감지 - 사용자 정보 새로고침');
+            fetchUserInfo(); // 사용자 정보 다시 불러오기
+            setUpdateKey(prev => prev + 1); // ✅ 강제 리렌더링
+        };
+        
+        const handleAuthChange = () => {
+            console.log('MyPage: 인증 변경 이벤트 감지 - 사용자 정보 새로고침');
+            fetchUserInfo(); // 사용자 정보 다시 불러오기
+            setUpdateKey(prev => prev + 1); // ✅ 강제 리렌더링
+        };
+        
+        // 프로필 업데이트 이벤트 리스너 등록
+        window.addEventListener('profileUpdate', handleProfileUpdate);
+        window.addEventListener('authChange', handleAuthChange);
+        
+        return () => {
+            window.removeEventListener('profileUpdate', handleProfileUpdate);
+            window.removeEventListener('authChange', handleAuthChange);
+        };
+    }, []);
+
+    // URL 변경 감지해서 메인 화면으로 리셋
+    useEffect(() => {
+        if (location.pathname === '/mypage' && !location.hash && !location.search) {
+            setCurrentView('main');
+            setSelectedRecipe(null);
+            setShowChangePw(false);
+            setShowPasswordCheck(false);
+        }
+    }, [location]);
 
     useEffect(() => {
         const handlePopState = (event) => {
@@ -45,43 +83,46 @@ const MyPage = () => {
 
     const handleChangePassword = () => {
         setShowChangePw(true);
+        navigate('/mypage?view=changePw');
     };
 
     const handleCloseChangePw = () => {
         setShowChangePw(false);
+        navigate('/mypage');
     };
 
     const handleRecipeClick = (recipe) => {
         setSelectedRecipe(recipe);
         setCurrentView('recipeDetail');
-        window.history.pushState(
-            { page: 'recipeDetail', recipe: recipe.RCP_SEQ }, 
-            '', 
-            `#recipe-${recipe.RCP_SEQ}`
-        );
+        navigate(`/mypage?view=recipeDetail&recipeId=${recipe.RCP_SEQ}`);
     };
 
     const handleBackFromRecipe = () => {
         setSelectedRecipe(null);
         setCurrentView('recipeFavorite');
-        window.history.pushState({page: 'recipeFavorite'}, '', window.location.pathname);
+        navigate('/mypage?view=recipeFavorite');
     };
 
     const getProfileImageUrl = (imageUrl) => {
         if (!imageUrl) return null;
-        return `http://localhost:8080${imageUrl}`;
+        // ✅ 이미지 캐시 방지를 위한 타임스탬프 추가
+        return `http://localhost:8080${imageUrl}?t=${Date.now()}`;
     };
 
     const fetchUserInfo = async () => {
         try {
+            console.log('MyPage: 사용자 정보 요청 중...'); // 디버깅
+            
             const response = await authenticatedFetch('http://localhost:8080/api/mypage', {
                 method: 'GET',
             });
             
             if (response.ok) {
                 const data = await response.json();
+                console.log('MyPage: 받아온 사용자 정보:', data); // 디버깅
+                
                 setUserInfo({
-                    username: data.username,
+                    username: data.username || data.name, // ✅ name도 고려
                     email: data.email,
                     phone: data.phone,
                     address: data.address,
@@ -89,6 +130,7 @@ const MyPage = () => {
                 });
             }
         } catch (error) {
+            console.error('MyPage: 사용자 정보 로드 실패:', error);
             alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
         }
     };
@@ -99,42 +141,59 @@ const MyPage = () => {
 
     const handlePasswordVerified = () => {
         setShowPasswordCheck(false);
-        window.history.pushState({page: 'editProfile'}, '', window.location.pathname);
         setCurrentView('editProfile');
+        navigate('/mypage?view=editProfile');
     };
 
     const handlePasswordCheckCancel = () => {
         setShowPasswordCheck(false);
+        navigate('/mypage'); // 메인으로 돌아가기
     };
 
     const handleGoToWishList = () => {
-        window.history.pushState({page: 'wishlist'}, '', window.location.pathname);
         setCurrentView('wishlist');
+        navigate('/mypage?view=wishlist');
     };
 
     const handleGoToRecipeFavorite = () => {
-        window.history.pushState({page: 'recipeFavorite'}, '', window.location.pathname);
         setCurrentView('recipeFavorite');
+        navigate('/mypage?view=recipeFavorite');
     };
 
     const handleGoToMyPost = () => {
-        window.history.pushState({page: 'myPosts'}, '', window.location.pathname);
         setCurrentView('myPosts');
+        navigate('/mypage?view=myPosts');
     };
 
+    // URL 파라미터에 따라 뷰 설정
+    useEffect(() => {
+        const urlParams = new URLSearchParams(location.search);
+        const view = urlParams.get('view');
+        const recipeId = urlParams.get('recipeId');
 
-    const handleDeleteAccount = async () => {
-        if (window.confirm('정말로 회원탈퇴를 하시겠습니까?\n\n탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
-            try {
-                const result = await deleteAccount();
-                if (result.success) {
-                    alert('회원탈퇴가 완료되었습니다.');
-                }
-            } catch (error) {
-                alert('회원탈퇴 중 오류가 발생했습니다.');
+        if (view) {
+            setCurrentView(view);
+            if (view === 'changePw') {
+                setShowChangePw(true);
+            } else if (view === 'recipeDetail' && recipeId) {
+                // 필요시 레시피 데이터를 다시 가져오는 로직 추가
+                // setSelectedRecipe(recipe);
             }
+        } else {
+            // URL에 view 파라미터가 없으면 메인 화면
+            setCurrentView('main');
+            setShowChangePw(false);
+            setShowPasswordCheck(false);
+            setSelectedRecipe(null);
         }
-    };
+    }, [location.search]);
+
+    // ✅ 프로필 편집에서 메인으로 돌아올 때 사용자 정보 새로고침
+    useEffect(() => {
+        if (currentView === 'main') {
+            fetchUserInfo();
+        }
+    }, [currentView]);
 
     if (currentView === 'recipeDetail' && selectedRecipe) {
         return (
@@ -170,6 +229,7 @@ const MyPage = () => {
                         <img 
                             src={getProfileImageUrl(userInfo.profileImage)}
                             alt="프로필"
+                            key={userInfo.profileImage} // ✅ 이미지 변경 시 리렌더링 강제
                         />
                     ) : (
                         <div>
@@ -177,8 +237,8 @@ const MyPage = () => {
                         </div>
                     )}
                 </div>
-                <h2 className="profile-name">
-                    {userInfo.username || user?.name || '홍길동'}
+                <h2 className="profile-name" key={`username-${updateKey}`}>
+                    {userInfo.username || '홍길동'}
                 </h2>
                 <p className="profile-email">
                     {userInfo.email || user?.email || 'example@email.com'}
@@ -215,15 +275,6 @@ const MyPage = () => {
                         text="내가 쓴 글" 
                         onClick={handleGoToMyPost}
                     />
-                </div>
-                
-                <div className="bottom-section">
-                    <button 
-                        onClick={handleDeleteAccount}
-                        className="delete-account-btn"
-                    >
-                        회원탈퇴
-                    </button>
                 </div>
             </div>
 

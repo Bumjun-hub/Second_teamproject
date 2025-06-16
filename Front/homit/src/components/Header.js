@@ -10,18 +10,22 @@ const Header = () => {
     const [notifications, setNotifications] = useState([]);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
-    const [unreadCount, setUnreadCount] = useState(0); // ✅ 종 옆에 표시할 안읽은 알림 수
+    const [unreadCount, setUnreadCount] = useState(0);
     const navigate = useNavigate();
 
     // ✅ 사용자 인증 상태 확인
     const checkAuth = async () => {
         try {
+            console.log('Header: 사용자 인증 상태 확인 중...'); // 디버깅
+            
             const response = await fetch('http://localhost:8080/api/mypage', {
                 credentials: 'include'
             });
 
             if (response.ok) {
                 const userData = await response.json();
+                console.log('Header: 받아온 사용자 데이터:', userData); // 디버깅
+                
                 setIsLoggedIn(true);
                 setUserInfo(userData);
             } else {
@@ -29,7 +33,7 @@ const Header = () => {
                 setUserInfo(null);
             }
         } catch (error) {
-            console.error('인증 확인 실패:', error);
+            console.error('Header: 인증 확인 실패:', error);
             setIsLoggedIn(false);
             setUserInfo(null);
         }
@@ -43,6 +47,11 @@ const Header = () => {
         }
     };
 
+    // ✅ 프로필 클릭 시 마이페이지로 이동
+    const handleProfileClick = () => {
+        navigate('/mypage');
+    };
+
     // ✅ 종 버튼 클릭 시 알림창 열기/닫기
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
@@ -50,8 +59,8 @@ const Header = () => {
 
     // ✅ 알림 수신 시 호출되는 콜백
     const handleNotificationMessage = (message) => {
-        setNotifications((prev) => [message, ...prev]); // 최신 알림을 위에 추가
-        setUnreadCount((prev) => prev + 1);             // ✅ 안읽은 알림 수 +1
+        setNotifications((prev) => [message, ...prev]);
+        setUnreadCount((prev) => prev + 1);
     };
 
     // ✅ 알림 클릭 시 해당 상세 페이지로 이동
@@ -63,7 +72,7 @@ const Header = () => {
         } else if (notification.recipeId) {
             navigate(`/recipe/${notification.recipeId}`);
         }
-        setShowNotifications(false); // ✅ 클릭 후 알림창 닫기
+        setShowNotifications(false);
     };
 
     // ✅ 마우스 오버 시 해당 알림 읽음 처리 (호버 기반)
@@ -83,34 +92,40 @@ const Header = () => {
         }
     };
 
-
     // 렌더링할때 모든 유저의 안읽은 알림 반환
     useEffect(() => {
-  const fetchNotifications = async () => {
-    try {
-      const res = await fetch('/api/notifications/get', { credentials: 'include' });
-      const data = await res.json();
-      const unread = data.filter((n) => !n.isRead); // 읽지않은 알림만
-      setNotifications(unread); // ✅ 서버에서 받아온 알림으로 상태 초기화
-    } catch (err) {
-      console.error('알림 불러오기 실패', err);
-    }
-  };
+        const fetchNotifications = async () => {
+            try {
+                const res = await fetch('/api/notifications/get', { credentials: 'include' });
+                const data = await res.json();
+                const unread = data.filter((n) => !n.isRead);
+                setNotifications(unread);
+            } catch (err) {
+                console.error('알림 불러오기 실패', err);
+            }
+        };
 
-  if (isLoggedIn) {
-    fetchNotifications(); // ✅ 로그인된 경우에만 불러오기
-  }
-}, [isLoggedIn]);
+        if (isLoggedIn) {
+            fetchNotifications();
+        }
+    }, [isLoggedIn]);
 
     // ✅ 알림 수 표시 초기값 불러오기
     useEffect(() => {
         const fetchUnreadCount = async () => {
-            const res = await fetch('/api/notifications/count/unread', { credentials: 'include' });
-            const count = await res.json();
-            setUnreadCount(count);
+            try {
+                const res = await fetch('/api/notifications/count/unread', { credentials: 'include' });
+                const count = await res.json();
+                setUnreadCount(count);
+            } catch (err) {
+                console.error('알림 수 불러오기 실패', err);
+            }
         };
-        fetchUnreadCount();
-    }, []);
+        
+        if (isLoggedIn) {
+            fetchUnreadCount();
+        }
+    }, [isLoggedIn]);
 
     // ✅ 최초 로그인 상태 확인
     useEffect(() => {
@@ -127,14 +142,33 @@ const Header = () => {
         return () => disconnectNotification();
     }, [isLoggedIn]);
 
-    // ✅ 인증 변경 이벤트 감지
+    // ✅ 인증 변경 이벤트 감지 (프로필 수정 시에도 업데이트)
     useEffect(() => {
         const handleAuthChange = () => {
-            checkAuth();
+            console.log('Header: authChange 이벤트 감지 - 사용자 정보 새로고침');
+            checkAuth(); // 사용자 정보 다시 불러오기
         };
+        
+        const handleProfileUpdate = () => {
+            console.log('Header: profileUpdate 이벤트 감지 - 사용자 정보 새로고침');
+            checkAuth(); // 프로필 업데이트 시에도 헤더 정보 갱신
+        };
+        
+        // 두 이벤트 모두 감지
         window.addEventListener('authChange', handleAuthChange);
-        return () => window.removeEventListener('authChange', handleAuthChange);
+        window.addEventListener('profileUpdate', handleProfileUpdate);
+        
+        return () => {
+            window.removeEventListener('authChange', handleAuthChange);
+            window.removeEventListener('profileUpdate', handleProfileUpdate);
+        };
     }, []);
+
+    // ✅ 프로필 이미지 URL 생성 (캐시 방지)
+    const getProfileImageUrl = (imageUrl) => {
+        if (!imageUrl) return null;
+        return `http://localhost:8080${imageUrl}?t=${Date.now()}`;
+    };
 
     return (
         <header className="Header">
@@ -204,9 +238,14 @@ const Header = () => {
 
                 {isLoggedIn ? (
                     <>
-                        <div className="header-user-profile">
+                        <button className="header-user-profile" onClick={handleProfileClick}>
                             {userInfo?.imageUrl ? (
-                                <img src={userInfo.imageUrl} alt="프로필" className="header-profile-image" />
+                                <img 
+                                    src={getProfileImageUrl(userInfo.imageUrl)}
+                                    alt="프로필" 
+                                    className="header-profile-image"
+                                    key={userInfo.imageUrl} 
+                                />
                             ) : (
                                 <div className="header-profile-placeholder">
                                     {(userInfo?.username || userInfo?.name)?.charAt(0).toUpperCase() || 'U'}
@@ -215,8 +254,7 @@ const Header = () => {
                             {(userInfo?.username || userInfo?.name) && (
                                 <span className="header-username">{userInfo.username || userInfo.name}님</span>
                             )}
-                        </div>
-                        <Link to="/mypage">마이페이지</Link>
+                        </button>
                         <button className="header-logout-btn" onClick={handleLogout}>
                             로그아웃
                         </button>

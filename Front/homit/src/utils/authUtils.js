@@ -92,10 +92,37 @@ export const refreshToken = async () => {
 };
 
 /**
- * 사용자 인증 상태 확인 함수
- * 보호된 엔드포인트를 호출해서 인증 상태를 확인
+ * 쿠키에서 특정 값 읽기 (간단한 인증 상태 체크용)
  */
-export const checkAuthStatus = async () => {
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+};
+
+/**
+ * 기본적인 로그인 상태 확인 (쿠키 기반)
+ * 서버 요청 없이 빠르게 확인
+ */
+export const isLoggedIn = () => {
+    // 쿠키에 토큰이 있는지 확인 (쿠키명은 실제 사용하는 것으로 변경)
+    const accessToken = getCookie('accessToken') || getCookie('token');
+    const refreshToken = getCookie('refreshToken');
+    
+    return !!(accessToken || refreshToken);
+};
+
+/**
+ * 사용자 인증 상태 확인 함수 (개선된 버전)
+ * 먼저 쿠키를 확인하고, 로그인 상태일 때만 서버에 요청
+ */
+export const checkAuthStatus = async (forceCheck = false) => {
+    // forceCheck가 false이고 쿠키에 토큰이 없으면 서버 요청 안함
+    if (!forceCheck && !isLoggedIn()) {
+        return { isAuthenticated: false, user: null };
+    }
+
     try {
         const response = await fetch('http://localhost:8080/api/mypage', {
             method: 'GET',
@@ -124,6 +151,52 @@ export const checkAuthStatus = async () => {
         return { isAuthenticated: false, user: null };
     } catch (error) {
         console.error('인증 상태 확인 오류:', error);
+        return { isAuthenticated: false, user: null };
+    }
+};
+
+/**
+ * 조용한 인증 상태 확인 (콘솔 로그 최소화)
+ * 페이지 로드 시 사용하기 좋음
+ */
+export const checkAuthStatusSilently = async () => {
+    // 쿠키 확인 먼저
+    if (!isLoggedIn()) {
+        return { isAuthenticated: false, user: null };
+    }
+
+    try {
+        const response = await fetch('http://localhost:8080/api/mypage', {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            return { isAuthenticated: true, user: userData };
+        } else if (response.status === 401) {
+            // 조용히 토큰 갱신 시도
+            const refreshResponse = await fetch('http://localhost:8080/api/refresh', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            
+            if (refreshResponse.ok) {
+                // 재시도
+                const retryResponse = await fetch('http://localhost:8080/api/mypage', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+                if (retryResponse.ok) {
+                    const userData = await retryResponse.json();
+                    return { isAuthenticated: true, user: userData };
+                }
+            }
+            return { isAuthenticated: false, user: null };
+        }
+        return { isAuthenticated: false, user: null };
+    } catch (error) {
+        // 네트워크 오류는 조용히 처리
         return { isAuthenticated: false, user: null };
     }
 };

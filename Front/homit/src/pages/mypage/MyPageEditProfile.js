@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AddressInput from '../memberpage/AddressInput'; 
 import './MyPageEditProfile.css';
+import { deleteAccount } from '../../utils/authUtils';
 
 const MyPageEditProfile = () => {
   const [profile, setProfile] = useState({
@@ -9,6 +10,7 @@ const MyPageEditProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({});
   const [availableImages, setAvailableImages] = useState([]);
+  const [phoneError, setPhoneError] = useState('');
 
   useEffect(() => {
     fetchProfile();
@@ -49,7 +51,7 @@ const MyPageEditProfile = () => {
         });
       }
     } catch (err) {
-      // 에러 처리 제거
+      console.error('프로필 로드 실패:', err);
     }
   };
 
@@ -66,35 +68,73 @@ const MyPageEditProfile = () => {
         setAvailableImages(images);
       }
     } catch (err) {
-      // 에러 처리 제거
+      console.error('이미지 로드 실패:', err);
     }
   };
 
   const startEdit = () => {
     setEditData({ ...profile });
     setEditMode(true);
+    setPhoneError('');
   };
 
   const cancelEdit = () => {
     setEditMode(false);
     setEditData({});
+    setPhoneError('');
   };
 
   const handleInputChange = (field, value) => {
     if (field === 'phone') {
       value = formatPhoneNumber(value);
+      
+      // 전화번호 유효성 검사
+      if (value && value.length > 0 && value.length !== 13) {
+        setPhoneError(`전화번호는 13자리로 입력해주세요. (현재: ${value.length}자리)`);
+      } else {
+        setPhoneError('');
+      }
     }
     setEditData(prev => ({ ...prev, [field]: value }));
   };
 
   const formatPhoneNumber = (value) => {
+    // 숫자만 추출
     const numbers = value.replace(/[^\d]/g, '');
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    
+    // 11자리 이상 입력 방지
+    if (numbers.length > 11) {
+      return editData.phone || '';
+    }
+    
+    // 전화번호 포맷팅 (13자리: 010-1234-5678)
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
+
+  const validateForm = () => {
+    // 전화번호가 입력되었다면 13자리 검증
+    if (editData.phone && editData.phone.length !== 13) {
+      setPhoneError('전화번호는 13자리로 입력해주세요. (예: 010-1234-5678)');
+      return false;
+    }
+    setPhoneError('');
+    return true;
   };
 
   const updateProfile = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    console.log('업데이트 전 원본 프로필:', profile);
+    console.log('업데이트할 데이터:', editData);
+
     try {
       // 프로필 정보 업데이트
       const profileResponse = await fetch('/api/mypage/editProfile', {
@@ -109,13 +149,21 @@ const MyPageEditProfile = () => {
         })
       });
 
-      if (!profileResponse.ok) return;
+      if (!profileResponse.ok) {
+        const errorText = await profileResponse.text();
+        console.error('프로필 업데이트 실패:', errorText);
+        alert('프로필 업데이트에 실패했습니다.');
+        return;
+      }
 
       // 프로필 이미지 업데이트
       let finalImageUrl = profile.imageUrl;
+      let imageUpdated = false;
       
       if (editData.imageUrl && editData.imageUrl !== profile.imageUrl) {
         const imageName = editData.imageUrl.substring(editData.imageUrl.lastIndexOf('/') + 1);
+        console.log('이미지 업데이트 시도:', imageName);
+        
         const imageResponse = await fetch('/api/profile/upload', {
           method: 'POST',
           credentials: 'include',
@@ -125,11 +173,20 @@ const MyPageEditProfile = () => {
 
         if (imageResponse.ok) {
           finalImageUrl = editData.imageUrl;
+          imageUpdated = true;
+          console.log('이미지 업데이트 성공');
+          
+          // ✅ 이미지만 변경된 경우에도 이벤트 발생
+          window.dispatchEvent(new Event('profileUpdate'));
+        } else {
+          console.error('이미지 업데이트 실패');
         }
       }
 
       // 성공 처리
       const data = await profileResponse.json();
+      console.log('서버 응답 데이터:', data);
+      
       const { address, detailAddress } = parseAddress(data.address);
       
       setProfile({
@@ -140,13 +197,35 @@ const MyPageEditProfile = () => {
         detailAddress,
         imageUrl: finalImageUrl
       });
+      
       setEditMode(false);
       setEditData({});
+      setPhoneError('');
+
+      alert('프로필이 성공적으로 업데이트되었습니다.');
+
+      // ✅ 프로필 업데이트 후 헤더와 마이페이지의 사용자 정보도 업데이트
+      window.dispatchEvent(new Event('authChange'));
+      window.dispatchEvent(new Event('profileUpdate'));
 
     } catch (err) {
-      // 에러 처리 제거
+      console.error('프로필 업데이트 중 오류:', err);
+      alert('프로필 업데이트 중 오류가 발생했습니다.');
     }
   };
+
+  const handleDeleteAccount = async () => {
+          if (window.confirm('정말로 회원탈퇴를 하시겠습니까?\n\n탈퇴 후에는 모든 데이터가 삭제되며 복구할 수 없습니다.')) {
+              try {
+                  const result = await deleteAccount();
+                  if (result.success) {
+                      alert('회원탈퇴가 완료되었습니다.');
+                  }
+              } catch (error) {
+                  alert('회원탈퇴 중 오류가 발생했습니다.');
+              }
+          }
+      };
 
   return (
     <div className="mypage-container">
@@ -224,13 +303,20 @@ const MyPageEditProfile = () => {
           <div className="field-group">
             <label>전화번호</label>
             {editMode ? (
-              <input
-                type="tel"
-                value={editData.phone || ''}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="전화번호를 입력하세요"
-                maxLength="13"
-              />
+              <div>
+                <input
+                  type="tel"
+                  value={editData.phone || ''}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="010-1234-5678 ( - 제외하고 입력 )"
+                  maxLength="13"
+                />
+                {phoneError && (
+                  <small className="phone-error" style={{color: '#f44336', fontSize: '12px', marginTop: '4px', display: 'block'}}>
+                    {phoneError}
+                  </small>
+                )}
+              </div>
             ) : (
               <span>{profile.phone || '설정되지 않음'}</span>
             )}
@@ -252,12 +338,27 @@ const MyPageEditProfile = () => {
               <span>{`${profile.address} ${profile.detailAddress}`.trim() || '설정되지 않음'}</span>
             )}
           </div>
+
+          <div className="bottom-section">
+                    <button 
+                        onClick={handleDeleteAccount}
+                        className="delete-account-btn"
+                    >
+                        회원탈퇴
+                    </button>
+                </div>
         </div>
 
         {editMode && (
           <div className="action-buttons">
             <button onClick={cancelEdit} className="cancel-button1">취소</button>
-            <button onClick={updateProfile} className="save-button">저장</button>
+            <button 
+              onClick={updateProfile} 
+              className="save-button"
+              disabled={!!phoneError}
+            >
+              저장
+            </button>
           </div>
         )}
       </div>

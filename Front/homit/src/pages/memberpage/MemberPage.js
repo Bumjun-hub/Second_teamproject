@@ -19,32 +19,37 @@ const MemberPage = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    if (name === 'phone') {
-        // 숫자만 추출
-        const numbersOnly = value.replace(/[^\d]/g, '');
+        const { name, value } = e.target;
         
-        // 전화번호 포맷팅
-        let formattedPhone = '';
-        if (numbersOnly.length <= 3) {
-            formattedPhone = numbersOnly;
-        } else if (numbersOnly.length <= 7) {
-            formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3)}`;
+        if (name === 'phone') {
+            // 숫자만 추출
+            const numbersOnly = value.replace(/[^\d]/g, '');
+            
+            // 11자리 이상 입력 방지 (010-1234-5678 형태)
+            if (numbersOnly.length > 11) {
+                return;
+            }
+            
+            // 전화번호 포맷팅 (13자리: 010-1234-5678)
+            let formattedPhone = '';
+            if (numbersOnly.length <= 3) {
+                formattedPhone = numbersOnly;
+            } else if (numbersOnly.length <= 7) {
+                formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3)}`;
+            } else {
+                formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3, 7)}-${numbersOnly.slice(7, 11)}`;
+            }
+            
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedPhone
+            }));
         } else {
-            formattedPhone = `${numbersOnly.slice(0, 3)}-${numbersOnly.slice(3, 7)}-${numbersOnly.slice(7, 11)}`;
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
         }
-        
-        setFormData(prev => ({
-            ...prev,
-            [name]: formattedPhone
-        }));
-    } else {
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    }
     };
 
     const handleAgreementChange = (e) => {
@@ -53,6 +58,7 @@ const MemberPage = () => {
             setError('');
         }
     };
+    
     // 주소 변경 핸들러
     const handleAddressChange = (address) => {
         setFormData(prev => ({
@@ -63,6 +69,7 @@ const MemberPage = () => {
             setError('');
         }
     };
+    
     // 상세주소 변경 핸들러
     const handleDetailAddressChange = (detailAddress) => {
         setFormData(prev => ({
@@ -93,6 +100,11 @@ const MemberPage = () => {
         }
         if (formData.password !== formData.confirmPassword) {
             setError('입력하신 비밀번호가 서로 일치하지 않습니다.');
+            return false;
+        }
+        // 전화번호 입력 시 13자리 검증
+        if (formData.phone && formData.phone.length !== 13) {
+            setError('전화번호는 13자리로 입력해주세요. (예: 010-1234-5678)');
             return false;
         }
         if (!agreed) {
@@ -234,9 +246,15 @@ const MemberPage = () => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            placeholder="010-0000-0000"
+                            placeholder="010-1234-5678 (- 제외하고 입력)"
                             className="input-field"
+                            maxLength="13"
                         />
+                        {formData.phone && formData.phone.length > 0 && formData.phone.length !== 13 && (
+                            <small className="input-hint" style={{color: '#f44336', fontSize: '12px', marginTop: '4px'}}>
+                                전화번호 형식이 맞지 않습니다. (현재: {formData.phone.length}자리)
+                            </small>
+                        )}
                     </div>
 
                     <div className="agreement-section">
