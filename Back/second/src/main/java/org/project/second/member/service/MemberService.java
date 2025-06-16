@@ -137,18 +137,12 @@ public class MemberService {
                 throw new IllegalArgumentException("이미 존재하는 유저네임 입니다.");
             }
 
-            Member updatedMember = Member.builder()
-                    .id(m.getId())
-                    .email(editProfileRequest.getEmail())
-                    .password(m.getPassword())
-                    .username(editProfileRequest.getName())
-                    .address(editProfileRequest.getAddress())
-                    .phone(editProfileRequest.getPhone())
-                    .imageUrl(m.getImageUrl())
-                    .role(m.getRole())
-                    .build();
+            m.setUsername(editProfileRequest.getName());
+            m.setEmail(editProfileRequest.getEmail());
+            m.setAddress(editProfileRequest.getAddress());
+            m.setPhone(editProfileRequest.getPhone());
 
-            return memberRepository.save(updatedMember);
+            return memberRepository.save(m);
         }
         throw new IllegalArgumentException("등록되어 있지 않은 이메일입니다.");
     }
@@ -200,43 +194,6 @@ public class MemberService {
            return true;
        }
         return false;
-    }
-
-    @Transactional
-    public Member saveOrUpdate(OAuthAttributesDto attributes) {
-        Optional<Member> opUser = memberRepository.findByEmailAndSocialProvider(attributes.getEmail(), attributes.getSocialProvider());
-        if (opUser.isPresent()) {
-            Member existingMember = opUser.get();
-            existingMember.setUsername(attributes.getName());
-
-            gradeService.addScore(existingMember, ActivityType.DAILY_LOGIN);  //등급
-            return memberRepository.save(existingMember);
-        } else {
-            if (memberRepository.existsByEmailAndSocialProvider(attributes.getEmail(), attributes.getSocialProvider())) {
-                throw new IllegalArgumentException("이미 존재하는 이메일 입니다.");
-            }
-
-            // String security : 유저네임 중복 체크
-            if (memberRepository.existsBySocialIdAndSocialProvider(attributes.getNameAttributeKey(), attributes.getSocialProvider())) {
-                throw new IllegalArgumentException("이미 존재하는 소셜 고유 ID 입니다.");
-            }
-
-            Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                    .orElseThrow(() -> new IllegalArgumentException("기본 USER 역할이 DB에 없습니다."));
-            String enPass = passwordEncoder.encode(UUID.randomUUID().toString());
-
-            Member newMember = Member.builder()
-                    .username(attributes.getName())
-                    .email(attributes.getEmail())
-                    .password(enPass)
-                    .socialProvider(attributes.getSocialProvider())
-                    .socialId(attributes.getNameAttributeKey())
-                    .role(userRole)
-                    .build();
-            Member savedMember = memberRepository.save(newMember);
-            gradeService.addScore(savedMember, ActivityType.DAILY_LOGIN);
-            return savedMember;
-        }
     }
 
     public LoginTypeResponse getTypeInfo(Member m) {

@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtProvider {
     private final MemberRepository memberRepository;
@@ -49,6 +51,7 @@ public class JwtProvider {
             username = ((UserDetails) principal).getUsername(); // 기본 로그인: email
         } else if (principal instanceof OAuth2User) {
             username = ((OAuth2User) principal).getAttribute("email"); // 소셜 로그인: email
+            log.info("generateAccessToken - email: {}", username);
         } else {
             throw new IllegalArgumentException("Unknown principal type: " + principal.getClass().getName());
         }
