@@ -63,17 +63,20 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)) // 커스텀 OAuth2 사용자 서비스
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService)
+                        ) // 커스텀 OAuth2 사용자 서비스
                         .successHandler((request, response, authentication) -> {
                             if (authentication == null || !authentication.isAuthenticated()) {
                                 log.error("인증 실패: Null 이거나 인증되지 않음");
                                 response.sendError(HttpStatus.UNAUTHORIZED.value(), "인증 객체가 없거나 인증되지 않았습니다.");
                                 return;
                             }
+                            log.info("Principal: {}", authentication.getPrincipal());
 
                             // 로그인 성공 시 JWT 토큰 생성 및 쿠키 세팅
                             DefaultOAuth2User oAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
                             String email = oAuth2User.getAttribute("email");
+
 
                             // JWT 생성
                             String accessToken = jwtAuthenticationFilter.getJwtProvider().generateAccessToken(authentication);
