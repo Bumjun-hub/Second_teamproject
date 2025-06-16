@@ -64,29 +64,25 @@ export const authenticatedFetch = async (url, options = {}) => {
  */
 export const refreshToken = async () => {
     try {
+        console.log('🔄 refreshToken 함수 시작');
+        
         const response = await fetch('http://localhost:8080/api/refresh', {
             method: 'POST',
             credentials: 'include',
         });
 
+        console.log('🔄 refreshToken 응답:', response.status);
+
         if (response.ok) {
-            console.log('토큰 갱신 성공');
+            console.log('✅ refreshToken 성공');
             return true;
-        } else if (response.status === 401 || response.status === 403) {
-            // 리프레시 토큰도 만료된 경우
-            console.log('리프레시 토큰 만료 - 재로그인 필요');
-            return false;
         } else {
-            console.log('토큰 갱신 실패:', response.status);
+            const errorText = await response.text();
+            console.log('❌ refreshToken 실패:', response.status, errorText);
             return false;
         }
     } catch (error) {
-        // 네트워크 오류나 서버 연결 실패
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            console.log('서버 연결 실패 - 토큰 갱신 건너뜀');
-            return true; // 네트워크 오류는 로그아웃시키지 않음
-        }
-        console.error('토큰 갱신 오류:', error);
+        console.error('💥 refreshToken 오류:', error);
         return false;
     }
 };
@@ -97,33 +93,50 @@ export const refreshToken = async () => {
  */
 export const checkAuthStatus = async () => {
     try {
+        console.log('🔍 checkAuthStatus 시작');
+        
+        // ✅ 일반 fetch 사용 (authenticatedFetch 사용 안함)
         const response = await fetch('http://localhost:8080/api/mypage', {
             method: 'GET',
             credentials: 'include',
         });
 
+        console.log('🔍 checkAuthStatus 응답:', response.status);
+
         if (response.ok) {
             const userData = await response.json();
+            console.log('✅ checkAuthStatus 성공');
             return { isAuthenticated: true, user: userData };
         } else if (response.status === 401) {
+            console.log('🔄 checkAuthStatus - 401 에러, 토큰 갱신 시도');
+            
             // 토큰 갱신 시도
             const refreshResult = await refreshToken();
+            console.log('🔄 checkAuthStatus - 토큰 갱신 결과:', refreshResult);
+            
             if (refreshResult) {
-                // 재시도
+                // 재시도 (여전히 일반 fetch 사용)
                 const retryResponse = await fetch('http://localhost:8080/api/mypage', {
                     method: 'GET',
                     credentials: 'include',
                 });
+                
+                console.log('🔄 checkAuthStatus - 재시도 응답:', retryResponse.status);
+                
                 if (retryResponse.ok) {
                     const userData = await retryResponse.json();
+                    console.log('✅ checkAuthStatus 재시도 성공');
                     return { isAuthenticated: true, user: userData };
                 }
             }
+            console.log('❌ checkAuthStatus - 토큰 갱신 실패');
             return { isAuthenticated: false, user: null };
         }
+        
+        console.log('❌ checkAuthStatus - 기타 오류');
         return { isAuthenticated: false, user: null };
     } catch (error) {
-        console.error('인증 상태 확인 오류:', error);
+        console.error('💥 checkAuthStatus 오류:', error);
         return { isAuthenticated: false, user: null };
     }
 };

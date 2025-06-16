@@ -41,7 +41,6 @@
 
 .edit-button1:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
 }
 
 .alert {
@@ -142,7 +141,6 @@
 }
 
 .cancel-button1:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(116, 185, 255, 0.4);
 }
 
@@ -152,7 +150,6 @@
 }
 
 .save-button:hover {
-  transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 210, 211, 0.4);
 }
 
