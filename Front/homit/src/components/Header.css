@@ -365,8 +365,8 @@
 }
 
 .header-profile-image {
-    width: 24px !important;
-    height: 24px !important;
+    width: 34px !important;
+    height: 34px !important;
     border-radius: 50% !important;
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
     object-fit: cover !important;

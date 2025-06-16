@@ -64,139 +64,79 @@ export const authenticatedFetch = async (url, options = {}) => {
  */
 export const refreshToken = async () => {
     try {
+        console.log('🔄 refreshToken 함수 시작');
+        
         const response = await fetch('http://localhost:8080/api/refresh', {
             method: 'POST',
             credentials: 'include',
         });
 
+        console.log('🔄 refreshToken 응답:', response.status);
+
         if (response.ok) {
-            console.log('토큰 갱신 성공');
+            console.log('✅ refreshToken 성공');
             return true;
-        } else if (response.status === 401 || response.status === 403) {
-            // 리프레시 토큰도 만료된 경우
-            console.log('리프레시 토큰 만료 - 재로그인 필요');
-            return false;
         } else {
-            console.log('토큰 갱신 실패:', response.status);
+            const errorText = await response.text();
+            console.log('❌ refreshToken 실패:', response.status, errorText);
             return false;
         }
     } catch (error) {
-        // 네트워크 오류나 서버 연결 실패
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            console.log('서버 연결 실패 - 토큰 갱신 건너뜀');
-            return true; // 네트워크 오류는 로그아웃시키지 않음
-        }
-        console.error('토큰 갱신 오류:', error);
+        console.error('💥 refreshToken 오류:', error);
         return false;
     }
 };
 
 /**
- * 쿠키에서 특정 값 읽기 (간단한 인증 상태 체크용)
+ * 사용자 인증 상태 확인 함수
+ * 보호된 엔드포인트를 호출해서 인증 상태를 확인
  */
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-};
-
-/**
- * 기본적인 로그인 상태 확인 (쿠키 기반)
- * 서버 요청 없이 빠르게 확인
- */
-export const isLoggedIn = () => {
-    // 쿠키에 토큰이 있는지 확인 (쿠키명은 실제 사용하는 것으로 변경)
-    const accessToken = getCookie('accessToken') || getCookie('token');
-    const refreshToken = getCookie('refreshToken');
-    
-    return !!(accessToken || refreshToken);
-};
-
-/**
- * 사용자 인증 상태 확인 함수 (개선된 버전)
- * 먼저 쿠키를 확인하고, 로그인 상태일 때만 서버에 요청
- */
-export const checkAuthStatus = async (forceCheck = false) => {
-    // forceCheck가 false이고 쿠키에 토큰이 없으면 서버 요청 안함
-    if (!forceCheck && !isLoggedIn()) {
-        return { isAuthenticated: false, user: null };
-    }
-
+export const checkAuthStatus = async () => {
     try {
+        console.log('🔍 checkAuthStatus 시작');
+        
+        // ✅ 일반 fetch 사용 (authenticatedFetch 사용 안함)
         const response = await fetch('http://localhost:8080/api/mypage', {
             method: 'GET',
             credentials: 'include',
         });
 
+        console.log('🔍 checkAuthStatus 응답:', response.status);
+
         if (response.ok) {
             const userData = await response.json();
+            console.log('✅ checkAuthStatus 성공');
             return { isAuthenticated: true, user: userData };
         } else if (response.status === 401) {
+            console.log('🔄 checkAuthStatus - 401 에러, 토큰 갱신 시도');
+            
             // 토큰 갱신 시도
             const refreshResult = await refreshToken();
-            if (refreshResult) {
-                // 재시도
-                const retryResponse = await fetch('http://localhost:8080/api/mypage', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                if (retryResponse.ok) {
-                    const userData = await retryResponse.json();
-                    return { isAuthenticated: true, user: userData };
-                }
-            }
-            return { isAuthenticated: false, user: null };
-        }
-        return { isAuthenticated: false, user: null };
-    } catch (error) {
-        console.error('인증 상태 확인 오류:', error);
-        return { isAuthenticated: false, user: null };
-    }
-};
-
-/**
- * 조용한 인증 상태 확인 (콘솔 로그 최소화)
- * 페이지 로드 시 사용하기 좋음
- */
-export const checkAuthStatusSilently = async () => {
-    // 쿠키 확인 먼저
-    if (!isLoggedIn()) {
-        return { isAuthenticated: false, user: null };
-    }
-
-    try {
-        const response = await fetch('http://localhost:8080/api/mypage', {
-            method: 'GET',
-            credentials: 'include',
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            return { isAuthenticated: true, user: userData };
-        } else if (response.status === 401) {
-            // 조용히 토큰 갱신 시도
-            const refreshResponse = await fetch('http://localhost:8080/api/refresh', {
-                method: 'POST',
-                credentials: 'include',
-            });
+            console.log('🔄 checkAuthStatus - 토큰 갱신 결과:', refreshResult);
             
-            if (refreshResponse.ok) {
-                // 재시도
+            if (refreshResult) {
+                // 재시도 (여전히 일반 fetch 사용)
                 const retryResponse = await fetch('http://localhost:8080/api/mypage', {
                     method: 'GET',
                     credentials: 'include',
                 });
+                
+                console.log('🔄 checkAuthStatus - 재시도 응답:', retryResponse.status);
+                
                 if (retryResponse.ok) {
                     const userData = await retryResponse.json();
+                    console.log('✅ checkAuthStatus 재시도 성공');
                     return { isAuthenticated: true, user: userData };
                 }
             }
+            console.log('❌ checkAuthStatus - 토큰 갱신 실패');
             return { isAuthenticated: false, user: null };
         }
+        
+        console.log('❌ checkAuthStatus - 기타 오류');
         return { isAuthenticated: false, user: null };
     } catch (error) {
-        // 네트워크 오류는 조용히 처리
+        console.error('💥 checkAuthStatus 오류:', error);
         return { isAuthenticated: false, user: null };
     }
 };

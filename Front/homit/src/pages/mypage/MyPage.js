@@ -8,6 +8,7 @@ import WishList  from './WishList';
 import RecipeFavorite  from './RecipeFavorite';
 import RecipeInfoPage from '../recipepage/RecipeInfoPage'; 
 import MyPosts from './MyPosts';
+import AccountBook from './accountbook/AccountBook';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -38,14 +39,14 @@ const MyPage = () => {
     useEffect(() => {
         const handleProfileUpdate = () => {
             console.log('MyPage: 프로필 업데이트 이벤트 감지 - 사용자 정보 새로고침');
-            fetchUserInfo(); // 사용자 정보 다시 불러오기
-            setUpdateKey(prev => prev + 1); // ✅ 강제 리렌더링
+            fetchUserInfo(); 
+            setUpdateKey(prev => prev + 1); 
         };
         
         const handleAuthChange = () => {
             console.log('MyPage: 인증 변경 이벤트 감지 - 사용자 정보 새로고침');
-            fetchUserInfo(); // 사용자 정보 다시 불러오기
-            setUpdateKey(prev => prev + 1); // ✅ 강제 리렌더링
+            fetchUserInfo(); 
+            setUpdateKey(prev => prev + 1); 
         };
         
         // 프로필 업데이트 이벤트 리스너 등록
@@ -111,15 +112,12 @@ const MyPage = () => {
 
     const fetchUserInfo = async () => {
         try {
-            console.log('MyPage: 사용자 정보 요청 중...'); // 디버깅
-            
             const response = await authenticatedFetch('http://localhost:8080/api/mypage', {
                 method: 'GET',
             });
             
             if (response.ok) {
                 const data = await response.json();
-                console.log('MyPage: 받아온 사용자 정보:', data); // 디버깅
                 
                 setUserInfo({
                     username: data.username || data.name, // ✅ name도 고려
@@ -163,6 +161,11 @@ const MyPage = () => {
     const handleGoToMyPost = () => {
         setCurrentView('myPosts');
         navigate('/mypage?view=myPosts');
+    };
+
+    const handleGoToaccountbook = () => {
+        setCurrentView('accountbook');
+        navigate('/mypage?view=accountbook');
     };
 
     // URL 파라미터에 따라 뷰 설정
@@ -221,6 +224,10 @@ const MyPage = () => {
         return <MyPosts />;
     }
 
+    if (currentView === 'accountbook') {
+        return <AccountBook />;
+    }
+
     return (
         <div className="mypage-container">
             <div className="profile-section">
@@ -274,6 +281,11 @@ const MyPage = () => {
                         icon="📝" 
                         text="내가 쓴 글" 
                         onClick={handleGoToMyPost}
+                    />
+                    <MenuItem 
+                        icon="📒" 
+                        text="가계부" 
+                        onClick={handleGoToaccountbook}
                     />
                 </div>
             </div>

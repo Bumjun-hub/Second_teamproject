@@ -132,9 +132,6 @@ const MyPageEditProfile = () => {
       return;
     }
 
-    console.log('업데이트 전 원본 프로필:', profile);
-    console.log('업데이트할 데이터:', editData);
-
     try {
       // 프로필 정보 업데이트
       const profileResponse = await fetch('/api/mypage/editProfile', {
