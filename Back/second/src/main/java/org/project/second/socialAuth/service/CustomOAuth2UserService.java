@@ -42,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                                         .getUserInfoEndpoint() // 사용자 정보 요청 엔드포인트
                                         .getUserNameAttributeName(); // 유저 고유 ID
         OAuthAttributesDto attributes = OAuthAttributesDto.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+        log.info("OAuth2 attributes: {}", attributes.getAttributes());
         log.info("Processing Google login for email: {}", attributes.getEmail());
 
         Member member = saveOrUpdate(attributes);
@@ -80,10 +81,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .email(attributes.getEmail())
                     .password(enPass)
                     .socialProvider(attributes.getSocialProvider())
-                    .socialId(attributes.getNameAttributeKey())
+                    .socialId(attributes.getAttributes().get("sub").toString())
                     .role(userRole)
                     .build();
-            return memberRepository.save(newMember);
+
+            Member saved = memberRepository.save(newMember);
+            log.info("saved member id: {}", saved.getId());
+            return saved;
         }
     }
 

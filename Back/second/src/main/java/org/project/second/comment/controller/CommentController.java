@@ -63,7 +63,7 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/list/{entityType}/{postId}")
+        @GetMapping("/list/{entityType}/{postId}")
     public ResponseEntity<?> listComments(@PathVariable CommentEntityType entityType, @PathVariable String postId) {
         try {
             List<CommentListResponse> commentList = commentService.getListComment(entityType, postId);
