@@ -328,7 +328,7 @@
   overflow: hidden;
 }
 
-.modal-header {
+.modal-header-account {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -336,7 +336,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.modal-header h3 {
+.modal-header-account h3 {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;

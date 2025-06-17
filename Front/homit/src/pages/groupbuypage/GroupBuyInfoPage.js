@@ -12,6 +12,10 @@ const GroupBuyInfoPage = () => {
     const [hasOrder, setHasOrder] = useState(false);
     const [role, setRole] = useState(null);
 
+    const salepercent = item && item.salePrice && item.originalPrice
+        ? Math.round((1 - item.salePrice / item.originalPrice) * 100)
+        : 0;
+
 
 
     // 서버에서 내려주는 status값(OPEN, CLOSED, COMPLETED) 만으로 판별
@@ -219,10 +223,7 @@ const GroupBuyInfoPage = () => {
                             <div className="gbi-section-content">{item.description}</div>
                         </div>
 
-                        <div className="gbi-card-section">
-                            <div className="gbi-section-title">📦 상세 내용</div>
-                            <div className="gbi-section-content">{item.content}</div>
-                        </div>
+
 
                         <div className="gbi-info-footer">
                             <div className="gbi-info-box">
@@ -250,6 +251,9 @@ const GroupBuyInfoPage = () => {
                         </div>
 
                         <div className="gbi-bottom-row">
+                            <div className='gbi-sale-badge'>
+                                {salepercent > 0 ? `${salepercent}% 할인` : ``}
+                            </div>
                             <div className="gbi-price-wrapper">
                                 <span className="gbi-original-price">
                                     {typeof item.originalPrice === 'number'
@@ -299,7 +303,10 @@ const GroupBuyInfoPage = () => {
                     </div>
                 </div>
             </div>
-        </Section>
+            <div className='gbi-content-container'>
+
+            </div>
+        </Section >
     );
 };
 

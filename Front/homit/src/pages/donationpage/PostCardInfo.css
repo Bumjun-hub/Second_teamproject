@@ -1,0 +1,242 @@
+/* 로딩 및 에러 상태 */
+.donationInfo-loading,
+.donationInfo-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 18px;
+  color: #666;
+}
+
+.donationInfo-error {
+  color: #e74c3c;
+}
+
+/* 메인 컨테이너 */
+.donationInfo-post-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.donationInfo-post-detail-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 이미지 섹션 */
+.donationInfo-post-images-detail {
+  position: relative;
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+.donationInfo-image-container-detail {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+}
+
+.donationInfo-post-image-detail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.donationInfo-image-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.donationInfo-image-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.donationInfo-prev-btn {
+  left: 15px;
+}
+
+.donationInfo-next-btn {
+  right: 15px;
+}
+
+.donationInfo-image-indicator {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+/* 콘텐츠 섹션 */
+.donationInfo-post-content-section {
+  padding: 24px;
+}
+
+.donationInfo-post-header-section {
+  margin-bottom: 20px;
+}
+
+.donationInfo-post-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.donationInfo-category-badge {
+  background: #3498db;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.donationInfo-category-badge.SHARE {
+  background: #27ae60;
+}
+
+.donationInfo-category-badge.REQUEST {
+  background: #e74c3c;
+}
+
+.donationInfo-category-badge.EXCHANGE {
+  background: #f39c12;
+}
+
+.donationInfo-price-badge {
+  background: #95a5a6;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.donationInfo-post-title-detail {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.3;
+  word-break: keep-all;
+}
+
+/* 메타 정보 섹션 */
+.donationInfo-post-meta-section {
+  border-top: 1px solid #ecf0f1;
+  border-bottom: 1px solid #ecf0f1;
+  padding: 16px 0;
+  margin: 20px 0;
+}
+
+.donationInfo-author-info-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.donationInfo-author-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.donationInfo-location-info-detail {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.donationInfo-icon {
+  font-size: 16px;
+}
+
+.donationInfo-post-stats {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.donationInfo-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.donationInfo-like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.donationInfo-like-btn:hover:not(.disabled) {
+  background-color: #f8f9fa;
+}
+
+.donationInfo-like-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.donationInfo-date {
+  font-size: 13px;
+  color: #95a5a6;
+  margin-left: auto;
+}
+
+/* 콘텐츠 상세 */
+.donationInfo-post-content-detail {
+  margin-top: 20px;
+  min-height: 200px;
+  padding: 20px 0;
+}
+
+.donationInfo-post-content-detail p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2c3e50;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 16px 0;
+}

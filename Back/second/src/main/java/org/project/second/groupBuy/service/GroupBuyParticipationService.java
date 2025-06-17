@@ -149,6 +149,7 @@ public class GroupBuyParticipationService {
                             post.getOriginalPrice(),
                             post.getSalePrice(),
                             post.getDeadline(),
+                            post.isHotDeal(),
                             imageUrls,
                             imageIds,
                             (long) post.getLikes().size(),
