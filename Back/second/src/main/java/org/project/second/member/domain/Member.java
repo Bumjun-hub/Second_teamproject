@@ -15,6 +15,7 @@ import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.groupBuy.domain.GroupBuyParticipation;
 import org.project.second.like.domain.Like;
 import org.project.second.order.domain.Order;
+import org.project.second.priceAlert.domain.PriceAlert;
 import org.project.second.recipe.domain.Recipe;
 import org.project.second.websocket.domain.Notification;
 import org.project.second.wishlist.domain.Wishlist;
@@ -95,6 +96,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<PriceAlert> priceAlerts;
 
 
 

@@ -50,9 +50,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/groupBuy/view/**", "/api/groupBuy/detail/**").permitAll()
                         .requestMatchers("/api/groupBuy/**").authenticated()
                         .requestMatchers("/api/item/search", "/api/recipe/**","/api/favorite/count/**", "/api/comment/list/**", "/api/likes/count/**").permitAll() // 쇼핑, 레시피, 즐찾, 댓글, 라이크
-                        .requestMatchers("/api/wishflist/**", "/api/favorite/**", "/api/comment/**", "/api/likes/**").authenticated()
-                        .requestMatchers("/api/community/view/**","/api/community/detail/**", "api/donation/view/**" ).permitAll() // 커뮤니티, 나눔
-                        .requestMatchers("/api/community/**", "api/donation/**").authenticated()
+                        .requestMatchers("/api/wishflist/**", "/api/favorite/**", "/api/comment/**", "/api/likes/**", "/api/item/pricealert/**").authenticated()
+                        .requestMatchers("/api/community/view/**","/api/community/detail/**", "/api/donation/view/**" ).permitAll() // 커뮤니티, 나눔
+                        .requestMatchers("/api/community/**", "/api/donation/**").authenticated()
                         .requestMatchers("/api/order/admin/**").hasRole("ADMIN") // 주문
                         .requestMatchers("/api/order/**").authenticated()
                         .requestMatchers("/api/notifications/**").authenticated()

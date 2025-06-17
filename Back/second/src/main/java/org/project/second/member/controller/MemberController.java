@@ -10,6 +10,7 @@ import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
 import org.project.second.member.dto.*;
 import org.project.second.member.repository.MemberRepository;
+import org.project.second.member.service.CustomUserDetailsService;
 import org.project.second.security.JwtProvider;
 import org.project.second.member.service.MemberService;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -36,6 +38,7 @@ public class MemberController {
     private final JwtProvider jwtProvider;  // JWT 생성 및 검증 유틸
     private final MemberRepository memberRepository;
     private final GradeService gradeService; // 등급관련
+    private final CustomUserDetailsService customUserDetailsService;
 
     //Valid : null 값 유효성 체크 자동
     @PostMapping("/signup")
@@ -84,7 +87,8 @@ public class MemberController {
         String refreshToken = jwtProvider.getRefreshTokenFromCookies(request);
         if (refreshToken != null && jwtProvider.validateRefreshToken(refreshToken)) {
             String username = jwtProvider.getUsernameFromToken(refreshToken, false);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             String newAccessToken = jwtProvider.generateAccessToken(authentication);
             jwtProvider.setTokensInCookies(response, newAccessToken, refreshToken);
             return ResponseEntity.ok(Map.of("message", "Access Token이 재발행 되었습니다."));

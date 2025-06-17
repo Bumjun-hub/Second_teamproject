@@ -66,6 +66,10 @@ public class GroupBuy extends BaseEntity {
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;  //마감일
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean hotDeal = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
