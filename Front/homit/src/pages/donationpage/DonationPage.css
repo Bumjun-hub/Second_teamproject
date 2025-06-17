@@ -31,7 +31,7 @@
 }
 
 /* 필터 섹션 */
-.filter-section {
+.filter-section-d {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -39,26 +39,26 @@
   margin-bottom: 24px;
 }
 
-.filter-grid {
+.filter-grid-d {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.filter-item {
+.filter-item-d {
   display: flex;
   flex-direction: column;
 }
 
-.filter-item label {
+.filter-item-d label {
   font-size: 0.875rem;
   font-weight: 500;
   color: #374151;
   margin-bottom: 8px;
 }
 
-.select-input {
+.select-input-d {
   padding: 12px 16px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -67,7 +67,7 @@
   background-color: white;
 }
 
-.select-input:focus {
+.select-input-d:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -104,14 +104,14 @@
 }
 
 /* 카테고리 탭 */
-.category-tabs {
+.category-tabs-d {
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.category-tab {
+.category-tab-d {
   padding: 12px 20px;
   border: none;
   border-radius: 8px;
@@ -122,17 +122,24 @@
   color: #374151;
 }
 
-.category-tab:hover {
+.category-tab-d:hover {
   background-color: #e5e7eb;
 }
 
-.category-tab.active {
+.category-tab-d.active-d {
   background-color: #3b82f6;
   color: white;
 }
 
+/* 액션 버튼들 */
+.action-buttons-d {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 /* 글쓰기 버튼 */
-.write-btn {
+.write-btn-d {
   background-color: #3b82f6;
   color: white;
   padding: 12px 20px;
@@ -146,17 +153,17 @@
   font-weight: 500;
 }
 
-.write-btn:hover {
+.write-btn-d:hover {
   background-color: #2563eb;
 }
 
-.write-btn .icon {
+.write-btn-d .icon-d {
   width: 16px;
   height: 16px;
 }
 
 /* 모달 */
-.modal-overlay {
+.modal-overlay-d {
   position: fixed;
   top: 0;
   left: 0;
@@ -170,7 +177,7 @@
   padding: 16px;
 }
 
-.modal-content {
+.modal-content-d {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
@@ -180,27 +187,33 @@
   overflow-y: auto;
 }
 
-.modal-header {
+.modal-header-d {
   padding: 24px 32px 0 32px;
 }
 
-.modal-header h2 {
+.modal-header-d h2 {
   font-size: 1.5rem;
   font-weight: bold;
   color: #1f2937;
   margin: 0 0 24px 0;
 }
 
+.user-info-d {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
 /* 폼 */
-.form-container {
+.form-container-d {
   padding: 0 32px 32px 32px;
 }
 
-.form-group {
+.form-group-d {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.form-group-d label {
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
@@ -208,8 +221,8 @@
   margin-bottom: 8px;
 }
 
-.form-input,
-.form-textarea {
+.form-input-d,
+.form-textarea-d {
   width: 100%;
   padding: 12px 16px;
   border: 1px solid #d1d5db;
@@ -219,38 +232,38 @@
   box-sizing: border-box;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.form-input-d:focus,
+.form-textarea-d:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.form-input:disabled {
+.form-input-d:disabled {
   background-color: #f9fafb;
   color: #6b7280;
   cursor: not-allowed;
 }
 
-.form-textarea {
+.form-textarea-d {
   resize: vertical;
   min-height: 120px;
 }
 
-.form-row {
+.form-row-d {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
 }
 
 /* 폼 액션 버튼 */
-.form-actions {
+.form-actions-d {
   display: flex;
   gap: 12px;
   padding-top: 16px;
 }
 
-.btn {
+.btn-d {
   flex: 1;
   padding: 12px 24px;
   border: none;
@@ -260,21 +273,21 @@
   font-size: 1rem;
 }
 
-.btn-primary {
+.btn-primary-d {
   background-color: #3b82f6;
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary-d:hover {
   background-color: #2563eb;
 }
 
-.btn-secondary {
+.btn-secondary-d {
   background-color: #d1d5db;
   color: #374151;
 }
 
-.btn-secondary:hover {
+.btn-secondary-d:hover {
   background-color: #9ca3af;
 }
 
@@ -303,346 +316,4 @@
 .empty-subtitle {
   color: #9ca3af;
   margin: 0;
-}
-
-/* 게시글 카드 */
-.post-card {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  transition: all 0.2s ease;
-}
-
-.post-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.post-badges {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.category-badge {
-  padding: 4px 12px;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.category-badge.FREE {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.category-badge.SELL {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.category-badge.BUY {
-  background-color: #fed7aa;
-  color: #ea580c;
-}
-
-.category-badge.LOCAL_ACTIVITY {
-  background-color: #e9d5ff;
-  color: #7c3aed;
-}
-
-.price-badge {
-  font-size: 1.125rem;
-  font-weight: bold;
-  color: #dc2626;
-}
-
-.post-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  color: #6b7280;
-}
-
-.action-btn:hover {
-  background-color: #f3f4f6;
-}
-
-.edit-btn:hover {
-  color: #3b82f6;
-}
-
-.delete-btn:hover {
-  color: #dc2626;
-}
-
-.action-btn .icon {
-  width: 16px;
-  height: 16px;
-}
-
-.post-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #1f2937;
-  margin: 0 0 12px 0;
-  line-height: 1.5;
-}
-
-.post-content {
-  color: #6b7280;
-  margin: 0 0 20px 0;
-  line-height: 1.6;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.post-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
-  color: #6b7280;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.post-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.location-info {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.location-info .icon {
-  width: 14px;
-  height: 14px;
-}
-
-.post-meta {
-  display: flex;
-  gap: 12px;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .donation-container {
-    padding: 16px;
-  }
-  
-  .donation-header,
-  .filter-section {
-    padding: 20px;
-  }
-  
-  .filter-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .category-tabs {
-    justify-content: center;
-  }
-  
-  .modal-content {
-    margin: 16px;
-    max-height: calc(100vh - 32px);
-  }
-  
-  .modal-header,
-  .form-container {
-    padding: 20px;
-  }
-  
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .post-footer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .post-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .donation-container {
-    padding: 12px;
-  }
-  
-  .donation-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .post-card {
-    padding: 16px;
-  }
-  
-  .post-header {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .post-actions {
-    align-self: flex-end;
-  }
-}
-
-/* 스크롤바 커스터마이징 */
-.modal-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* 포커스 상태 개선 */
-.category-tab:focus,
-.write-btn:focus,
-.btn:focus,
-.action-btn:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* 애니메이션 */
-.post-card {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-content {
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* 로딩 상태 (추후 확장용) */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f4f6;
-  border-top: 4px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 다크모드 지원 (선택사항) */
-@media (prefers-color-scheme: dark) {
-  .donation-container {
-    background-color: #111827;
-    color: #f9fafb;
-  }
-  
-  .donation-header,
-  .filter-section,
-  .post-card,
-  .modal-content {
-    background-color: #1f2937;
-    border: 1px solid #374151;
-  }
-  
-  .donation-header h1,
-  .post-title {
-    color: #f9fafb;
-  }
-  
-  .form-input,
-  .form-textarea,
-  .select-input,
-  .search-input {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #f9fafb;
-  }
-  
-  .form-input:focus,
-  .form-textarea:focus,
-  .select-input:focus,
-  .search-input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-  }
-  
-  .category-tab {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-  
-  .category-tab:hover {
-    background-color: #4b5563;
-  }
 }

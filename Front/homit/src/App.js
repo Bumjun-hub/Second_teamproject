@@ -16,6 +16,8 @@ import BoardInfoPage from './pages/boardpage/BoardInfoPage';
 import BoardWritePage from './pages/boardpage/BoardWritePage';
 import MyPage from './pages/mypage/MyPage';
 import EditProfile from './pages/mypage/MyPageEditProfile';
+import AccountBook from './pages/mypage/accountbook/AccountBook';
+import BudgetGoalPage from './pages/mypage/accountbook/BudgetGoalPage';
 import { AuthProvider } from './utils/AuthProvider';
 import PaymentPage from './pages/paymentpage/PaymentPage';
 import DashBoard from './pages/admin/DashBoard';
@@ -47,6 +49,9 @@ function App() {
           <Route path="/editProfile" element={<EditProfile />} />
 
           <Route path="/donation" element={<DonationPage />} />
+
+          <Route path="/accountbook" element={<AccountBook />} />
+          <Route path="/budget" element={<BudgetGoalPage />} />
         </Route>
 
         {/* 헤더/푸터 없는(단독) 페이지 */}

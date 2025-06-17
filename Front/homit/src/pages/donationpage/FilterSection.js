@@ -1,5 +1,3 @@
-import React from 'react';
-
 const FilterSection = ({
   selectedRegion,
   setSelectedRegion,
@@ -14,10 +12,10 @@ const FilterSection = ({
   onRefresh
 }) => {
   return (
-    <div className="filter-section">
-      <div className="filter-grid">
+    <div className="filter-section-d">
+      <div className="filter-grid-d">
         {/* 지역 선택 */}
-        <div className="filter-item">
+        <div className="filter-item-d">
           <label>지역 선택</label>
           <select
             value={selectedRegion.province}
@@ -27,7 +25,7 @@ const FilterSection = ({
               district: '',
               neighborhood: ''
             })}
-            className="select-input"
+            className="select-input-d"
             disabled={loading}
           >
             <option value="">전체 지역</option>
@@ -38,7 +36,7 @@ const FilterSection = ({
         </div>
 
         {selectedRegion.province && (
-          <div className="filter-item">
+          <div className="filter-item-d">
             <label>시/구</label>
             <select
               value={selectedRegion.city}
@@ -48,7 +46,7 @@ const FilterSection = ({
                 district: '',
                 neighborhood: ''
               })}
-              className="select-input"
+              className="select-input-d"
               disabled={loading}
             >
               <option value="">전체</option>
@@ -60,7 +58,7 @@ const FilterSection = ({
         )}
 
         {selectedRegion.city && (
-          <div className="filter-item">
+          <div className="filter-item-d">
             <label>동</label>
             <select
               value={selectedRegion.district}
@@ -68,7 +66,7 @@ const FilterSection = ({
                 ...selectedRegion,
                 district: e.target.value
               })}
-              className="select-input"
+              className="select-input-d"
               disabled={loading}
             >
               <option value="">전체</option>
@@ -80,7 +78,7 @@ const FilterSection = ({
         )}
 
         {/* 검색 */}
-        <div className="filter-item">
+        <div className="filter-item-d">
           <label>검색</label>
           <div className="search-container-d">
             <span className="search-icon-d">🔍</span>
@@ -97,12 +95,12 @@ const FilterSection = ({
       </div>
 
       {/* 카테고리 탭 */}
-      <div className="category-tabs">
+      <div className="category-tabs-d">
         {categories.map(category => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`category-tab ${selectedCategory === category ? 'active' : ''}`}
+            className={`category-tab-d ${selectedCategory === category ? 'active-d' : ''}`}
             disabled={loading}
           >
             {category}
@@ -111,13 +109,13 @@ const FilterSection = ({
       </div>
 
       {/* 액션 버튼들 */}
-      <div className="action-buttons">
+      <div className="action-buttons-d">
         <button
           onClick={onWriteClick}
-          className="write-btn"
+          className="write-btn-d"
           disabled={loading}
         >
-          <span className="icon">✏️</span>
+          <span className="icon-d">✏️</span>
           <span>글쓰기</span>
         </button>
       </div>

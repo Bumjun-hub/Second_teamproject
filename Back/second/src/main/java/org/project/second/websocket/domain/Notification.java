@@ -6,6 +6,7 @@ import org.project.second.common.enums.NotificationType;
 import org.project.second.community.domain.Community;
 import org.project.second.groupBuy.domain.GroupBuy;
 import org.project.second.member.domain.Member;
+import org.project.second.priceAlert.domain.PriceAlert;
 import org.project.second.recipe.domain.Recipe;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -32,7 +33,7 @@ public class Notification {
     @Column(nullable = false)
     private NotificationType type;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,9 +48,17 @@ public class Notification {
     @JoinColumn(name = "recipe_id", nullable = true)
     private Recipe recipe;
 
+    @ManyToOne
+    @JoinColumn(name = "price_alert_id", nullable = true)
+    private PriceAlert priceAlert;
+
     @Column(name = "is_read", nullable = false)
     @Builder.Default
     private Boolean isRead = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean isSent = true;
 
     @CreatedDate
     @Column(updatable = false)
