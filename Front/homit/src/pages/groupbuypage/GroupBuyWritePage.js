@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import './GroupBuyWritePage.css';
 import Section from '../../components/Section';
 
+
 const GroupBuyWritePage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -21,6 +22,7 @@ const GroupBuyWritePage = () => {
     originalPrice: 20000,
     salePrice: 10000,
     deadline: '',
+    hotdeal: false,
     status: 'OPEN'
   });
 
@@ -46,6 +48,7 @@ const GroupBuyWritePage = () => {
             originalPrice: data.originalPrice,
             salePrice: data.salePrice,
             deadline: data.deadline?.slice(0, 16),
+            hotdeal: data.hotdeal,
             status: data.status
           });
 
@@ -126,6 +129,7 @@ const GroupBuyWritePage = () => {
     data.append('originalPrice', formData.originalPrice);
     data.append('salePrice', formData.salePrice);
     data.append('deadline', formData.deadline);
+    data.append('hotdeal', formData.hotdeal);
 
     // 새로운 이미지 파일들 추가
     imageFiles.forEach((file) => {
@@ -184,24 +188,24 @@ const GroupBuyWritePage = () => {
 
 
   useEffect(() => {
-  const fetchRole = async () => {
-    try {
-      const res = await fetch("/api/roleinfo", {
-        credentials: "include",
-      });
-      const text = await res.text();
-      setRole(text);
-      if (text !== "ROLE_ADMIN") {
-        alert('접근 권한이 없습니다.');
-        navigate('/');
+    const fetchRole = async () => {
+      try {
+        const res = await fetch("/api/roleinfo", {
+          credentials: "include",
+        });
+        const text = await res.text();
+        setRole(text);
+        if (text !== "ROLE_ADMIN") {
+          alert('접근 권한이 없습니다.');
+          navigate('/');
+        }
+      } catch (e) {
+        console.error("roleinfo 요청 실패:", e);
+        navigate("/");
       }
-    } catch (e) {
-      console.error("roleinfo 요청 실패:", e);
-      navigate("/");
-    }
-  };
-  fetchRole();
-}, [navigate]);
+    };
+    fetchRole();
+  }, [navigate]);
 
   // 컴포넌트 언마운트 시 메모리 정리
   useEffect(() => {
@@ -306,14 +310,7 @@ const GroupBuyWritePage = () => {
               required
             />
 
-            <label>현재 인원</label>
-            <input
-              name="currentParticipants"
-              type="number"
-              value={formData.currentParticipants}
-              disabled
-              readOnly
-            />
+
 
             {/* 기존 이미지들 표시 */}
             {existingImages.length > 0 && (
@@ -354,25 +351,42 @@ const GroupBuyWritePage = () => {
             )}
 
             <div className="form-bottom">
-              <div className="button-area">
-                <label className="upload-button">
-                  이미지 첨부
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageChange}
-                    style={{ display: 'none' }}
-                  />
-                </label>
+              <div className="gbw-form-bottom-row">
+                {/* 왼쪽 - 체크박스 */}
+                {role === "ROLE_ADMIN" && (
+                  <label className="gbw-hotdeal-check">
+                    <input
+                      type="checkbox"
+                      className="gbw-checkbox"
+                      checked={formData.hotdeal}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, hotdeal: e.target.checked }))
+                      }
+                    />핫딜 등록
+                  </label>
 
-                <div>
+                )}
+
+                {/* 오른쪽 - 첨부/버튼 */}
+                <div className="gbw-button-right">
+                  <label className="gbw-upload-button">
+                    첨부 이미지
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+
                   <button type="button" className="gbw-cancel-button" onClick={handleCancel}>취소</button>
                   <button type="submit" className="gbw-submit-button">{isEdit ? '수정' : '등록'}</button>
                 </div>
-
               </div>
             </div>
+
+
           </form>
         </div>
       </div>

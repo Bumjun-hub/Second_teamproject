@@ -26,6 +26,18 @@ const MainPage = () => {
         currentPage * itemsPerPage,
         (currentPage + 1) * itemsPerPage
     )
+    const [hotDeals, setHotDeals] = useState([]);
+
+    useEffect(() => {
+        const fetchHotDeals = async () => {
+            const res = await fetch("http://localhost:8080/api/groupBuy/view");
+            const data = await res.json();
+
+            const hotOnly = data.filter(item => item.hotdeal === true); // ✅ 여기서 필터
+            setHotDeals(hotOnly);
+        };
+        fetchHotDeals();
+    }, []);
 
     useEffect(() => {
         const fetchUrgentItems = async () => {
@@ -138,16 +150,14 @@ const MainPage = () => {
                 </div>
             </div>
 
-            {/* 오늘의 상품 섹션 */}
+            {/* 핫딜 공동구매 섹션 */}
             <div className="section-container">
                 <div className="section-header">
-                    <h2 className="section-title">오늘의 상품 🔥</h2>
+                    <h2 className="section-title">🔥 HOT 공동구매</h2>
                 </div>
                 <div className="product-grid">
-                    {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="product-card">
-                            <div className="product-image"></div>
-                        </div>
+                    {hotDeals.map(item => (
+                        <UrgentGroupBuyCard key={item.id} item={item} />
                     ))}
                 </div>
             </div>
