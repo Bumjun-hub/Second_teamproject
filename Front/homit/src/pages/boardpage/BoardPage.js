@@ -28,6 +28,7 @@ const BoardPage = () => {
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc', });
 
 
+
     const categoryMap = {
         '자유게시판': 'FREE',
         '꿀팁': 'TIP',

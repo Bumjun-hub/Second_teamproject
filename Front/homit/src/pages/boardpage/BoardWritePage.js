@@ -14,7 +14,7 @@ const BoardWritePage = () => {
   const [originalImageUrls, setOriginalImageUrls] = useState([]); // 기존 이미지만 따로 저장
   const [removedImages, setRemovedImages] = useState([]); // 삭제 대상 이미지
 
-  // 사용자가 입력한 글 제목, 작성자, 카테고리, 내용 , 공지 여부 결정
+  // 사용자가 입력한 글 제목, 작성자, 카테고리, 내용 , 공지 여부 결정 
   const [formData, setFormData] = useState({
     title: '',
     writer: '',
@@ -232,7 +232,7 @@ const BoardWritePage = () => {
               {role === "ROLE_ADMIN" && (
                 <label>
                   <input
-                    type="bpw-checkbox"
+                    type="checkbox"
                     className="bpw-checkbox"
                     checked={formData.isNotice}
                     onChange={(e) =>
