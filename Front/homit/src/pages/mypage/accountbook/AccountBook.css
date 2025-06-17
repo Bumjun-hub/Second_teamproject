@@ -342,9 +342,10 @@
 }
 
 /* 헤더 액션 버튼들 */
-.header-actions {
+.header-actions-account {
   display: flex;
   gap: 8px;
+  margin-right: 10px;
 }
 
 .nav-link-button {

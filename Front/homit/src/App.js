@@ -7,6 +7,7 @@ import RecipePage from './pages/recipepage/RecipePage';
 import RecipeInfoPage from './pages/recipepage/RecipeInfoPage';
 import HotItemPage from './pages/hotitempage/HotItemPage';
 import DonationPage from './pages/donationpage/DonationPage';
+import PostCardInfo from './pages/donationpage/PostCardInfo'; 
 import LoginPage from './pages/loginpage/LoginPage';
 import MemberPage from './pages/memberpage/MemberPage';
 import Layout from './components/Layout';
@@ -36,6 +37,7 @@ function App() {
 
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/info/:category/:id" element={<BoardInfoPage />} />
+          <Route path="/board/:id" element={<PostCardInfo />} /> {/* 일반 게시판 상세 페이지 */}
           <Route path="/board/write" element={<BoardWritePage />} />
           <Route path="/board/edit/:category/:id" element={<BoardWritePage />} />
 
@@ -49,6 +51,7 @@ function App() {
           <Route path="/editProfile" element={<EditProfile />} />
 
           <Route path="/donation" element={<DonationPage />} />
+          <Route path="/donation/view/:category/:id" element={<PostCardInfo />} />
 
           <Route path="/accountbook" element={<AccountBook />} />
           <Route path="/budget" element={<BudgetGoalPage />} />

@@ -64,14 +64,35 @@ const FilterSection = ({
               value={selectedRegion.district}
               onChange={(e) => setSelectedRegion({
                 ...selectedRegion,
-                district: e.target.value
+                district: e.target.value,
+                neighborhood: ''
               })}
               className="select-input-d"
               disabled={loading}
             >
               <option value="">전체</option>
-              {regionData[selectedRegion.province][selectedRegion.city].map(district => (
+              {Object.keys(regionData[selectedRegion.province][selectedRegion.city]).map(district => (
                 <option key={district} value={district}>{district}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {selectedRegion.district && (
+          <div className="filter-item-d">
+            <label>세부 동/리</label>
+            <select
+              value={selectedRegion.neighborhood}
+              onChange={(e) => setSelectedRegion({
+                ...selectedRegion,
+                neighborhood: e.target.value
+              })}
+              className="select-input-d"
+              disabled={loading}
+            >
+              <option value="">전체</option>
+              {regionData[selectedRegion.province][selectedRegion.city][selectedRegion.district].map(neighborhood => (
+                <option key={neighborhood} value={neighborhood}>{neighborhood}</option>
               ))}
             </select>
           </div>
