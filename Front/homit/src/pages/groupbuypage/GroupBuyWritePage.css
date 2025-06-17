@@ -78,7 +78,24 @@ textarea {
   margin-top: 24px;
 }
 
-.button-area {
+.gbw-upload-button {
+  background-color: #2668A7;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 10px;
+}
+
+.gbw-button-area {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.gbw-form-bottom-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -86,15 +103,23 @@ textarea {
   gap: 12px;
 }
 
-.upload-button {
-  background-color: #f0f0f0;
-  border: 1px solid #bbb;
-  padding: 8px 14px;
-  border-radius: 6px;
+.gbw-hotdeal-check {
+  display: flex;
+  align-items: center;
   font-size: 14px;
-  cursor: pointer;
-  font-weight: 500;
+  white-space: nowrap;
+  gap:2px;
+  
 }
+
+
+.gbw-button-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 
 .gbw-submit-button,
 .gbw-cancel-button {

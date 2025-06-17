@@ -1,7 +1,7 @@
 .gbi-info-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 60px 0px;
+  padding: 60px 0;
   font-family: 'Noto Sans KR', sans-serif;
   position: relative;
 }
@@ -12,6 +12,7 @@
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 20px;
+  padding-right: 10px;
 }
 
 .gbi-edit-button,
@@ -22,7 +23,7 @@
   font-weight: bold;
   cursor: pointer;
   color: white;
-  transition: 0.gbi-2s;
+  transition: 0.2s;
 }
 
 .gbi-edit-button {
@@ -44,36 +45,44 @@
 /* 상품 카드 전체 */
 .gbi-product-card {
   display: flex;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.gbi-2);
-  padding: 20px;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* 이미지 */
 .gbi-image-area {
-  width: 40%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .gbi-image-area img {
+  max-width: 600px;
   width: 100%;
-  max-width: 300px;
-  border-radius: 8px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
   border: 1px solid #ccc;
 }
 
-
-
+/* 상세 영역 */
 .gbi-details-area {
+  flex: 1;
+  width: 100%;
+  min-width: 320px;
   padding: 20px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.gbi-06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .gbi-main-title {
@@ -89,7 +98,8 @@
   padding: 18px;
   background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.gbi-03);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.03);
+
 }
 
 .gbi-section-title {
@@ -102,7 +112,7 @@
 .gbi-section-content {
   font-size: 14px;
   color: #555;
-  line-height: 1.gbi-6;
+  line-height: 1.6;
   white-space: pre-line;
 }
 
@@ -130,7 +140,7 @@
   justify-content: flex-end;
   align-items: center;
   margin-top: 15px;
-  gap: 20px; /* 버튼과 가격 간격 */
+  gap: 20px;
 }
 
 .gbi-price-row {
@@ -140,12 +150,13 @@
   margin-top: 15px;
 }
 
-
+/* 가격 */
 .gbi-price-wrapper {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-right: 20px; /* 구매참여 버튼과의 간격 조절 */
+  text-align: right;
+  margin-right: 20px;
 }
 
 .gbi-original-price {
@@ -155,33 +166,32 @@
   margin-bottom: 4px;
 }
 
-
-.gbi-sale-price {
+.gbi-sale-price,
+.gbi-price {
   font-size: 20px;
   font-weight: bold;
   color: #ff4d4f;
 }
 
+/* 구매 버튼 */
 .gbi-buy-button {
-  background-color: #4CAF50;
+  background-color: #f44336;
   color: white;
+  border: none;
   padding: 10px 20px;
   border-radius: 6px;
-  border: none;
   cursor: pointer;
   font-weight: bold;
+  transition: 0.2s;
+  min-width: 140px;
+  text-align: center;
 }
 
 .gbi-buy-button:hover {
-  background-color: #45a049;
+  background-color: #d32f2f;
 }
 
-
-
-
-
-
-/* 제목 및 액션 */
+/* 액션 */
 .gbi-header-row {
   display: flex;
   justify-content: space-between;
@@ -202,7 +212,7 @@
   border-radius: 5px;
   text-decoration: none;
   display: inline-block;
-  transition: 0.gbi-2s;
+  transition: 0.2s;
 }
 
 .gbi-detail-link:hover {
@@ -216,7 +226,7 @@
   cursor: pointer;
 }
 
-/* 내용 */
+/* 기타 텍스트 */
 .gbi-description {
   font-size: 15px;
   margin: 8px 0;
@@ -229,60 +239,15 @@
   color: #555;
 }
 
-/* 하단 고정 */
-.gbi-bottom-fixed {
-  margin-top: auto;
-}
-
-.gbi-goal {
+.gbi-goal,
+.gbi-deadline {
   font-size: 14px;
   color: #666;
   text-align: right;
   margin-bottom: 8px;
 }
 
-.gbi-deadline {
-  font-size: 14px;
-  color: #666;
-  text-align: right;
-  margin-bottom: 12px;
-}
-
-.gbi-bottom-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-}
-
-.gbi-original-price {
-  text-decoration: line-through;
-  color: #999;
-  font-size: 15px;
-}
-
-.gbi-price {
-  font-size: 20px;
-  font-weight: bold;
-  color: #e53935;
-}
-
-.gbi-buy-button {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.gbi-2s;
-}
-
-.gbi-buy-button:hover {
-  background-color: #d32f2f;
-}
-
-
+/* 참여자 수 */
 .gbi-participant-info {
   margin-top: 10px;
 }
@@ -299,49 +264,20 @@
 .gbi-progress-bar-fill {
   height: 100%;
   background-color: #4caf50;
-  transition: width 0.gbi-3s ease-in-out;
+  transition: width 0.3s ease-in-out;
 }
 
-/* 정렬 개선 */
-.gbi-product-card {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  justify-content: center;
-  padding: 30px;
-}
-
-.gbi-image-area {
-  flex: 0 0 300px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.gbi-details-area {
-  flex: 1;
-  min-width: 320px;
-}
-
-/* 가격 정렬 보정 */
-.gbi-price-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-}
-
-/* 버튼 너비 고정 */
-.gbi-buy-button {
-  min-width: 140px;
-  text-align: center;
-}
-
-/* 상단 버튼 위치 개선 */
-.gbi-top-buttons {
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 10px;
+/* 할인 뱃지 */
+.gbi-sale-badge {
+  display: inline-block;
+  background-color: #ff4d4f;
+  color: white;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* 반응형 대응 */
@@ -350,7 +286,17 @@
     flex-direction: column;
     align-items: center;
   }
+
   .gbi-details-area {
     width: 100%;
   }
+}
+
+.gbi-content-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  position: relative;
+  border: 1px solid;
 }
