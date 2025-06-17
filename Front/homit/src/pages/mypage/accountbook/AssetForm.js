@@ -23,7 +23,7 @@ const AssetForm = ({ assets, onSave, loading, errors }) => {
                             type="number"
                             value={assetForm[key]}
                             onChange={(e) => setAssetForm(prev => ({
-                                ...prev, [key]: Math.max(0, parseInt(e.target.value) || 0)
+                                ...prev, [key]: Math.max(0, parseInt(e.target.value))
                             }))}
                             placeholder="0"
                         />

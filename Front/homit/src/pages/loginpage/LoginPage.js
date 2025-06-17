@@ -159,7 +159,7 @@ const LoginPage = () => {
                         className="social-login-button naver"
                     >
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.1 9.8L5.9 0H0V18H5.9V8.2L12.1 18H18V0H12.1V9.8Z" fill="#03C75A"/>
+                            <path d="M12.1 9.8L5.9 0H0V18H5.9V8.2L12.1 18H18V0H12.1V9.8Z" fill="white"/>
                         </svg>
                         네이버로 로그인
                     </button>

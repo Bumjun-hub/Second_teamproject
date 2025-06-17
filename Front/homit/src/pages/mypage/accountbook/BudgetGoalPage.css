@@ -1,0 +1,523 @@
+/* BudgetGoal.css */
+
+.budget-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 헤더 스타일 */
+.budget-header {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-title h1 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.header-icon {
+  font-size: 1.25rem;
+}
+
+/* 탭 네비게이션 */
+.tab-navigation {
+  display: flex;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.tab-item {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-item.inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.tab-item:hover {
+  transform: translateY(-1px);
+}
+
+/* 필터 섹션 */
+.filter-section {
+  display: flex;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.filter-icon {
+  font-size: 1rem;
+}
+
+/* 예산 요약 */
+.budget-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-item {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.summary-amount {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.summary-amount.spent {
+  color: #dc2626;
+}
+
+.summary-percentage {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #059669;
+}
+
+.summary-percentage.over-budget {
+  color: #dc2626;
+}
+
+/* 목표 리스트 */
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.goal-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.goal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.goal-category {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+}
+
+.category-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.edit-button {
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* 금액 정보 */
+.goal-amounts {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.amount-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.amount-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.amount-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.amount-value.current {
+  color: #dc2626;
+}
+
+/* 진행바 */
+.progress-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-safe {
+  background-color: #10b981;
+}
+
+.progress-warning {
+  background-color: #f59e0b;
+}
+
+.progress-danger {
+  background-color: #ef4444;
+}
+
+.percentage {
+  font-weight: 600;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* 상태별 색상 */
+.status-safe {
+  color: #10b981;
+}
+
+.status-warning {
+  color: #f59e0b;
+}
+
+.status-danger {
+  color: #ef4444;
+}
+
+/* 목표 메시지 */
+.goal-message {
+  font-size: 0.875rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #10b981;
+}
+
+.goal-message.status-warning {
+  border-left-color: #f59e0b;
+  background-color: #fffbeb;
+}
+
+.goal-message.status-danger {
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+/* 모달 스타일 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.amount-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.amount-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.current-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancel-button,
+.save-button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-button {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.cancel-button:hover {
+  background-color: #e5e7eb;
+}
+
+.save-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.save-button:hover {
+  background-color: #2563eb;
+}
+
+/* 플로팅 액션 버튼 */
+.floating-button {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.floating-button:hover {
+  background-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.plus-icon {
+  font-size: 1.5rem;
+  font-weight: normal;
+  line-height: 1;
+  user-select: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .budget-container {
+    padding: 0.5rem;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .filter-item {
+    justify-content: center;
+  }
+  
+  .goal-amounts {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .amount-row {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .tab-navigation {
+    flex-direction: column;
+  }
+  
+  .summary-item {
+    padding: 1rem;
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .goal-card {
+    padding: 1rem;
+  }
+  
+  .goal-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  
+  .progress-section {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .percentage {
+    text-align: center;
+  }
+}
