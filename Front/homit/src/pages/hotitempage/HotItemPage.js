@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import Section from "../../components/Section";
 import './HotItemPage.css';
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { useAuth } from "../../utils/AuthProvider";
 
 const HotItemPage = () => {
+
+  const { user } = useAuth();
+
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [offset, setOffset] = useState(1);
@@ -11,9 +15,11 @@ const HotItemPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [wishlistIds, setWishlistIds] = useState(new Set());
 
+  // 카테고리 
   const categories = ['주방용품', '청소용품', '욕실용품', '생활용품', '가전제품', '뷰티/건강', '반려동물', '음식'];
   const [selectedCategory, setSelectedCategory] = useState('주방도구');
 
+  // 무한 스크롤
   const loadMoreItems = async () => {
     if (loading || !hasMore || offset > 1000) return;
     setLoading(true);
@@ -34,6 +40,32 @@ const HotItemPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 상품을 localstorage에 저장 -> 자주본 상품에 표시
+  const saveViewedProduct = (item) => {
+    if (!user || !user.email) {
+      console.log("❌ 저장 실패 - user.email 없음:", user);
+      return;
+    }
+
+    const key = `viewedProducts_${user.email}`;
+    const viewed = JSON.parse(localStorage.getItem(key)) || [];
+
+    const newViewed = [
+      {
+        naverProductId: item.naverProductId,
+        name: item.name?.replace(/<[^>]*>/g, '') ?? '',
+        price: item.price,
+        imageUrl: item.imageUrl,
+        url: item.url
+      },
+      ...viewed.filter(v => v.naverProductId !== item.naverProductId)
+    ];
+
+    const trimmed = newViewed.slice(0, 10);
+    console.log("✅ 최종 저장 배열:", trimmed);
+    localStorage.setItem(key, JSON.stringify(trimmed));
   };
 
   useEffect(() => {
@@ -151,7 +183,13 @@ const HotItemPage = () => {
               <div className="hot-card-body">
                 <h3 className="hot-item-name">{item.name.replace(/<[^>]*>/g, '')}</h3>
                 <p className="hot-item-price">{Number(item.price).toLocaleString()}원</p>
-                <button className="hot-view-btn" onClick={() => window.open(item.url, "_blank")}>상세 보기</button>
+                <button className="hot-view-btn" onClick={() => {
+
+                  saveViewedProduct(item);
+                  window.open(item.url, "_blank");
+
+
+                }}>상세 보기</button>
               </div>
             </div>
           ))}
