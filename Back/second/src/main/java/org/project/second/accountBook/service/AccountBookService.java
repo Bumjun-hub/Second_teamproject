@@ -10,6 +10,7 @@ import org.project.second.accountBook.repository.AccountBookImageRepository;
 import org.project.second.accountBook.repository.AccountBookRepository;
 import org.project.second.common.enums.ExpenseCategory;
 import org.project.second.common.enums.IncomeCategory;
+import org.project.second.common.enums.MoneyMethod;
 import org.project.second.common.enums.RecordType;
 import org.project.second.common.image.ImageService;
 import org.project.second.member.domain.Member;
@@ -17,7 +18,6 @@ import org.project.second.myAsset.domain.MyAsset;
 import org.project.second.myAsset.repository.MyAssetRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -39,6 +39,10 @@ public class AccountBookService {
         validateIncomeDto(dto);
         MyAsset asset = validateAsset(loginUser);
 
+        if (dto.getMoneyMethod() == MoneyMethod.CREDIT_CARD) {
+            throw new IllegalArgumentException("수입에선 신용카드 사용 불가");
+        }
+
         String memo = dto.getMemo() != null ? dto.getMemo() : "";
         LocalDate date = dto.getDate() != null ? dto.getDate() : LocalDate.now();
         IncomeCategory category = dto.getIncomeCategory() != null ? dto.getIncomeCategory() : IncomeCategory.ETC;
@@ -57,7 +61,6 @@ public class AccountBookService {
         switch (dto.getMoneyMethod()) {
             case CASH -> asset.setCash(asset.getCash() + dto.getAmount());
             case CHECK_CARD -> asset.setCheckCard(asset.getCheckCard() + dto.getAmount());
-            case CREDIT_CARD -> asset.setCreditCard(asset.getCreditCard() + dto.getAmount());
         }
     }
 
@@ -115,7 +118,7 @@ public class AccountBookService {
         accountBook.setAmount(dto.getAmount());
         accountBook.setMemo(dto.getMemo());
         accountBook.setMoneyMethod(dto.getMoneyMethod());
-        accountBook.setDate(dto.getDate());
+        accountBook.setDate(dto.getDate() != null ? dto.getDate() : LocalDate.now());
         accountBook.setIncomeCategory(dto.getIncomeCategory());
     }
 
@@ -128,7 +131,7 @@ public class AccountBookService {
         accountBook.setAmount(dto.getAmount());
         accountBook.setMemo(dto.getMemo());
         accountBook.setMoneyMethod(dto.getMoneyMethod());
-        accountBook.setDate(dto.getDate());
+        accountBook.setDate(dto.getDate() != null ? dto.getDate() : LocalDate.now());
         accountBook.setExpenseCategory(dto.getExpenseCategory());
 
         if (deleteImageUrls != null && !deleteImageUrls.isEmpty()) {
@@ -194,7 +197,7 @@ public class AccountBookService {
 
     //수입/지출유형
     public void validateRecordType(AccountBook accountBook, RecordType recordType) {
-        if (accountBook.getRecordType().equals(recordType)) {
+        if (!accountBook.getRecordType().equals(recordType)) {
             throw new IllegalArgumentException("타입이 맞지 않습니다");
         }
     }

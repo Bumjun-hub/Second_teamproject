@@ -17,30 +17,37 @@ public class MyAssetService {
 
     private final MyAssetRepository myAssetRepository;
 
+    //최초생성
     @Transactional
     public void inAsset(MyAssetDto myAssetDto, Member loginUser) {
-        Optional<MyAsset> optionalMyAsset = myAssetRepository.findByMember(loginUser);
-
-        if (optionalMyAsset.isPresent()){ // 존재한다면 수정
-            MyAsset asset = optionalMyAsset.get();
-            asset.setCash(myAssetDto.getCash());
-            asset.setCheckCard(myAssetDto.getCheckCard());
-            asset.setCreditCard(myAssetDto.getCreditCard());
-            asset.setSavingDeposit(myAssetDto.getSavingDeposit());
-            asset.setSavingInstallment(myAssetDto.getSavingInstallment());
-        }else {
-            MyAsset newAsset = MyAsset.builder()  //없으면 생성
+        if (myAssetRepository.findByMember(loginUser).isPresent()) {
+            throw new IllegalArgumentException("이미 자산이 등록되어 있습니다");
+        }
+            MyAsset newAsset = MyAsset.builder()
                     .member(loginUser)
-                    .cash(myAssetDto.getCash())
-                    .checkCard(myAssetDto.getCheckCard())
-                    .creditCard(myAssetDto.getCreditCard())
-                    .savingDeposit(myAssetDto.getSavingDeposit())
-                    .savingInstallment(myAssetDto.getSavingInstallment())
+                    .cash(myAssetDto.getCash() != null ? myAssetDto.getCash() : 0L)
+                    .checkCard(myAssetDto.getCheckCard() != null ? myAssetDto.getCheckCard() : 0L)
+                    .creditCard(0L)
+                    .savingDeposit(myAssetDto.getSavingDeposit() != null ? myAssetDto.getSavingDeposit() : 0L)
+                    .savingInstallment(myAssetDto.getSavingInstallment() != null ? myAssetDto.getSavingInstallment() : 0L)
                     .build();
             myAssetRepository.save(newAsset);
         }
+
+
+    //수정
+    @Transactional
+    public void edit(MyAssetDto myAssetDto, Member loginUser) {
+        MyAsset asset = myAssetRepository.findByMember(loginUser)
+                .orElseThrow(() -> new IllegalArgumentException("자산이 등록되어 있지 않습니다"));
+
+            asset.setCash(myAssetDto.getCash() != null ? myAssetDto.getCash() : asset.getCash());
+            asset.setCheckCard(myAssetDto.getCheckCard() != null ? myAssetDto.getCheckCard() : asset.getCheckCard());
+            asset.setSavingDeposit(myAssetDto.getSavingDeposit() != null ? myAssetDto.getSavingDeposit() : asset.getSavingDeposit());
+            asset.setSavingInstallment(myAssetDto.getSavingInstallment() != null ? myAssetDto.getSavingInstallment() : asset.getSavingInstallment());
     }
 
+    //조회
     @Transactional
     public MyAssetDto getMyAsset(Member loginUser) {
         MyAsset asset = myAssetRepository.findByMember(loginUser)
@@ -53,4 +60,5 @@ public class MyAssetService {
                 .savingInstallment(asset.getSavingInstallment())
                 .build();
     }
+
 }

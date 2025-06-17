@@ -3,7 +3,6 @@ package org.project.second.myAsset.controller;
 import lombok.RequiredArgsConstructor;
 import org.project.second.member.config.CustomUserDetails;
 import org.project.second.member.domain.Member;
-import org.project.second.myAsset.domain.MyAsset;
 import org.project.second.myAsset.dto.MyAssetDto;
 import org.project.second.myAsset.service.MyAssetService;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,16 @@ public class MyAssetController {
         Member loginUser = userDetails.getMember();
         myAssetService.inAsset(myAssetDto, loginUser);
         return ResponseEntity.ok("내 자산이 등록되었습니다");
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<String> edit(
+            @RequestBody MyAssetDto myAssetDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ){
+        Member loginUser = userDetails.getMember();
+        myAssetService.edit(myAssetDto, loginUser);
+        return ResponseEntity.ok("내 자산이 수정되었습니다");
     }
 
     @GetMapping("/view")

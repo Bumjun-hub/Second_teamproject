@@ -14,7 +14,7 @@ import org.project.second.member.domain.Member;
 public class MyAsset extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
