@@ -16,6 +16,7 @@ public class NotificationResponse {
     private Long communityId;
     private Long groupBuyId;
     private Long recipeId;
+    private Long priceAlertId;
     private String category;
     private Boolean isRead;
     private LocalDateTime createdAt;

@@ -26,4 +26,5 @@ public class GroupBuyDto {
     private Long originalPrice;
     private Long salePrice;
     private LocalDateTime deadline;
+    private boolean hotdeal;
 }
