@@ -14,7 +14,6 @@ const LoginPage = () => {
     const [checkingAuth, setCheckingAuth] = useState(true);
     const navigate = useNavigate();
 
-    // 컴포넌트 마운트 시 자동 로그인 확인
     useEffect(() => {
         const checkExistingAuth = async () => {
             try {
@@ -34,10 +33,15 @@ const LoginPage = () => {
         checkExistingAuth();
     }, [navigate]);
 
-    // 구글 로그인 버튼 클릭 핸들러 (OAuth2 리다이렉트 방식)
-    const handleGoogleLogin = () => {
-        // 백엔드의 OAuth2 로그인 엔드포인트로 리다이렉트
-        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    // 소셜 로그인 핸들러
+    const handleSocialLogin = (provider) => {
+        const socialLoginUrls = {
+            google: 'http://localhost:8080/oauth2/authorization/google',
+            kakao: 'http://localhost:8080/oauth2/authorization/kakao',
+            naver: 'http://localhost:8080/oauth2/authorization/naver'
+        };
+        
+        window.location.href = socialLoginUrls[provider];
     };
 
     const handleChange = (e) => {
@@ -57,13 +61,12 @@ const LoginPage = () => {
         setError('');
 
         try {
-            // 일반 로그인 API 호출 (쿠키 방식)
             const response = await fetch('http://localhost:8080/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // 쿠키 포함
+                credentials: 'include',
                 body: JSON.stringify({
                     email: formData.email,
                     password: formData.password
@@ -74,15 +77,10 @@ const LoginPage = () => {
 
             if (response.ok) {
                 console.log('로그인 성공:', data);
-
-                // 인증 상태 변경 이벤트 발생
                 window.dispatchEvent(new Event('authChange'));
-                
-                // 잠시 대기 후 네비게이션
                 setTimeout(() => {
                     navigate('/', { replace: true });
                 }, 200);
-                
             } else {
                 setError(data.message || '로그인에 실패했습니다.');
             }
@@ -98,7 +96,6 @@ const LoginPage = () => {
         navigate('/member');
     };
 
-    // 초기 인증 상태 확인 중일 때 로딩 표시
     if (checkingAuth) {
         return (
             <div className="login-container">
@@ -126,12 +123,13 @@ const LoginPage = () => {
                     </div>
                 </div>
 
-                {/* 구글 로그인 버튼 */}
-                <div className="google-login-section">
+                {/* 소셜 로그인 버튼들 */}
+                <div className="social-login-section">
+                    {/* Google 로그인 */}
                     <button
                         type="button"
-                        onClick={handleGoogleLogin}
-                        className="google-login-button"
+                        onClick={() => handleSocialLogin('google')}
+                        className="social-login-button google"
                     >
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" clipRule="evenodd" d="M17.64 9.20454C17.64 8.56636 17.5827 7.95272 17.4764 7.36363H9V10.845H13.8436C13.635 11.97 13.0009 12.9231 12.0477 13.5613V15.8195H14.9564C16.6582 14.2527 17.64 11.9454 17.64 9.20454Z" fill="#4285F4"/>
@@ -140,6 +138,30 @@ const LoginPage = () => {
                             <path fillRule="evenodd" clipRule="evenodd" d="M8.99976 3.57955C10.3211 3.57955 11.5075 4.03364 12.4402 4.92545L15.0216 2.34409C13.4629 0.891818 11.4257 0 8.99976 0C5.48158 0 2.43794 2.01682 0.957031 4.95818L3.96385 7.29C4.67158 5.16273 6.65567 3.57955 8.99976 3.57955Z" fill="#EA4335"/>
                         </svg>
                         Google로 로그인
+                    </button>
+
+                    {/* 카카오 로그인 */}
+                    <button
+                        type="button"
+                        onClick={() => handleSocialLogin('kakao')}
+                        className="social-login-button kakao"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 0C4.03 0 0 3.15 0 7.03C0 9.71 1.69 12.05 4.26 13.31L3.36 16.71C3.3 16.89 3.51 17.04 3.66 16.92L7.74 14.25C8.15 14.29 8.57 14.31 9 14.31C13.97 14.31 18 11.16 18 7.28C18 3.4 13.97 0.25 9 0.25V0Z" fill="#3C1E1E"/>
+                        </svg>
+                        카카오로 로그인
+                    </button>
+
+                    {/* 네이버 로그인 */}
+                    <button
+                        type="button"
+                        onClick={() => handleSocialLogin('naver')}
+                        className="social-login-button naver"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12.1 9.8L5.9 0H0V18H5.9V8.2L12.1 18H18V0H12.1V9.8Z" fill="#03C75A"/>
+                        </svg>
+                        네이버로 로그인
                     </button>
                 </div>
 
@@ -185,7 +207,7 @@ const LoginPage = () => {
 
                     <button
                         type="submit"
-                        className={'signup-button'}
+                        className="signup-button"
                         disabled={loading}
                     >
                         {loading ? '로그인 중...' : '로그인'}

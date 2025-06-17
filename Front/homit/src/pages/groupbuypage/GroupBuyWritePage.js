@@ -7,6 +7,7 @@ const GroupBuyWritePage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+  const [role, setRole] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -64,6 +65,10 @@ const GroupBuyWritePage = () => {
         });
     }
   }, [isEdit, id]);
+
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -177,6 +182,27 @@ const GroupBuyWritePage = () => {
     navigate('/groupbuy');
   };
 
+
+  useEffect(() => {
+  const fetchRole = async () => {
+    try {
+      const res = await fetch("/api/roleinfo", {
+        credentials: "include",
+      });
+      const text = await res.text();
+      setRole(text);
+      if (text !== "ROLE_ADMIN") {
+        alert('접근 권한이 없습니다.');
+        navigate('/');
+      }
+    } catch (e) {
+      console.error("roleinfo 요청 실패:", e);
+      navigate("/");
+    }
+  };
+  fetchRole();
+}, [navigate]);
+
   // 컴포넌트 언마운트 시 메모리 정리
   useEffect(() => {
     return () => {
@@ -190,9 +216,9 @@ const GroupBuyWritePage = () => {
 
   return (
     <Section>
-      <div className="write-wrapper">
+      <div className="gbw-write-wrapper">
         <div className="write-container">
-          <form className="input-form" onSubmit={handleSubmit}>
+          <form className="gbw-input-form" onSubmit={handleSubmit}>
             <h2>{isEdit ? '공동구매 글 수정' : '공동구매 글 작성'}</h2>
 
             <label>제목</label>
@@ -279,7 +305,7 @@ const GroupBuyWritePage = () => {
               onChange={handleChange}
               required
             />
-            
+
             <label>현재 인원</label>
             <input
               name="currentParticipants"
@@ -340,8 +366,11 @@ const GroupBuyWritePage = () => {
                   />
                 </label>
 
-                <button type="button" className="cancel-button" onClick={handleCancel}>취소</button>
-                <button type="submit" className="submit-button">{isEdit ? '수정' : '등록'}</button>
+                <div>
+                  <button type="button" className="gbw-cancel-button" onClick={handleCancel}>취소</button>
+                  <button type="submit" className="gbw-submit-button">{isEdit ? '수정' : '등록'}</button>
+                </div>
+
               </div>
             </div>
           </form>

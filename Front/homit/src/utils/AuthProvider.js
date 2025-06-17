@@ -18,67 +18,62 @@ export const AuthProvider = ({ children }) => {
 
     // 인증 상태 확인 함수
     const checkAuth = async () => {
-        try {
-            const authResult = await checkAuthStatus();
-            if (authResult.isAuthenticated) {
-                setUser(authResult.user);
-                setIsAuthenticated(true);
-            } else {
-                setUser(null);
-                setIsAuthenticated(false);
-            }
-        } catch (error) {
-            console.error('인증 상태 확인 오류:', error);
-            setUser(null);
-            setIsAuthenticated(false);
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    console.log('🔍 checkAuth 시작');
+    const result = await checkAuthStatus();
+    console.log('🔍 checkAuth 결과:', result);
+    
+    if (result.isAuthenticated) {
+        console.log('✅ checkAuth - 인증됨, 상태 업데이트');
+        setIsAuthenticated(true);
+        setUser(result.user);
+    } else {
+        console.log('❌ checkAuth - 비인증, 상태 초기화');
+        setIsAuthenticated(false);
+        setUser(null);
+    }
+};
     // 토큰 자동 갱신 설정
     useEffect(() => {
-        // 초기 인증 상태 확인
-        checkAuth();
+    checkAuth();
 
-        // 주기적으로 토큰 갱신 (예: 13분마다) - Access Token 만료 전에 미리 갱신
-        const tokenRefreshInterval = setInterval(async () => {
-            // 현재 상태를 다시 체크해서 로그인된 상태인지 확인
-            const currentAuthResult = await checkAuthStatus();
-            if (currentAuthResult.isAuthenticated) {
-                console.log('토큰 자동 갱신 시도...');
-                const refreshResult = await refreshToken();
-                if (!refreshResult) {
-                    // 토큰 갱신 실패 시 로그아웃 처리
-                    console.log('토큰 갱신 실패 - 자동 로그아웃');
-                    setUser(null);
-                    setIsAuthenticated(false);
-                    alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-                    window.location.href = '/login';
-                }
-            }
-        }, 13 * 60 * 1000); // 13분 (15분 만료 전에 미리 갱신)
+    // 주기적으로 토큰 갱신 (13분마다)
+    const tokenRefreshInterval = setInterval(async () => {
+    console.log('⏰ 1분 타이머 발동 - 서버 상태 직접 확인');
+    
+    // isAuthenticated 대신 서버에 직접 확인
+    const serverAuthResult = await checkAuthStatus();
+    
+    if (serverAuthResult.isAuthenticated) {
+        console.log('🔄 서버에서 인증 확인됨 - 토큰 갱신 시도');
+        
+        const refreshResult = await refreshToken();
+        
+        if (refreshResult) {
+            console.log('✅ 토큰 갱신 성공');
+            // 상태 동기화
+            setIsAuthenticated(true);
+            setUser(serverAuthResult.user);
+        } else {
+            console.log('❌ 토큰 갱신 실패 - 로그아웃');
+            setUser(null);
+            setIsAuthenticated(false);
+            alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+            window.location.href = '/login';
+        }
+    } else {
+        console.log('ℹ️ 서버에서 비인증 확인됨 - 토큰 갱신 건너뜀');
+        setIsAuthenticated(false);
+        setUser(null);
+    }
+}, 13 * 60 * 1000);
 
-        // 브라우저 focus 시 토큰 상태 확인
-        const handleFocus = async () => {
-            await checkAuth();
-        };
+    console.log('⏰ 토큰 자동 갱신 타이머 설정됨 (13분 간격)');
 
-        window.addEventListener('focus', handleFocus);
-
-        // 인증 상태 변경 이벤트 리스너
-        const handleAuthChange = () => {
-            checkAuth();
-        };
-
-        window.addEventListener('authChange', handleAuthChange);
-
-        return () => {
-            clearInterval(tokenRefreshInterval);
-            window.removeEventListener('focus', handleFocus);
-            window.removeEventListener('authChange', handleAuthChange);
-        };
-    }, []); // 빈 의존성 배열로 변경 - 한 번만 실행
+    return () => {
+        console.log('⏰ 토큰 자동 갱신 타이머 해제됨');
+        clearInterval(tokenRefreshInterval);
+    };
+}, []);
 
     // 로그인 함수
     const login = async (email, password) => {
