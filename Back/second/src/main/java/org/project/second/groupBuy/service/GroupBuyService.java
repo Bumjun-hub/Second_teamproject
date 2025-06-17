@@ -52,6 +52,7 @@ public class GroupBuyService {
                 .currentQuantity(0)
                 .salePrice(groupBuyDto.getSalePrice())
                 .deadline(groupBuyDto.getDeadline())
+                .hotDeal(groupBuyDto.isHotdeal())
                 .status(groupBuyDto.getStatus())
                 .member(loginUser)
                 .build();
@@ -205,7 +206,7 @@ public class GroupBuyService {
                     post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
-                    post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                    post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
                     (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                     Collections.emptyList()
 
@@ -235,7 +236,7 @@ public class GroupBuyService {
                 post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
                 post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                 post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
-                post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
                 (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                 participants
         );
@@ -258,7 +259,7 @@ public class GroupBuyService {
                     post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
-                    post.getSalePrice(), post.getDeadline(), imageUrls, imageIds,
+                    post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
                     (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                     Collections.emptyList()
             );

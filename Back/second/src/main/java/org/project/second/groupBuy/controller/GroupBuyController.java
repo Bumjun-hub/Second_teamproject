@@ -39,6 +39,7 @@ public class GroupBuyController {
             @RequestParam("originalPrice") Long originalPrice,
             @RequestParam("salePrice") Long salePrice,
             @RequestParam("deadline") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadline,
+            @RequestParam("hotdeal") boolean hotdeal,
             @RequestParam(value = "images", required = false) MultipartFile imageFile,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
@@ -54,6 +55,7 @@ public class GroupBuyController {
                 .originalPrice(originalPrice)
                 .salePrice(salePrice)
                 .deadline(deadline)
+                .hotdeal(hotdeal)
                 .build();
 
         Member loginUser = userDetails.getMember();
