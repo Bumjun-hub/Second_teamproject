@@ -46,15 +46,15 @@ public class AccountBook extends BaseEntity {
     private MoneyMethod moneyMethod;  // 수단
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private IncomeCategory incomeCategory; // 수입항목
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private ExpenseCategory expenseCategory; // 지출항목
 
     @Column(nullable = false)
-    private  boolean imRepeat; // 반복항목
+    private  boolean isRepeat; // 반복항목
 
     @OneToMany(mappedBy = "accountBook", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AccountBookImage> accountBookImages;  // 이미지

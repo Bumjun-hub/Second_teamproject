@@ -36,5 +36,4 @@ public class MyAsset extends BaseEntity {
     @Column(nullable = false)
     private Long savingInstallment = 0L;  //적금
 
-
 }
