@@ -151,13 +151,13 @@ const BoardPage = () => {
 
     return (
         <Section>
-            <div className="Pageinfo">
-                <div className="board-header">
-                    <h2 className="board-title">다양한 정보를 공유해보세요!</h2>
+            <div className="bp-pageinfo">
+                <div className="bp-header">
+                    <h2 className="bp-title">다양한 정보를 공유해보세요!</h2>
                 </div>
             </div>
 
-            <div className="category-filter">
+            <div className="bp-category-filter">
                 {categories.map((cat) => (
                     <button
                         key={cat}
@@ -169,28 +169,28 @@ const BoardPage = () => {
                 ))}
             </div>
 
-            <div className="boardtable-container">
-                <button className="write-button" onClick={handleWrite}>
+            <div className="bp-table-container">
+                <button className="bp-write-button" onClick={handleWrite}>
                     글쓰기
                 </button>
 
-                <table className="board-table">
+                <table className="bp-table">
                     <thead>
                         <tr>
                             <th>카테고리</th>
                             <th>제목</th>
                             <th>작성자</th>
-                            <th>작성일<button className="sort-button" onClick={() => handleSort('createdAt')}>
+                            <th>작성일<button className="bp-sort-button" onClick={() => handleSort('createdAt')}>
                                 {getSortArrow('createdAt')}</button></th>
-                            <th>조회수<button className="sort-button" onClick={() => handleSort('viewCount')}>
+                            <th>조회수<button className="bp-sort-button" onClick={() => handleSort('viewCount')}>
                                 {getSortArrow('viewCount')}</button></th>
-                            <th>추천수<button className="sort-button" onClick={() => handleSort('likes')}>
+                            <th>추천수<button className="bp-sort-button" onClick={() => handleSort('likes')}>
                                 {getSortArrow('likes')}</button></th>
                         </tr>
                     </thead>
                     <tbody>
                         {noticePosts.map((item) => (
-                            <tr key={item.id} className="notice-row">
+                            <tr key={item.id} className="bp-notice-row">
                                 <td>{item.notice === true ? "공지사항" : categoryLabelMap[item.category]}</td>
                                 <td>
                                     <a
@@ -249,7 +249,7 @@ const BoardPage = () => {
                     </tbody>
                 </table>
 
-                <div className="board-pagination">
+                <div className="bp-pagination">
                     {Array.from({ length: totalPages }, (_, index) => (
                         <button
                             key={index}
@@ -261,11 +261,11 @@ const BoardPage = () => {
                     ))}
                 </div>
 
-                <div className="search-bar">
+                <div className="bp-search-bar">
                     <select
                         value={searchField}
                         onChange={(e) => setSearchField(e.target.value)}
-                        className="search-select"
+                        className="bp-search-select"
                     >
                         <option value="title">제목</option>
                         <option value="writer">작성자</option>
@@ -273,18 +273,18 @@ const BoardPage = () => {
                     <input
                         type="text"
                         placeholder="검색어를 입력하세요"
-                        className="search-input"
+                        className="bp-search-input"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <button className="search-button" onClick={handleSearch}>검색</button>
+                    <button className="bp-search-button" onClick={handleSearch}>검색</button>
                 </div>
             </div>
 
             {/* 썸네일 */}
             {thumbnail.visible && (
                 <div
-                    className="thumbnail-tooltip"
+                    className="bp-thumbnail-tooltip"
                     style={{ top: thumbnail.y, left: thumbnail.x, position: 'absolute' }}
                 >
                     <img src={thumbnail.url} alt="썸네일" />

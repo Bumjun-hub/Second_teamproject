@@ -60,7 +60,7 @@ const GroupBuyPage = () => {
 
     return (
         <Section>
-            <div className="Pageinfo">
+            <div className="gbp-Pageinfo">
                 <div className="board-header">
                     <h2 className="board-title">다양한 물건을 싸게 구매해보세요!</h2>
                 </div>
@@ -68,9 +68,9 @@ const GroupBuyPage = () => {
 
             {/* 관리자만 글쓰기 가능 */}
             {role === "ROLE_ADMIN" && (
-                <div className="write-button-wrapper">
+                <div className="gbp-write-button-wrapper">
                     <button
-                        className="write-button"
+                        className="gbp-write-button"
                         onClick={() => navigate("/groupbuy/write")}
                     >
                         글쓰기
@@ -78,16 +78,16 @@ const GroupBuyPage = () => {
                 </div>
             )}
 
-            <div className="Groupbuylist">
-                <div className="Groupbuylist-inner">
+            <div className="gbp-Groupbuylist">
+                <div className="gbp-Groupbuylist-inner">
                     {currentItems.map((item) => (
-                        <div key={item.id} className="GroupbuyItem">
-                            <div className="image-wrapper">
+                        <div key={item.id} className="gbp-GroupbuyItem">
+                            <div className="gbp-image-wrapper">
                                 {item.status === 'COMPLETED' && (
-                                    <div className="diagonal-badge status-completed">모집 완료</div>
+                                    <div className="gbp-diagonal-badge gbp-status-completed">모집 완료</div>
                                 )}
                                 {item.status === 'CLOSED' && (
-                                    <div className="diagonal-badge status-closed">모집 실패</div>
+                                    <div className="gbp-diagonal-badge gbp-status-closed">모집 실패</div>
                                 )}
                                 <img src={item.imgUrls?.[0]} alt={item.title} className="item-image" />
                             </div>
@@ -96,7 +96,7 @@ const GroupBuyPage = () => {
                             <p>{item.salePrice?.toLocaleString()}원</p>
 
                             <button
-                                className="apply-button"
+                                className="gbp-apply-button"
                                 onClick={() => {
                                     if (item.status === 'CLOSED') {
                                         alert("모집 실패된 공동구매는 열람할 수 없습니다.");
@@ -118,26 +118,20 @@ const GroupBuyPage = () => {
             </div>
 
             {/* 페이지네이션 버튼 */}
-            <div style={{ textAlign: "center", marginTop: "40px" }}>
+            <div className="gbp-pagination">
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
                         key={index}
+                        className={currentPage === index + 1 ? 'active' : ''}
                         onClick={() => setCurrentPage(index + 1)}
-                        style={{
-                            margin: "0 5px",
-                            padding: "8px 16px",
-                            backgroundColor: currentPage === index + 1 ? "#2668A7" : "#ddd",
-                            color: currentPage === index + 1 ? "#fff" : "#000",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                        }}
                     >
                         {index + 1}
                     </button>
                 ))}
             </div>
-        </Section>
+
+
+        </Section >
     );
 };
 

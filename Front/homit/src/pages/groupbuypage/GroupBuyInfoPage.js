@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './GroupBuyInfoPage.css';
 import Section from '../../components/Section';
+import { refreshToken } from "../../utils/authUtils";
 
 const GroupBuyInfoPage = () => {
     const { id } = useParams();
@@ -9,7 +10,7 @@ const GroupBuyInfoPage = () => {
     const [item, setItem] = useState(null);
     const [currentUser, setCurrentUser] = useState("");
     const [hasOrder, setHasOrder] = useState(false);
-    const [isLiked, setIsLiked] = useState(false);
+    const [role, setRole] = useState(null);
 
 
 
@@ -19,20 +20,37 @@ const GroupBuyInfoPage = () => {
 
     const fetchItem = async () => {
         try {
+            // 1. 게시글 정보
             const res = await fetch(`http://localhost:8080/api/groupBuy/detail/${id}`, {
                 credentials: 'include',
             });
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            if (!res.ok) throw new Error(`상세 불러오기 실패: ${res.status}`);
             const json = await res.json();
             setItem(json);
 
-            // 참여 여부 판단
-            const userRes = await fetch("http://localhost:8080/api/mypage", { credentials: "include" });
+            // gbi-2. 사용자 정보
+            const userRes = await fetch("http://localhost:8080/api/mypage", {
+                credentials: "include"
+            });
+
+            if (!userRes.ok) throw new Error(`사용자 정보 불러오기 실패: ${userRes.status}`);
             const userData = await userRes.json();
+            if (!userData.name) throw new Error("사용자 이름이 없음");
             setCurrentUser(userData.name);
 
-            const ordersRes = await fetch(`/api/order/myPage/order`, { credentials: "include" });
-            const orders = await ordersRes.json();
+            // 3. 주문 정보
+            const ordersRes = await fetch(`/api/order/myPage/order`, {
+                credentials: "include"
+            });
+
+            let orders = [];
+            if (ordersRes.ok) {
+                const orderJson = await ordersRes.json();
+                if (Array.isArray(orderJson)) {
+                    orders = orderJson;
+                }
+            }
+
             const myOrder = orders.find(order => order.groupBuyId === Number(id));
             setHasOrder(!!myOrder);
 
@@ -41,6 +59,45 @@ const GroupBuyInfoPage = () => {
             alert("데이터를 불러오는데 실패했습니다.");
         }
     };
+    // 권한 정보 불러오기
+
+
+    // useEffect 안에서 fetchRole 함수 수정
+    useEffect(() => {
+        const fetchRole = async () => {
+            try {
+                let res = await fetch("http://localhost:8080/api/roleinfo", {
+                    credentials: "include",
+                });
+
+                // 401이면 토큰 갱신 시도
+                if (res.status === 401) {
+                    const refreshed = await refreshToken();
+                    if (refreshed) {
+                        res = await fetch("http://localhost:8080/api/roleinfo", {
+                            credentials: "include",
+                        });
+                    }
+                }
+
+                if (!res.ok) throw new Error("권한 요청 실패");
+
+                const text = await res.text();
+                console.log("🎯 현재 사용자 권한:", text);
+                setRole(text);
+
+            } catch (e) {
+                console.error("roleinfo 요청 실패:", e);
+                alert("로그인이 필요합니다.");
+                navigate("/login");
+            }
+        };
+
+        fetchRole();
+    }, [navigate]);
+
+
+
 
     useEffect(() => {
         if (id) fetchItem();
@@ -129,54 +186,56 @@ const GroupBuyInfoPage = () => {
 
     return (
         <Section>
-            <div className="info-container">
-                <div className="top-buttons">
-                    <button className="edit-button" onClick={handleEdit}>수정</button>
-                    <button className="delete-button" onClick={handleDelete}>삭제</button>
-                </div>
+            <div className="gbi-info-container">
+                {role === "ROLE_ADMIN" && (
+                    <div className="gbi-top-buttons">
+                        <button className="gbi-edit-button" onClick={handleEdit}>수정</button>
+                        <button className="gbi-delete-button" onClick={handleDelete}>삭제</button>
+                    </div>
+                )}
 
-                <div className="product-card">
-                    <div className="image-area">
+                <div className="gbi-product-card">
+                    <div className="gbi-image-area">
                         {item.imgUrls?.length > 0 && (
                             <img src={item.imgUrls[0]} alt={item.title} />
                         )}
                     </div>
 
-                    <div className="details-area">
-                        <div className="header-row">
-                            <h2 className="main-title">{item.title}</h2>
-                            <div className="actions">
+                    <div className="gbi-details-area">
+                        <div className="gbi-header-row">
+                            <h2 className="gbi-main-title">{item.title}</h2>
+                            <div className="gbi-actions">
                                 {item.productUrl && (
-                                    <a href={item.productUrl} target="_blank" rel="noreferrer" className="detail-link">
+                                    <a href={item.productUrl} target="_blank" rel="noreferrer" className="gbi-detail-link">
                                         제품 상세보기
                                     </a>
                                 )}
-                                <button className="heart-button">♡</button>
+                                <button className="gbi-heart-button">♡</button>
                             </div>
                         </div>
 
-                        <div className="card-section">
-                            <div className="section-title">📝 상품 설명</div>
-                            <div className="section-content">{item.description}</div>
+                        <div className="gbi-card-section">
+                            <div className="gbi-section-title">📝 상품 설명</div>
+                            <div className="gbi-section-content">{item.description}</div>
                         </div>
 
-                        <div className="card-section">
-                            <div className="section-title">📦 상세 내용</div>
-                            <div className="section-content">{item.content}</div>
+                        <div className="gbi-card-section">
+                            <div className="gbi-section-title">📦 상세 내용</div>
+                            <div className="gbi-section-content">{item.content}</div>
                         </div>
 
-                        <div className="info-footer">
-                            <div className="info-box">
-                                <span className="info-label">모집 인원</span>
+                        <div className="gbi-info-footer">
+                            <div className="gbi-info-box">
+                                <span className="gbi-info-label">모집 인원</span>
                                 <span>{item.minParticipants} ~ {item.maxParticipants} 명</span>
                             </div>
 
-                            <div className="info-box">
-                                <span className="info-label">참여자 수 : <strong>{item.currentParticipants}</strong> / {item.maxParticipants}명
+                            <div className="gbi-info-box">
+                                <span className="gbi-info-label">참여자 수 : <strong>{item.currentParticipants}</strong> / {item.maxParticipants}명
                                     {hasOrder && <span> (참여중)</span>}</span>
-                                <div className="progress-bar-wrapper">
+                                <div className="gbi-progress-bar-wrapper">
                                     <div
-                                        className="progress-bar-fill"
+                                        className="gbi-progress-bar-fill"
                                         style={{
                                             width: `${Math.min((item.currentParticipants / item.maxParticipants) * 100, 100)}%`,
                                         }}
@@ -184,20 +243,20 @@ const GroupBuyInfoPage = () => {
                                 </div>
                             </div>
 
-                            <div className="info-box">
-                                <span className="info-label">마감일</span>
+                            <div className="gbi-info-box">
+                                <span className="gbi-info-label">마감일</span>
                                 <span>{item.deadline ? new Date(item.deadline).toLocaleString() : '-'}</span>
                             </div>
                         </div>
 
-                        <div className="bottom-row">
-                            <div className="price-wrapper">
-                                <span className="original-price">
+                        <div className="gbi-bottom-row">
+                            <div className="gbi-price-wrapper">
+                                <span className="gbi-original-price">
                                     {typeof item.originalPrice === 'number'
                                         ? item.originalPrice.toLocaleString()
                                         : `${item.originalPrice ?? '-'}`}원
                                 </span>
-                                <span className="sale-price">
+                                <span className="gbi-sale-price">
                                     {typeof item.salePrice === 'number'
                                         ? item.salePrice.toLocaleString()
                                         : `${item.salePrice ?? '-'}`}원
@@ -209,27 +268,27 @@ const GroupBuyInfoPage = () => {
                             {/* 마감 완료 상태일때 */}
                             {item.status === "COMPLETED" ? (
                                 hasOrder ? (
-                                    <button className="buy-button" disabled>
+                                    <button className="gbi-buy-button" disabled>
                                         신청 완료(구매대기)
                                     </button>
                                 ) : (
-                                    <button className="buy-button" disabled>
+                                    <button className="gbi-buy-button" disabled>
                                         마감 완료
                                     </button>
                                 )
                             ) : item.status !== "OPEN" ? (
-                                <button className="buy-button" disabled>
+                                <button className="gbi-buy-button" disabled>
                                     마감 종료
                                 </button>
                             ) : (
                                 hasOrder ? (
-                                    // <button className="buy-button" disabled>
+                                    // <button className="gbi-buy-button" disabled>
                                     // 이미 신청함
                                     // </button>
                                     // 만약 취소 허용하려면
-                                    <button className="buy-button" onClick={handleCancel}>신청 취소</button>
+                                    <button className="gbi-buy-button" onClick={handleCancel}>신청 취소</button>
                                 ) : (
-                                    <button className="buy-button" onClick={handleApply}>
+                                    <button className="gbi-buy-button" onClick={handleApply}>
                                         구매 신청(결제)
                                     </button>
                                 )

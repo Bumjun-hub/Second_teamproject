@@ -1,4 +1,4 @@
-.info-container {
+.gbi-info-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 60px 0px;
@@ -7,60 +7,60 @@
 }
 
 /* 수정 / 삭제 버튼 */
-.top-buttons {
+.gbi-top-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.edit-button,
-.delete-button {
+.gbi-edit-button,
+.gbi-delete-button {
   padding: 6px 14px;
   border: none;
   border-radius: 5px;
   font-weight: bold;
   cursor: pointer;
   color: white;
-  transition: 0.2s;
+  transition: 0.gbi-2s;
 }
 
-.edit-button {
+.gbi-edit-button {
   background-color: royalblue;
 }
 
-.edit-button:hover {
+.gbi-edit-button:hover {
   background-color: #4169e1;
 }
 
-.delete-button {
+.gbi-delete-button {
   background-color: crimson;
 }
 
-.delete-button:hover {
+.gbi-delete-button:hover {
   background-color: #c21807;
 }
 
 /* 상품 카드 전체 */
-.product-card {
+.gbi-product-card {
   display: flex;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.gbi-2);
   padding: 20px;
   gap: 20px;
 }
 
 /* 이미지 */
-.image-area {
+.gbi-image-area {
   width: 40%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.image-area img {
+.gbi-image-area img {
   width: 100%;
   max-width: 300px;
   border-radius: 8px;
@@ -69,14 +69,14 @@
 
 
 
-.details-area {
+.gbi-details-area {
   padding: 20px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.gbi-06);
 }
 
-.main-title {
+.gbi-main-title {
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 15px;
@@ -84,29 +84,29 @@
   padding-bottom: 8px;
 }
 
-.card-section {
+.gbi-card-section {
   margin-bottom: 25px;
   padding: 18px;
   background-color: #f9f9f9;
   border-radius: 10px;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.03);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.gbi-03);
 }
 
-.section-title {
+.gbi-section-title {
   font-weight: bold;
   font-size: 16px;
   margin-bottom: 10px;
   color: #333;
 }
 
-.section-content {
+.gbi-section-content {
   font-size: 14px;
   color: #555;
-  line-height: 1.6;
+  line-height: 1.gbi-6;
   white-space: pre-line;
 }
 
-.info-footer {
+.gbi-info-footer {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
@@ -115,17 +115,17 @@
   border-bottom: 1px solid #ddd;
 }
 
-.info-box {
+.gbi-info-box {
   display: flex;
   flex-direction: column;
 }
 
-.info-label {
+.gbi-info-label {
   font-size: 13px;
   color: #888;
 }
 
-.bottom-row {
+.gbi-bottom-row {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -133,7 +133,7 @@
   gap: 20px; /* 버튼과 가격 간격 */
 }
 
-.price-row {
+.gbi-price-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -141,14 +141,14 @@
 }
 
 
-.price-wrapper {
+.gbi-price-wrapper {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   margin-right: 20px; /* 구매참여 버튼과의 간격 조절 */
 }
 
-.original-price {
+.gbi-original-price {
   font-size: 14px;
   color: #aaa;
   text-decoration: line-through;
@@ -156,13 +156,13 @@
 }
 
 
-.sale-price {
+.gbi-sale-price {
   font-size: 20px;
   font-weight: bold;
   color: #ff4d4f;
 }
 
-.buy-button {
+.gbi-buy-button {
   background-color: #4CAF50;
   color: white;
   padding: 10px 20px;
@@ -172,7 +172,7 @@
   font-weight: bold;
 }
 
-.buy-button:hover {
+.gbi-buy-button:hover {
   background-color: #45a049;
 }
 
@@ -182,19 +182,19 @@
 
 
 /* 제목 및 액션 */
-.header-row {
+.gbi-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.actions {
+.gbi-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.detail-link {
+.gbi-detail-link {
   background-color: #4caf50;
   color: white;
   font-size: 14px;
@@ -202,14 +202,14 @@
   border-radius: 5px;
   text-decoration: none;
   display: inline-block;
-  transition: 0.2s;
+  transition: 0.gbi-2s;
 }
 
-.detail-link:hover {
+.gbi-detail-link:hover {
   background-color: #449d48;
 }
 
-.heart-button {
+.gbi-heart-button {
   font-size: 20px;
   background: none;
   border: none;
@@ -217,57 +217,57 @@
 }
 
 /* 내용 */
-.description {
+.gbi-description {
   font-size: 15px;
   margin: 8px 0;
   color: #333;
 }
 
-.content {
+.gbi-content {
   font-size: 14px;
   margin: 4px 0 16px 0;
   color: #555;
 }
 
 /* 하단 고정 */
-.bottom-fixed {
+.gbi-bottom-fixed {
   margin-top: auto;
 }
 
-.goal {
+.gbi-goal {
   font-size: 14px;
   color: #666;
   text-align: right;
   margin-bottom: 8px;
 }
 
-.deadline {
+.gbi-deadline {
   font-size: 14px;
   color: #666;
   text-align: right;
   margin-bottom: 12px;
 }
 
-.bottom-row {
+.gbi-bottom-row {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 12px;
 }
 
-.original-price {
+.gbi-original-price {
   text-decoration: line-through;
   color: #999;
   font-size: 15px;
 }
 
-.price {
+.gbi-price {
   font-size: 20px;
   font-weight: bold;
   color: #e53935;
 }
 
-.buy-button {
+.gbi-buy-button {
   background-color: #f44336;
   color: white;
   border: none;
@@ -275,19 +275,19 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.2s;
+  transition: 0.gbi-2s;
 }
 
-.buy-button:hover {
+.gbi-buy-button:hover {
   background-color: #d32f2f;
 }
 
 
-.participant-info {
+.gbi-participant-info {
   margin-top: 10px;
 }
 
-.progress-bar-wrapper {
+.gbi-progress-bar-wrapper {
   width: 100%;
   height: 12px;
   background-color: #e0e0e0;
@@ -296,8 +296,61 @@
   margin-top: 10px;
 }
 
-.progress-bar-fill {
+.gbi-progress-bar-fill {
   height: 100%;
   background-color: #4caf50;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.gbi-3s ease-in-out;
+}
+
+/* 정렬 개선 */
+.gbi-product-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  padding: 30px;
+}
+
+.gbi-image-area {
+  flex: 0 0 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gbi-details-area {
+  flex: 1;
+  min-width: 320px;
+}
+
+/* 가격 정렬 보정 */
+.gbi-price-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* 버튼 너비 고정 */
+.gbi-buy-button {
+  min-width: 140px;
+  text-align: center;
+}
+
+/* 상단 버튼 위치 개선 */
+.gbi-top-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+  .gbi-product-card {
+    flex-direction: column;
+    align-items: center;
+  }
+  .gbi-details-area {
+    width: 100%;
+  }
 }
