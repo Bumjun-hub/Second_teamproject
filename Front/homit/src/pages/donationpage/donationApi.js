@@ -4,28 +4,21 @@ import { authenticatedFetch, checkAuthStatus } from '../../utils/authUtils';
 // donationApi.js
 const BASE_URL = 'http://localhost:8080/api/donation';
 
-
+// 1. 게시글 작성 - 백엔드 스펙에 맞춤
 export const createPost = async (postData) => {
   try {
     console.log('🚀 createPost 시작');
+    console.log('📤 원본 데이터:', postData);
     
-    // 로그인 상태 확인 (올바른 속성명 사용)
-    console.log('🔐 로그인 상태 확인 중...');
-    const authStatus = await checkAuthStatus(); // await 추가
-    console.log('🔐 최종 인증 상태:', authStatus);
+    // 로그인 상태 확인
+    const authStatus = await checkAuthStatus();
+    console.log('🔐 인증 상태:', authStatus);
     
-    if (!authStatus.isAuthenticated) { // isLoggedIn → isAuthenticated
-      console.error('❌ 로그인되지 않음');
-      console.error('❌ authStatus 상세:', JSON.stringify(authStatus, null, 2));
+    if (!authStatus.isAuthenticated) {
       throw new Error('로그인이 필요합니다. 먼저 로그인해주세요.');
     }
     
-    console.log('✅ 로그인 확인됨, 사용자:', authStatus.user);
-    
-    // 요청 데이터 로깅
-    console.log('📤 원본 데이터:', JSON.stringify(postData, null, 2));
-    
-    // FormData 생성 (백엔드 @RequestPart 형식에 맞춤)
+    // FormData 생성 (백엔드 @RequestPart 개별 필드 형식에 맞춤)
     const formData = new FormData();
     
     // 카테고리 매핑 (프론트 → 백엔드)
@@ -36,341 +29,397 @@ export const createPost = async (postData) => {
       '동네 생활': 'LOCAL_ACTIVITY'
     };
     
-    // 가격 처리: "나눔"이면 0, 아니면 숫자로 변환
-    let priceValue = 0;
-    if (postData.price !== '나눔') {
-      // 문자열에서 숫자만 추출 (쉼표 등 제거)
-      const cleanPrice = postData.price.toString().replace(/[^0-9]/g, '');
-      priceValue = parseInt(cleanPrice) || 0;
-    }
-    
-    // 백엔드 enum 값 확인
     const mappedCategory = categoryMap[postData.category];
     if (!mappedCategory) {
       throw new Error(`지원하지 않는 카테고리입니다: ${postData.category}`);
     }
     
-    // 각 필드를 개별적으로 FormData에 추가
+    // 가격 처리: "나눔"이면 "0", 아니면 숫자 문자열
+    let priceValue = "0";
+    if (postData.price !== '나눔') {
+      const cleanPrice = postData.price.toString().replace(/[^0-9]/g, '');
+      priceValue = cleanPrice || "0";
+    }
+    
+    // 백엔드 @RequestPart 개별 필드 형식으로 추가
     formData.append('category', mappedCategory);
     formData.append('province', postData.region.province);
-    formData.append('city', postData.region.city); 
+    formData.append('city', postData.region.city);
     formData.append('district', postData.region.district);
     formData.append('neighborhood', postData.region.neighborhood || '');
     formData.append('title', postData.title);
     formData.append('content', postData.content);
-    formData.append('price', priceValue.toString()); // 문자열로 전송
+    formData.append('price', priceValue);
     
-    // FormData 내용 확인 (디버깅용)
-    console.log('📤 FormData 내용:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}: ${value} (${typeof value})`);
+    console.log('📋 FormData 필드들:');
+    console.log('  category:', mappedCategory);
+    console.log('  province:', postData.region.province);
+    console.log('  city:', postData.region.city);
+    console.log('  district:', postData.region.district);
+    console.log('  neighborhood:', postData.region.neighborhood || '');
+    console.log('  title:', postData.title);
+    console.log('  content:', postData.content);
+    console.log('  price:', priceValue);
+    
+    // 🖼️ 이미지 파일들 추가 - @RequestPart(value = "images")
+    if (postData.images && postData.images.length > 0) {
+      console.log(`🖼️ 이미지 ${postData.images.length}개 추가 중...`);
+      
+      postData.images.forEach((file, index) => {
+        console.log(`🖼️ ${index + 1}번째 이미지:`, {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        });
+        // 백엔드의 @RequestPart(value = "images") 에 맞춤
+        formData.append('images', file);
+      });
+    } else {
+      console.log('📷 업로드할 이미지가 없습니다.');
     }
     
-    // 백엔드 요구사항 재확인
-    console.log('🔍 백엔드 매핑 확인:');
-    console.log('  - category (enum):', mappedCategory);
-    console.log('  - price (Long):', priceValue, typeof priceValue);
-    console.log('  - region fields:', {
-      province: postData.region.province,
-      city: postData.region.city,
-      district: postData.region.district,
-      neighborhood: postData.region.neighborhood || ''
-    });
+    // FormData 전체 내용 확인
+    console.log('📤 최종 FormData 내용:');
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: ${value.name} (${value.size} bytes)`);
+      } else {
+        console.log(`  ${key}: "${value}"`);
+      }
+    }
     
-    // XMLHttpRequest로 multipart/form-data 전송 (쿠키 기반 인증)
-    const response = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      
-      xhr.open('POST', `${BASE_URL}/write`, true);
-      xhr.withCredentials = true; // 쿠키 기반 인증을 위해 필수!
-      
-      // JWT가 쿠키에 있으므로 Authorization 헤더 불필요
-      // Content-Type도 설정하지 않음 (브라우저가 자동으로 multipart/form-data 설정)
-      
-      xhr.onload = function() {
-        console.log('📥 응답 수신:', xhr.status, xhr.statusText);
-        resolve({
-          ok: xhr.status >= 200 && xhr.status < 300,
-          status: xhr.status,
-          statusText: xhr.statusText,
-          text: () => Promise.resolve(xhr.responseText),
-          json: () => Promise.resolve(JSON.parse(xhr.responseText))
-        });
-      };
-      
-      xhr.onerror = function() {
-        console.error('❌ 네트워크 오류');
-        reject(new Error('네트워크 오류가 발생했습니다.'));
-      };
-      
-      console.log('📤 FormData 전송 시작...');
-      xhr.send(formData);
+    // 백엔드 엔드포인트 /write 로 요청
+    const response = await fetch(`${BASE_URL}/write`, {
+      method: 'POST',
+      credentials: 'include', // 쿠키 기반 인증
+      body: formData
+      // Content-Type 헤더는 설정하지 않음 (브라우저가 자동 설정)
     });
 
-    // 응답 처리
     console.log('📥 응답 상태:', response.status);
 
     if (!response.ok) {
-      // 인증 실패 시 특별 처리
       if (response.status === 401) {
         throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.');
       }
       
-      // 에러 응답 확인
       const errorText = await response.text();
-      console.error('❌ 서버 에러 응답:', errorText);
-      
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      console.error('❌ 서버 에러:', errorText);
+      throw new Error(`서버 오류: ${response.status} - ${errorText}`);
     }
 
-    // 성공 응답 처리
-    const textResult = await response.text();
-    console.log('✅ 성공 응답:', textResult);
-    return { success: true, message: textResult };
+    const result = await response.text(); // 백엔드가 String 반환
+    console.log('✅ 성공 응답:', result);
+    return { success: true, message: result };
 
   } catch (error) {
     console.error('❌ 게시글 작성 실패:', error);
-    
-    // 사용자 친화적 에러 메시지
-    if (error.message.includes('로그인')) {
-      alert(error.message);
-    }
-    
     throw error;
   }
 };
 
-// XMLHttpRequest 버전도 인증 헤더 추가
-export const createPostXHR = async (postData) => {
-  return new Promise((resolve, reject) => {
-    // 로그인 상태 확인
-    const authStatus = checkAuthStatus();
-    if (!authStatus.isLoggedIn) {
-      reject(new Error('로그인이 필요합니다.'));
-      return;
-    }
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${BASE_URL}/write`, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('Accept', 'application/json');
-    
-    // 인증 헤더 추가
-    if (authStatus.token) {
-      const token = authStatus.token.startsWith('Bearer ') 
-        ? authStatus.token 
-        : `Bearer ${authStatus.token}`;
-      xhr.setRequestHeader('Authorization', token);
-    }
-    
-    // 쿠키 기반 인증도 지원
-    xhr.withCredentials = true;
-    
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4) {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const result = JSON.parse(xhr.responseText);
-            resolve(result);
-          } catch (e) {
-            resolve({ message: xhr.responseText });
-          }
-        } else if (xhr.status === 401) {
-          reject(new Error('로그인이 만료되었습니다. 다시 로그인해주세요.'));
-        } else {
-          reject(new Error(`HTTP error! status: ${xhr.status}, message: ${xhr.responseText}`));
-        }
-      }
-    };
-    
-    xhr.onerror = function() {
-      reject(new Error('네트워크 오류가 발생했습니다.'));
-    };
-    
-    xhr.send(JSON.stringify(postData));
-  });
-};
-
-// 2. 게시글 수정
+// 2. 게시글 수정 - 백엔드 스펙에 맞춤
 export const updatePost = async (id, postData) => {
   try {
-    console.log('📤 게시글 수정 요청 시작 - ID:', id);
-    console.log('📤 전송할 데이터:', postData);
+    console.log('🔧 게시글 수정 요청 - ID:', id);
+    console.log('📤 수정 데이터:', postData);
     
+    // 로그인 상태 확인
+    const authStatus = await checkAuthStatus();
+    if (!authStatus.isAuthenticated) {
+      throw new Error('로그인이 필요합니다.');
+    }
+    
+    // FormData 생성 (백엔드 @RequestParam 형식에 맞춤)
     const formData = new FormData();
     
-    // 각 필드 추가하면서 로그 출력
-    console.log('FormData 추가 중...');
-    formData.append('title', String(postData.title));
-    console.log('✓ title 추가:', postData.title);
+    // 카테고리 매핑
+    const categoryMap = {
+      '나눔': 'FREE',
+      '팝니다': 'SELL', 
+      '삽니다': 'BUY',
+      '동네 생활': 'LOCAL_ACTIVITY'
+    };
     
-    formData.append('content', String(postData.content));
-    console.log('✓ content 추가:', postData.content);
+    const mappedCategory = categoryMap[postData.category] || postData.category;
     
-    formData.append('category', String(postData.category));
-    console.log('✓ category 추가:', postData.category);
-    
-    formData.append('price', String(postData.price));
-    console.log('✓ price 추가:', postData.price);
-    
-    formData.append('province', String(postData.region.province));
-    console.log('✓ province 추가:', postData.region.province);
-    
-    formData.append('city', String(postData.region.city));
-    console.log('✓ city 추가:', postData.region.city);
-    
-    formData.append('district', String(postData.region.district));
-    console.log('✓ district 추가:', postData.region.district);
-    
-    formData.append('neighborhood', String(postData.region.neighborhood || ''));
-    console.log('✓ neighborhood 추가:', postData.region.neighborhood);
-    
-    // FormData 전체 내용 확인
-    console.log('📋 FormData 최종 내용:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`  ${key}: "${value}" (타입: ${typeof value}, 길이: ${String(value).length})`);
+    // 가격 처리
+    let priceValue = "0";
+    if (postData.price !== '나눔') {
+      const cleanPrice = postData.price.toString().replace(/[^0-9]/g, '');
+      priceValue = cleanPrice || "0";
     }
     
-    console.log('📤 요청 전송 시작...');
+    // 백엔드 @RequestParam 개별 필드 형식으로 추가
+    formData.append('category', mappedCategory);
+    formData.append('province', postData.region.province);
+    formData.append('city', postData.region.city);
+    formData.append('district', postData.region.district);
+    formData.append('neighborhood', postData.region.neighborhood || '');
+    formData.append('title', postData.title);
+    formData.append('content', postData.content);
+    formData.append('price', priceValue);
     
-    const response = await fetch(`/api/donation/edit/${id}`, {
+    console.log('📋 수정용 필드들:');
+    console.log('  category:', mappedCategory);
+    console.log('  province:', postData.region.province);
+    console.log('  city:', postData.region.city);
+    console.log('  district:', postData.region.district);
+    console.log('  neighborhood:', postData.region.neighborhood || '');
+    console.log('  title:', postData.title);
+    console.log('  content:', postData.content);
+    console.log('  price:', priceValue);
+    
+    // 새로운 이미지 파일들 추가
+    if (postData.images && postData.images.length > 0) {
+      console.log(`🖼️ 새 이미지 ${postData.images.length}개 추가`);
+      postData.images.forEach((file, index) => {
+        console.log(`🖼️ 새 이미지 ${index + 1}: ${file.name}`);
+        // 백엔드의 @RequestParam(value = "images") 에 맞춤
+        formData.append('images', file);
+      });
+    }
+    
+    // 삭제할 이미지 URLs 추가 - JSON 문자열로
+    if (postData.removedImages && postData.removedImages.length > 0) {
+      console.log(`🗑️ 삭제할 이미지 ${postData.removedImages.length}개:`, postData.removedImages);
+      // 백엔드가 JSON 문자열을 기대함
+      const removedImagesJson = JSON.stringify(postData.removedImages);
+      formData.append('removedImages', removedImagesJson);
+      console.log('🗑️ removedImages JSON:', removedImagesJson);
+    }
+    
+    // FormData 내용 확인
+    console.log('📤 수정용 FormData 내용:');
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: ${value.name} (${value.size} bytes)`);
+      } else {
+        console.log(`  ${key}: "${value}"`);
+      }
+    }
+    
+    const response = await fetch(`${BASE_URL}/edit/${id}`, {
       method: 'PUT',
+      credentials: 'include',
       body: formData
-      // Content-Type 헤더는 설정하지 않음 (브라우저가 자동 설정)
     });
     
-    console.log('📥 응답 수신:', response.status, response.statusText);
+    console.log('📥 수정 응답 상태:', response.status);
     
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.');
+      }
+      
       const errorText = await response.text();
-      console.error('❌ 에러 응답:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      console.error('❌ 수정 에러:', errorText);
+      throw new Error(`수정 실패: ${response.status} - ${errorText}`);
     }
     
-    const result = await response.text();
-    console.log('✅ 성공 응답:', result);
-    return result;
+    const result = await response.text(); // 백엔드가 String 반환
+    console.log('✅ 수정 성공:', result);
+    return { success: true, message: result };
     
   } catch (error) {
-    console.error('❌ updatePost 에러:', error);
+    console.error('❌ 수정 실패:', error);
     throw error;
   }
 };
 
 // 3. 게시글 삭제
 export const deletePost = async (id) => {
-    try {
-        const response = await authenticatedFetch(`${BASE_URL}/delete/${id}`, {
-            method: 'DELETE',
-        });
+  try {
+    console.log('🗑️ 게시글 삭제 요청 - ID:', id);
+    
+    const response = await authenticatedFetch(`${BASE_URL}/delete/${id}`, {
+      method: 'DELETE',
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.text();
-        return { success: true, message: result };
-    } catch (error) {
-        console.error('게시글 삭제 실패:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const result = await response.text();
+    console.log('✅ 삭제 성공:', result);
+    return { success: true, message: result };
+  } catch (error) {
+    console.error('❌ 게시글 삭제 실패:', error);
+    throw error;
+  }
 };
 
 // 4. 카테고리별 게시글 목록 조회
 export const getPostsByCategory = async (category) => {
-    try {
-        // '전체' 카테고리 처리
-        if (category === '전체') {
-            // 모든 카테고리의 게시글을 가져와서 합치기
-            const categories = ['BUY', 'FREE', 'LOCAL_ACTIVITY', 'SELL'];
-            const allPosts = [];
-            
-            for (const cat of categories) {
-                try {
-                    const response = await authenticatedFetch(`${BASE_URL}/view/${cat}`, {
-                        method: 'GET',
-                    });
-                    
-                    if (response.ok) {
-                        const posts = await response.json();
-                        allPosts.push(...posts);
-                    }
-                } catch (error) {
-                    console.warn(`카테고리 ${cat} 조회 중 오류:`, error);
-                }
-            }
-            
-            return allPosts;
-        }
-        
-        // 카테고리 매핑 (프론트 카테고리 → 백엔드 enum)
-        const categoryMap = {
-            '나눔': 'FREE',
-            '팝니다': 'SELL',
-            '삽니다': 'BUY',
-            '동네 생활': 'LOCAL_ACTIVITY'
-        };
-        
-        const backendCategory = categoryMap[category] || category;
-        
-        const response = await authenticatedFetch(`${BASE_URL}/view/${backendCategory}`, {
+  try {
+    console.log('📋 카테고리별 조회 요청:', category);
+    
+    // '전체' 카테고리 처리
+    if (category === '전체') {
+      console.log('📋 전체 카테고리 조회 중...');
+      const categories = ['BUY', 'FREE', 'LOCAL_ACTIVITY', 'SELL'];
+      const allPosts = [];
+      
+      for (const cat of categories) {
+        try {
+          const response = await authenticatedFetch(`${BASE_URL}/view/${cat}`, {
             method: 'GET',
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+          });
+          
+          if (response.ok) {
+            const posts = await response.json();
+            console.log(`📋 ${cat} 카테고리: ${posts.length}개 글 조회`);
+            allPosts.push(...posts);
+          }
+        } catch (error) {
+          console.warn(`⚠️ 카테고리 ${cat} 조회 중 오류:`, error);
         }
-
-        const posts = await response.json();
-        return posts;
-    } catch (error) {
-        console.error(`카테고리 ${category} 조회 실패:`, error);
-        throw error;
+      }
+      
+      console.log(`📋 전체 조회 완료: 총 ${allPosts.length}개 글`);
+      return allPosts;
     }
+    
+    // 카테고리 매핑 (프론트 카테고리 → 백엔드 enum)
+    const categoryMap = {
+      '나눔': 'FREE',
+      '팝니다': 'SELL',
+      '삽니다': 'BUY',
+      '동네 생활': 'LOCAL_ACTIVITY'
+    };
+    
+    const backendCategory = categoryMap[category] || category;
+    console.log(`📋 매핑된 카테고리: ${category} → ${backendCategory}`);
+    
+    const response = await authenticatedFetch(`${BASE_URL}/view/${backendCategory}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const posts = await response.json();
+    console.log(`✅ ${category} 카테고리 조회 성공: ${posts.length}개 글`);
+    return posts;
+  } catch (error) {
+    console.error(`❌ 카테고리 ${category} 조회 실패:`, error);
+    throw error;
+  }
 };
 
 // 5. 게시글 상세 조회
 export const getDetailPost = async (category, id) => {
-    try {
-        const response = await authenticatedFetch(`${BASE_URL}/view/${category}/${id}`, {
-            method: 'GET',
-        });
+  try {
+    console.log(`📖 상세 조회 요청 - 카테고리: ${category}, ID: ${id}`);
+    
+    const response = await authenticatedFetch(`${BASE_URL}/view/${category}/${id}`, {
+      method: 'GET',
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const post = await response.json();
-        return post;
-    } catch (error) {
-        console.error('게시글 상세 조회 실패:', error);
-        throw error;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const post = await response.json();
+    console.log('✅ 상세 조회 성공:', post.title);
+    return post;
+  } catch (error) {
+    console.error('❌ 게시글 상세 조회 실패:', error);
+    throw error;
+  }
 };
 
-// authApi에서 가져온 checkAuthStatus를 다시 export
+// authApi에서 가져온 함수들 re-export
 export { checkAuthStatus };
 
-// 지역별 필터링 (필요시 사용)
+// 유틸리티 함수들
 export const filterPostsByRegion = (posts, region) => {
-    return posts.filter(post => {
-        const postProvince = post.province || post.region?.province;
-        const postCity = post.city || post.region?.city;
-        const postDistrict = post.district || post.region?.district;
-        
-        return !region.province || 
-            (postProvince === region.province &&
-             (!region.city || postCity === region.city) &&
-             (!region.district || postDistrict === region.district));
-    });
+  if (!region || !region.province) return posts;
+  
+  return posts.filter(post => {
+    const postProvince = post.province || post.region?.province;
+    const postCity = post.city || post.region?.city;
+    const postDistrict = post.district || post.region?.district;
+    
+    if (postProvince !== region.province) return false;
+    if (region.city && postCity !== region.city) return false;
+    if (region.district && postDistrict !== region.district) return false;
+    
+    return true;
+  });
 };
 
-// 검색어 필터링 (필요시 사용)
 export const filterPostsBySearch = (posts, searchTerm) => {
-    if (!searchTerm) return posts;
+  if (!searchTerm || !searchTerm.trim()) return posts;
+  
+  const lowerSearchTerm = searchTerm.toLowerCase().trim();
+  
+  return posts.filter(post => 
+    (post.title && post.title.toLowerCase().includes(lowerSearchTerm)) ||
+    (post.content && post.content.toLowerCase().includes(lowerSearchTerm)) ||
+    (post.username && post.username.toLowerCase().includes(lowerSearchTerm))
+  );
+};
+
+export const getCategoryDisplayName = (backendCategory) => {
+  const displayMap = {
+    'FREE': '나눔',
+    'SELL': '팝니다',
+    'BUY': '삽니다',
+    'LOCAL_ACTIVITY': '동네 생활'
+  };
+  
+  return displayMap[backendCategory] || backendCategory;
+};
+
+export const getBackendCategory = (displayCategory) => {
+  const backendMap = {
+    '나눔': 'FREE',
+    '팝니다': 'SELL',
+    '삽니다': 'BUY',
+    '동네 생활': 'LOCAL_ACTIVITY'
+  };
+  
+  return backendMap[displayCategory] || displayCategory;
+};
+
+export const formatPrice = (price) => {
+  if (!price || price === '0' || price === 0) return '나눔';
+  
+  const numPrice = parseInt(price);
+  if (isNaN(numPrice)) return price;
+  
+  return numPrice.toLocaleString() + '원';
+};
+
+export const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = now - date;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    return posts.filter(post => 
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    if (diffDays === 0) {
+      const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+      if (diffHours === 0) {
+        const diffMinutes = Math.floor(diffTime / (1000 * 60));
+        return diffMinutes <= 0 ? '방금 전' : `${diffMinutes}분 전`;
+      }
+      return `${diffHours}시간 전`;
+    } else if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  } catch (error) {
+    console.warn('날짜 포맷팅 오류:', error);
+    return dateString;
+  }
 };
