@@ -141,7 +141,7 @@ const AccountBook = () => {
             <span className="header-icon">📌</span>
             <h1>일일 미니 캘린더</h1>
           </div>
-          <div className="header-actions">
+          <div className="header-actions-account">
             <button 
               className="nav-link-button"
               onClick={() => navigate('/budget')}
