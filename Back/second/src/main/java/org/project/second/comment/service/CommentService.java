@@ -67,6 +67,7 @@ public class CommentService {
                             content,
                             community,
                             null,
+                            null,
                             null
                             );
                 }
@@ -86,6 +87,7 @@ public class CommentService {
                             content,
                             null,
                             groupBuy,
+                            null,
                             null
                     );
                 }

@@ -6,10 +6,12 @@ import org.project.second.product.dto.NaverProductItemDto;
 import org.project.second.product.dto.NaverSearchResponse;
 import org.project.second.product.dto.ProductResponseDto;
 import org.project.second.product.repository.ProductRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,19 +65,60 @@ public class ProductService {
 
         return productRepository.findByNaverProductId(item.getProductId())
                 .orElseGet(() -> {
-                    Product product = Product.builder()
-                            .naverProductId(item.getProductId())
-                            .name(item.getTitle())
-                            .url(item.getLink())
-                            .price(item.getLprice() != null ? Double.valueOf(item.getLprice()) : 0.0)
-                            .imageUrl(item.getImage())
-                            .category1(item.getCategory1())
-                            .category2(item.getCategory2())
-                            .category3(item.getCategory3())
-                            .category4(item.getCategory4())
-                            .build();
-                    return productRepository.save(product);
+                    try {
+                        Product product = Product.builder()
+                                .naverProductId(item.getProductId())
+                                .name(item.getTitle())
+                                .url(item.getLink())
+                                .price(item.getLprice() != null ? Double.valueOf(item.getLprice()) : 0.0)
+                                .imageUrl(item.getImage())
+                                .category1(item.getCategory1())
+                                .category2(item.getCategory2())
+                                .category3(item.getCategory3())
+                                .category4(item.getCategory4())
+                                .build();
+                        return productRepository.save(product);
+                    } catch (DataIntegrityViolationException e) { // 만약 동시에 같은 상품이 들어오면 중복에러 발생 -> 예외처리
+                        return productRepository.findByNaverProductId(item.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Product 저장 중 에러 발생 후 재조회 실패"));
+                    }
                 });
+    }
+
+    @Transactional
+    public Mono<Product> saveProductAsync(NaverProductItemDto item) {
+        if (item == null || item.getProductId() == null || item.getProductId().trim().isEmpty()) {
+            return Mono.error(new IllegalArgumentException("Invalid product data"));
+        }
+
+        return Mono.fromCallable(() -> productRepository.findByNaverProductId(item.getProductId()))
+                .flatMap(optionalProduct -> {
+                    if (optionalProduct.isPresent()) {
+                        return Mono.just(optionalProduct.get());
+                    } else {
+                        Product product = Product.builder()
+                                .naverProductId(item.getProductId())
+                                .name(item.getTitle())
+                                .url(item.getLink())
+                                .price(item.getLprice() != null ? Double.valueOf(item.getLprice()) : 0.0)
+                                .imageUrl(item.getImage())
+                                .category1(item.getCategory1())
+                                .category2(item.getCategory2())
+                                .category3(item.getCategory3())
+                                .category4(item.getCategory4())
+                                .build();
+
+                        try {
+                            Product savedProduct = productRepository.save(product);
+                            return Mono.just(savedProduct);
+                        } catch (DataIntegrityViolationException e) {
+                            // 동시성 문제로 중복 발생 가능 -> 재조회
+                            return Mono.fromCallable(() -> productRepository.findByNaverProductId(item.getProductId())
+                                    .orElseThrow(() -> new RuntimeException("Product 저장 중 에러 발생 후 재조회 실패")));
+                        }
+                    }
+                })
+                .subscribeOn(Schedulers.boundedElastic()); // 블로킹 호출 별도 스레드에서 실행
     }
 
     //NaverProductItemDto용

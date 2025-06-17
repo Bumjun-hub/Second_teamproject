@@ -12,6 +12,8 @@ import org.project.second.groupBuy.repository.GroupBuyParticipationRepository;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
 import org.project.second.member.repository.MemberRepository;
+import org.project.second.priceAlert.domain.PriceAlert;
+import org.project.second.product.domain.Product;
 import org.project.second.recipe.domain.Recipe;
 import org.project.second.websocket.domain.Notification;
 import org.project.second.websocket.dto.NotificationResponse;
@@ -19,6 +21,9 @@ import org.project.second.websocket.repository.NotificationRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +39,7 @@ public class NotificationService {
 
     @Transactional
     public void createAndSendNotification(Member m, NotificationType type, String content,
-                                          Community community, GroupBuy groupBuy, Recipe recipe) {
+                                          Community community, GroupBuy groupBuy, Recipe recipe, PriceAlert priceAlert) {
         // DB에 저장
         Notification notification = Notification.builder()
                 .member(m)
@@ -43,6 +48,7 @@ public class NotificationService {
                 .community(community)
                 .groupBuy(groupBuy)
                 .recipe(recipe)
+                .priceAlert(priceAlert)
                 .build();
         notificationRepository.save(notification);
 
@@ -53,6 +59,7 @@ public class NotificationService {
                 .communityId(community != null ? community.getId() : null)
                 .groupBuyId(groupBuy != null ? groupBuy.getId() : null)
                 .recipeId(recipe != null ? recipe.getId() : null)
+                .priceAlertId(priceAlert != null ? priceAlert.getId() : null)
                 .category(community != null ? String.valueOf(community.getCategory()) : null) // ✅ 이 줄 추가
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
@@ -75,7 +82,7 @@ public class NotificationService {
         // 사용자별 알람 전송
         log.info("🔔 {}공동구매 오픈 알림 전송: {}", groupBuy.getTitle(), content);
         for (Member member : members) {
-            createAndSendNotification(member, NotificationType.GROUP_BUY_OPEN, content, null, groupBuy, null);
+            createAndSendNotification(member, NotificationType.GROUP_BUY_OPEN, content, null, groupBuy, null, null);
         }
     }
 
@@ -91,7 +98,7 @@ public class NotificationService {
         // 사용자별 알람 전송
         log.info("🔔 {}공동구매 인원미달 종료 알림 전송: {}", groupBuy.getTitle(), content);
         for (Member participant : participants) {
-            createAndSendNotification(participant, NotificationType.GROUP_BUY_CLOSED, content, null, groupBuy, null);
+            createAndSendNotification(participant, NotificationType.GROUP_BUY_CLOSED, content, null, groupBuy, null, null);
         }
     }
 
@@ -107,8 +114,53 @@ public class NotificationService {
         // 사용자별 알람 전송
         log.info("🔔 {}공동구매 마감 알림 전송: {}", groupBuy.getTitle(), content);
         for (Member participant : participants) {
-            createAndSendNotification(participant, NotificationType.GROUP_BUY_COMPLETED, content, null, groupBuy, null);
+            createAndSendNotification(participant, NotificationType.GROUP_BUY_COMPLETED, content, null, groupBuy, null, null);
         }
+    }
+
+    // PriceAlert용 비동기 알림
+    @Transactional
+    public Mono<Void> sendPriceAlertNotification(PriceAlert alert, Product product, double currentPrice) {
+        Member member = alert.getMember();
+        String content = String.format(
+                "키워드 '%s'의 최저가 알림! 상품: %s, 가격: %,.0f원, URL: %s, 이미지: %s",
+                alert.getKeyword(), product.getName(), currentPrice, product.getUrl(), product.getImageUrl());
+
+        Notification notification = Notification.builder()
+                .member(member)
+                .type(NotificationType.PRICE_ALERT)
+                .content(content)
+                .priceAlert(alert)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationRepository.save(notification);
+
+        NotificationResponse response = NotificationResponse.builder()
+                .id(notification.getId())
+                .type(notification.getType())
+                .content(notification.getContent())
+                .communityId(null)  // 명시적 null
+                .groupBuyId(null)
+                .recipeId(null)
+                .priceAlertId(notification.getId())
+                .isRead(notification.getIsRead())
+                .createdAt(notification.getCreatedAt())
+                .build();
+
+        return Mono.fromRunnable(() -> {
+            try {
+                log.info("🔔 {}에게 최저가 알림 전송: {}", member.getUsername(), content);
+                messagingTemplate.convertAndSendToUser(
+                        member.getEmail(),
+                        "/topic/notification",
+                        response);
+            } catch (Exception e) {
+                log.error("Failed to send WebSocket to {}: {}", member.getEmail(), e.getMessage());
+                notification.setSent(false);
+                notificationRepository.save(notification);
+            }
+        });
     }
 
 
