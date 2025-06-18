@@ -87,6 +87,9 @@ public class GroupBuy extends BaseEntity {
     private List<GroupBuyImage> groupBuyImages ;
 
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupBuyContentImage> groupBuyContentImages;
+
+    @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "groupBuy", cascade = CascadeType.ALL, orphanRemoval = true)
