@@ -94,6 +94,7 @@ const GroupBuyPage = () => {
 
                             <h3>{item.title}</h3>
                             <p>{item.salePrice?.toLocaleString()}원</p>
+                            <p>마감일 : {new Date(item.deadline).toLocaleDateString('ko-KR')}</p>
 
                             <button
                                 className="gbp-apply-button"

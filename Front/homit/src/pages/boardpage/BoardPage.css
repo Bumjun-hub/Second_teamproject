@@ -83,9 +83,10 @@ td a {
 }
 
 .bp-table-container {
-  padding: 40px;
-
-
+  max-width: 1200px;   /* ✅ 고정 너비 설정 */
+  margin: 0 auto;      /* ✅ 가운데 정렬 */
+  padding: 40px 20px;  /* ✅ 좌우 여백도 살짝 */
+  position: relative;  /* ✅ 글쓰기 버튼 위치 정렬용 */
 }
 
 

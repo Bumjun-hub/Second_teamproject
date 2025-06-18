@@ -298,5 +298,34 @@
   padding: 60px 0;
   font-family: 'Noto Sans KR', sans-serif;
   position: relative;
-  border: 1px solid;
+  
+}
+
+
+.gbi-detail-image {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  display: block;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.gbi-tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+  justify-content: center;
+}
+.gbi-tabs button{
+  padding: 10px 20px;
+  border :none;
+  background-color: #eee;
+  cursor: pointer;
+  font-weight:bold;
+}
+
+.gbi-tabs button.active{
+  background-color: royalblue;
+  color: white;
 }

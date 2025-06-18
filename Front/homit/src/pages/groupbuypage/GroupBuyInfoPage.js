@@ -3,14 +3,17 @@ import { useEffect, useState } from 'react';
 import './GroupBuyInfoPage.css';
 import Section from '../../components/Section';
 import { refreshToken } from "../../utils/authUtils";
+import CommentSection from './../../components/CommentSection';
+import ParticipantList from '../../components/ParticipantList';
 
-const GroupBuyInfoPage = () => {
+const GroupBuyInfoPage = ({ postId }) => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [currentUser, setCurrentUser] = useState("");
     const [hasOrder, setHasOrder] = useState(false);
     const [role, setRole] = useState(null);
+    const [activeTab, setActiveTab] = useState('detail');
 
     const salepercent = item && item.salePrice && item.originalPrice
         ? Math.round((1 - item.salePrice / item.originalPrice) * 100)
@@ -303,8 +306,51 @@ const GroupBuyInfoPage = () => {
                     </div>
                 </div>
             </div>
-            <div className='gbi-content-container'>
 
+            <div className="gbi-tabs">
+                <button
+                    className={activeTab === 'detail' ? 'active' : ''}
+                    onClick={() => setActiveTab('detail')}
+                >
+                    상세정보
+                </button>
+                <button
+                    className={activeTab === 'participants' ? 'active' : ''}
+                    onClick={() => setActiveTab('participants')}
+                >
+                    공구 참가자 목록
+                </button>
+                <button
+                    className={activeTab === 'review' ? 'active' : ''}
+                    onClick={() => setActiveTab('review')}
+                >
+                    후기
+                </button>
+            </div>
+
+            <div className='tab-content'>
+                {activeTab === 'detail' && (
+                    <div className='gbi-content-container'>
+                        {item.contentImgUrls?.map((url, idx) => (
+                            <img
+                                key={idx}
+                                src={url}
+                                alt={`상세 이미지 ${idx + 1}`}
+                                className="gbi-detail-image"
+                            />
+                        ))}
+                    </div>
+                )}
+                {activeTab === 'participants' && (
+                    <ParticipantList groupBuyId={id} />
+                )}
+                {activeTab === 'review' && (
+                    <CommentSection
+                        postId={id}
+                        currentUser={currentUser}
+                        entityType="GROUPBUY"
+                    />
+                )}
             </div>
         </Section >
     );

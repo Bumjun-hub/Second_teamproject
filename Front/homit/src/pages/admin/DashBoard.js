@@ -77,7 +77,7 @@ const DashBoard = () => {
         const data = await res.json();
         console.log("🎯 현재 사용자 권한:", data.role);
         setRole(data.role);
-        if (data.role !== "ROLE_ADMIN") {
+        if (!String(data.role) !== "ROLE_ADMIN") {
           alert('접근 권한이 없습니다.');
           navigate('/');
 
