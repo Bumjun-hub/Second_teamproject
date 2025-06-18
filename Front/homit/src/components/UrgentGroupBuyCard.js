@@ -1,3 +1,5 @@
+// 메인페이지 공동구매 마감 알림 카드
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
