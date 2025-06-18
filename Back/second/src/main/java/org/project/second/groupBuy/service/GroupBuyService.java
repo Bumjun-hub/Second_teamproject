@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.common.image.ImageService;
 import org.project.second.groupBuy.domain.GroupBuy;
+import org.project.second.groupBuy.domain.GroupBuyContentImage;
 import org.project.second.groupBuy.domain.GroupBuyImage;
 import org.project.second.groupBuy.dto.GroupBuyDto;
 import org.project.second.groupBuy.dto.GroupBuyResponseDto;
+import org.project.second.groupBuy.repository.GroupBuyContentImageRepository;
 import org.project.second.groupBuy.repository.GroupBuyImageRepository;
 import org.project.second.groupBuy.repository.GroupBuyRepository;
 import org.project.second.member.domain.Member;
@@ -32,10 +34,11 @@ public class GroupBuyService {
     private final ImageService imageService;
     private final GroupBuyImageRepository groupBuyImageRepository;
     private final NotificationService notificationService;
+    private final GroupBuyContentImageRepository groupBuyContentImageRepository;
 
     //작성
     @Transactional
-    public void createPost(GroupBuyDto groupBuyDto, List<MultipartFile> imageFiles, Member loginUser) {
+    public void createPost(GroupBuyDto groupBuyDto, List<MultipartFile> imageFiles,List<MultipartFile>contentImages, Member loginUser) {
         validateMember(loginUser);
         validateMember(groupBuyDto);
 
@@ -58,6 +61,7 @@ public class GroupBuyService {
                 .build();
         groupBuyRepository.save(groupBuy);
 
+        //썸네일용 1장
         if (imageFiles != null && !imageFiles.isEmpty()) {
             for (MultipartFile imageFile : imageFiles) {
                 String imageUrl = imageService.saveImage(imageFile);
@@ -72,13 +76,27 @@ public class GroupBuyService {
                 }
             }
         }
+        // content용
+        if (contentImages != null && !contentImages.isEmpty()) {
+            for (MultipartFile contentFile : contentImages) {
+                String imageUrl = imageService.saveImage(contentFile);
+
+                if (imageUrl != null) {
+                    GroupBuyContentImage image = GroupBuyContentImage.builder()
+                            .imgUrl(imageUrl)
+                            .groupBuy(groupBuy)
+                            .isDeleted(false)
+                            .build();
+                    groupBuyContentImageRepository.save(image);
+                }
+            }
+        }
 
         // 공동구매 오픈 알림
         String content = "🔔 \"" + groupBuy.getTitle() + "\" 새로운 공동구매가 OPEN 되었습니다!";
         notificationService.sendGruopBuyOpenToAll(
                 groupBuy, content
         );
-
     }
 
     //수정
@@ -131,7 +149,8 @@ public class GroupBuyService {
     //수정
     @Transactional
     public void editPost(Long id, GroupBuyDto groupBuyDto, Member loginUser,
-                         List<MultipartFile> imageFiles, List<Long> deleteImageIds) {
+                         List<MultipartFile> imageFiles, List<Long> deleteImageIds,
+                         List<MultipartFile>contentImages, List<Long>deleteContentImageIds) {
         GroupBuy post = validatePost(id);
         validateMember(loginUser, post.getMember());
         validateMember(groupBuyDto);
@@ -148,6 +167,7 @@ public class GroupBuyService {
         post.setMaxQuantity(groupBuyDto.getMaxQuantity());
         post.setDeadline(groupBuyDto.getDeadline());
 
+        //썸네일용이미지
         if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
             List<GroupBuyImage> imagesToDelete = groupBuyImageRepository.findAllById(deleteImageIds);
 
@@ -177,6 +197,37 @@ public class GroupBuyService {
                 }
             }
         }
+
+        //contentImage상세내용이미지
+        if (deleteContentImageIds != null && !deleteContentImageIds.isEmpty()) {
+            List<GroupBuyContentImage> imagesToDelete = groupBuyContentImageRepository.findAllById(deleteContentImageIds);
+
+            for (GroupBuyContentImage image : imagesToDelete) {
+                if (image.getGroupBuy().getId().equals(id)) {
+                    imageService.deleteImage(image.getImgUrl());
+                    image.setIsDeleted(true);
+                    groupBuyContentImageRepository.save(image);
+                }
+            }
+        }
+
+        if (contentImages != null && !contentImages.isEmpty()) {
+            for (MultipartFile imageFile : contentImages) {
+                if (!imageFile.isEmpty()) {
+                    String imageUrl = imageService.saveImage(imageFile);
+
+                    if (imageUrl != null) {
+                        GroupBuyContentImage image = GroupBuyContentImage.builder()
+                                .imgUrl(imageUrl)
+                                .groupBuy(post)
+                                .isDeleted(false)
+                                .build();
+
+                        groupBuyContentImageRepository.save(image);
+                    }
+                }
+            }
+        }
     }
 
     //삭제
@@ -200,6 +251,16 @@ public class GroupBuyService {
                     .map(GroupBuyImage::getId)
                     .collect(Collectors.toList());
 
+            //contentImage
+            List<String> contentImgUrls = post.getGroupBuyContentImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyContentImage::getImgUrl)
+                    .collect(Collectors.toList());
+
+            List<Long> contentImgIds = post.getGroupBuyContentImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyContentImage::getId)
+                    .collect(Collectors.toList());
 
             return new GroupBuyResponseDto(
                     post.getId(), post.getStatus(), post.getMember().getUsername(),
@@ -207,6 +268,7 @@ public class GroupBuyService {
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                     post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
+                    contentImgUrls, contentImgIds,
                     (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                     Collections.emptyList()
 
@@ -227,6 +289,17 @@ public class GroupBuyService {
                 .filter(img -> !img.getIsDeleted())
                 .map(GroupBuyImage::getId)
                 .collect(Collectors.toList());
+        //contentImage
+        List<String> contentImgUrls = post.getGroupBuyContentImages().stream()
+                .filter(img -> !img.getIsDeleted())
+                .map(GroupBuyContentImage::getImgUrl)
+                .collect(Collectors.toList());
+
+        List<Long> contentImgIds = post.getGroupBuyContentImages().stream()
+                .filter(img -> !img.getIsDeleted())
+                .map(GroupBuyContentImage::getId)
+                .collect(Collectors.toList());
+
         List<String> participants = post.getParticipations().stream()
                 .map(participation -> participation.getMember().getUsername())
                 .collect(Collectors.toList());
@@ -237,6 +310,7 @@ public class GroupBuyService {
                 post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                 post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                 post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
+                contentImgUrls, contentImgIds,
                 (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                 participants
         );
@@ -254,12 +328,24 @@ public class GroupBuyService {
                     .map(GroupBuyImage::getId)
                     .collect(Collectors.toList());
 
+            //contentImage
+            List<String> contentImgUrls = post.getGroupBuyContentImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyContentImage::getImgUrl)
+                    .collect(Collectors.toList());
+
+            List<Long> contentImgIds = post.getGroupBuyContentImages().stream()
+                    .filter(img -> !img.getIsDeleted())
+                    .map(GroupBuyContentImage::getId)
+                    .collect(Collectors.toList());
+
             return new GroupBuyResponseDto(
                     post.getId(), post.getStatus(), post.getMember().getUsername(),
                     post.getTitle(), post.getDescription(), post.getContent(), post.getProductUrl(),
                     post.getMaxParticipants(), post.getMinParticipants(), post.getCurrentParticipants(),
                     post.getMaxQuantity(), post.getCurrentQuantity(), post.getOriginalPrice(),
                     post.getSalePrice(), post.getDeadline(), post.isHotDeal(), imageUrls, imageIds,
+                    contentImgUrls, contentImgIds,
                     (long) post.getLikes().size(), post.getCreatedAt(), post.getUpdatedAt(),
                     Collections.emptyList()
             );
@@ -279,9 +365,6 @@ public class GroupBuyService {
     public void validateMember(GroupBuyDto groupBuyDto) {
         if (groupBuyDto.getTitle() == null || groupBuyDto.getTitle().isBlank()) {
             throw new IllegalArgumentException("제목을 입력하세요");
-        }
-        if (groupBuyDto.getContent() == null || groupBuyDto.getContent().isBlank()) {
-            throw new IllegalArgumentException("내용을 입력하세요");
         }
     }
 

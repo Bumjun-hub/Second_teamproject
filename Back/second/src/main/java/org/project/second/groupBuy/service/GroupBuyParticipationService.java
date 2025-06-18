@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.project.second.common.enums.GroupBuyStatus;
 import org.project.second.groupBuy.domain.GroupBuy;
+import org.project.second.groupBuy.domain.GroupBuyContentImage;
 import org.project.second.groupBuy.domain.GroupBuyParticipation;
 import org.project.second.groupBuy.domain.GroupBuyImage;
 import org.project.second.groupBuy.dto.GroupBuyParticipationDto;
@@ -129,6 +130,17 @@ public class GroupBuyParticipationService {
                             .map(GroupBuyImage::getId)
                             .collect(Collectors.toList());
 
+                    //contentImage
+                    List<String> contentImgUrls = post.getGroupBuyContentImages().stream()
+                            .filter(img -> !img.getIsDeleted())
+                            .map(GroupBuyContentImage::getImgUrl)
+                            .collect(Collectors.toList());
+
+                    List<Long> contentImgIds = post.getGroupBuyContentImages().stream()
+                            .filter(img -> !img.getIsDeleted())
+                            .map(GroupBuyContentImage::getId)
+                            .collect(Collectors.toList());
+
                     List<String> participants = post.getParticipations().stream()
                             .map(p -> p.getMember().getUsername())
                             .collect(Collectors.toList());
@@ -152,6 +164,8 @@ public class GroupBuyParticipationService {
                             post.isHotDeal(),
                             imageUrls,
                             imageIds,
+                            contentImgUrls,
+                            contentImgIds,
                             (long) post.getLikes().size(),
                             post.getCreatedAt(),
                             post.getUpdatedAt(),

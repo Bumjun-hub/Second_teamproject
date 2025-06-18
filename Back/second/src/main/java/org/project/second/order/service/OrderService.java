@@ -78,6 +78,7 @@ public class OrderService {
                 .build();
         groupBuyParticipationRepository.save(participation);
 
+
         // 참여자수 증가 & 상태 변경
         groupBuy.setCurrentParticipants(groupBuy.getCurrentParticipants() + 1);
         if (groupBuy.getCurrentParticipants() >= groupBuy.getMaxParticipants()) {
