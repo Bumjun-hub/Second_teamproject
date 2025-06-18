@@ -13,16 +13,21 @@ const getTimeDiff = (deadline) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-const UrgentGroupBuyCard = ({ item }) => {
+const UrgentGroupBuyCard = ({ item, onExpire }) => {
   const [timeLeft, setTimeLeft] = useState(() => getTimeDiff(item.deadline));
   const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(getTimeDiff(item.deadline));
+      const diffStr = getTimeDiff(item.deadline);
+      setTimeLeft(diffStr);
+      if (diffStr === "00:00:00" && onExpire) {
+        onExpire(item.id); // 타임 종료시 부모에게 알림
+      }
+
     }, 1000);
     return () => clearInterval(interval);
-  }, [item.deadline]);
+  }, [item.deadline, onExpire]);
 
   return (
     <div className="product-card" onClick={() => navigate(`/groupbuy/info/${item.id}`)} style={{ cursor: 'pointer' }}>
