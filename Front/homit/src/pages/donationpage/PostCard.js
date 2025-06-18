@@ -1,21 +1,42 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PostCard.css';
 
-const PostCardDonation = ({ post, onEdit, onDelete }) => {
+const PostCard = ({ post, onEdit, onDelete, postType = 'donation' }) => {
   const [currentImageIndex ] = useState(0);
   const [currentUser, setCurrentUser] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("/api/mypage", { credentials: "include" })
-      .then(res => res.json())
-      .then(data => setCurrentUser(data.name));
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        } else if (res.status === 401) {
+          // 로그인하지 않은 상태 - 무시
+          return null;
+        } else {
+          throw new Error('사용자 정보를 가져올 수 없습니다.');
+        }
+      })
+      .then(data => {
+        if (data && data.name) {
+          setCurrentUser(data.name);
+        }
+      })
+      .catch(err => console.error("사용자 정보 로드 실패:", err));
   }, []);
 
   const isAuthor = () => {
-    return post.username === currentUser;
+    return currentUser && post && post.username === currentUser;
   };
 
-  const handleEdit = () => {
+  const handleEdit = (e) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    if (!currentUser) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
     if (post.username !== currentUser) {
       alert("권한이 없습니다");
       return;
@@ -23,7 +44,12 @@ const PostCardDonation = ({ post, onEdit, onDelete }) => {
     onEdit(post);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    if (!currentUser) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
     if (post.username !== currentUser) {
       alert("권한이 없습니다");
       return;
@@ -31,6 +57,19 @@ const PostCardDonation = ({ post, onEdit, onDelete }) => {
     
     if (window.confirm("정말 삭제하시겠습니까?")) {
       onDelete(post.id);
+    }
+  };
+
+  const handleCardClick = () => {
+    // 게시글 타입에 따라 다른 상세 페이지로 이동
+    if (postType === 'donation') {
+      // 기부 게시글의 경우 카테고리 정보도 함께 전달
+      const category = post.category || 'SHARE'; // 기본값 설정
+      navigate(`/donation/view/${category}/${post.id}`);
+    } else if (postType === 'board') {
+      navigate(`/board/${post.id}`);
+    } else {
+      navigate(`/posts/${post.id}`);
     }
   };
 
@@ -63,7 +102,11 @@ const PostCardDonation = ({ post, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="post-card-donation">
+    <div 
+      className="post-card-donation"
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
+    >
       {/* 이미지 섹션 */}
       {post.imgUrls && post.imgUrls.length > 0 && (
         <div className="post-images-donation">
@@ -136,4 +179,4 @@ const PostCardDonation = ({ post, onEdit, onDelete }) => {
   );
 };
 
-export default PostCardDonation;
+export default PostCard;

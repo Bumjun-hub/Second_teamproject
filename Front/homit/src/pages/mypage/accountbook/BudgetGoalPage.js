@@ -233,7 +233,7 @@ const BudgetGoalPage = () => {
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
+            <div className="modal-header-account">
               <h3>{editingGoal?.categoryName} 목표 설정</h3>
               <button 
                 className="close-button"
