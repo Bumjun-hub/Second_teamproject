@@ -30,6 +30,8 @@ public class GroupBuyResponseDto {
     private boolean hotdeal;
     private List<String> imgUrls;
     private List<Long> imgIds;
+    private List<String> contentImgUrls;
+    private List<Long> contentImgIds;
     private Long likes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
