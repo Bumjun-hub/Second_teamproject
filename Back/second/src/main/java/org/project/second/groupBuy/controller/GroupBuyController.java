@@ -30,7 +30,7 @@ public class GroupBuyController {
     public ResponseEntity<String> createPost(
             @RequestParam("status") String status,
             @RequestParam("title") String title,
-            @RequestParam("content") String content,
+            @RequestParam(value = "content", required = false, defaultValue = "") String content,
             @RequestParam("productUrl") String productUrl,
             @RequestParam("description") String description,
             @RequestParam("maxParticipants") Integer maxParticipants,
@@ -41,6 +41,7 @@ public class GroupBuyController {
             @RequestParam("deadline") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime deadline,
             @RequestParam("hotdeal") boolean hotdeal,
             @RequestParam(value = "images", required = false) MultipartFile imageFile,
+            @RequestParam(value = "contentImage", required = false) List<MultipartFile> contentImages,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
@@ -63,7 +64,7 @@ public class GroupBuyController {
         // 단일 파일 → 리스트로 변환
         List<MultipartFile> imageFiles = imageFile != null ? List.of(imageFile) : List.of();
 
-        groupBuyService.createPost(groupBuyDto, imageFiles, loginUser);
+        groupBuyService.createPost(groupBuyDto, imageFiles, contentImages, loginUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("게시글이 작성되었습니다");
     }
@@ -86,6 +87,8 @@ public class GroupBuyController {
             @RequestParam("deadline") LocalDateTime deadline,
             @RequestParam(value = "images", required = false) List<MultipartFile> imageFiles,
             @RequestParam(value = "deleteImageIds", required = false) List<Long> deleteImageIds,
+            @RequestParam(value = "contentImage", required = false) List<MultipartFile> contentImages,
+            @RequestParam(value = "deleteContentImageIds", required = false) List<Long> deleteContentImageIds,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         GroupBuyDto groupBuyDto = GroupBuyDto.builder()
@@ -103,7 +106,7 @@ public class GroupBuyController {
                 .build();
 
         Member loginUser = userDetails.getMember();
-        groupBuyService.editPost(id, groupBuyDto, loginUser, imageFiles, deleteImageIds);
+        groupBuyService.editPost(id, groupBuyDto, loginUser, imageFiles, deleteImageIds, contentImages, deleteContentImageIds);
         return ResponseEntity.status(HttpStatus.OK).body("게시글이 수정되었습니다");
     }
 
