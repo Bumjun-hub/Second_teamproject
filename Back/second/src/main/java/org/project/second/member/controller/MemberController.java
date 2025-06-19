@@ -186,7 +186,7 @@ public class MemberController {
             String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
             jwtProvider.setTokensInCookies(response, newAccessToken, newRefreshToken);
 
-            return ResponseEntity.ok(new EditProfileResponse("프로필 변경 완료", updatedMember.getUsername(), updatedMember.getEmail(), updatedMember.getPhone(), updatedMember.getAddress()));
+            return ResponseEntity.ok(new EditProfileResponse("프로필 변경 완료", updatedMember.getUsername(), updatedMember.getEmail(), updatedMember.getPhone(), updatedMember.getAddress(), updatedMember.getDongName()));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()

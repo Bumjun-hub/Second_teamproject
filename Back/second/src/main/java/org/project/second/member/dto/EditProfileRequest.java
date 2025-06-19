@@ -12,4 +12,5 @@ public class EditProfileRequest {
     String email;
     String phone;
     String address;
+    String dongName;
 }

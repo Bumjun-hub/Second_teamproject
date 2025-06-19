@@ -123,8 +123,8 @@ public class NotificationService {
     public Mono<Void> sendPriceAlertNotification(PriceAlert alert, Product product, double currentPrice) {
         Member member = alert.getMember();
         String content = String.format(
-                "키워드 '%s'의 최저가 알림! 상품: %s, 가격: %,.0f원, URL: %s, 이미지: %s",
-                alert.getKeyword(), product.getName(), currentPrice, product.getUrl(), product.getImageUrl());
+                "키워드 '%s'의 최저가 알림! 상품: %s, 가격: %,.0f원, URL: %s",
+                alert.getKeyword(), product.getName(), currentPrice, product.getUrl());
 
         Notification notification = Notification.builder()
                 .member(member)
@@ -133,6 +133,7 @@ public class NotificationService {
                 .priceAlert(alert)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
+                .url(product.getUrl())
                 .build();
         notificationRepository.save(notification);
 
@@ -146,6 +147,7 @@ public class NotificationService {
                 .priceAlertId(notification.getId())
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
+                .url(notification.getUrl())
                 .build();
 
         return Mono.fromRunnable(() -> {
