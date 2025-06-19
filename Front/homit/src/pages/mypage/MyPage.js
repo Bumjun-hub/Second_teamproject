@@ -8,7 +8,6 @@ import WishList  from './WishList';
 import RecipeFavorite  from './RecipeFavorite';
 import RecipeInfoPage from '../recipepage/RecipeInfoPage'; 
 import MyPosts from './MyPosts';
-import AccountBook from './accountbook/AccountBook';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -163,11 +162,6 @@ const MyPage = () => {
         navigate('/mypage?view=myPosts');
     };
 
-    const handleGoToaccountbook = () => {
-        setCurrentView('accountbook');
-        navigate('/mypage?view=accountbook');
-    };
-
     // URL 파라미터에 따라 뷰 설정
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -224,10 +218,6 @@ const MyPage = () => {
         return <MyPosts />;
     }
 
-    if (currentView === 'accountbook') {
-        return <AccountBook />;
-    }
-
     return (
         <div className="mypage-container">
             <div className="profile-section">
@@ -281,11 +271,6 @@ const MyPage = () => {
                         icon="📝" 
                         text="내가 쓴 글" 
                         onClick={handleGoToMyPost}
-                    />
-                    <MenuItem 
-                        icon="📒" 
-                        text="가계부" 
-                        onClick={handleGoToaccountbook}
                     />
                 </div>
             </div>
