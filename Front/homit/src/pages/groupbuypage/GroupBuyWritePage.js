@@ -28,8 +28,11 @@ const GroupBuyWritePage = () => {
 
   const [imageFiles, setImageFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]); // 기존 이미지 (ID와 URL 포함)
+  const [existingDetailImages, setExistingDetailImages] = useState([]);
   const [newImagePreviews, setNewImagePreviews] = useState([]); // 새로 추가된 이미지 미리보기
   const [deletedImageIds, setDeletedImageIds] = useState([]); // 삭제할 기존 이미지 ID들
+  const [deletedDetailImageIds, setDeletedDetailImageIds] = useState([]);
+  const [detailImages, setDetailImages] = useState([]);
 
   useEffect(() => {
     if (isEdit) {
@@ -61,6 +64,15 @@ const GroupBuyWritePage = () => {
             }));
             setExistingImages(existingImgs);
           }
+
+          if (data.contentImgUrls && data.contentImgIds && data.contentImgUrls.length > 0) {
+            const existingDetailImages = data.contentImgUrls.map((url, index) => ({
+              id: data.contentImgIds[index],
+              url: url,
+              isExisting: true
+            }));
+            setExistingDetailImages(existingDetailImages);
+          }
         })
         .catch(err => {
           console.error('데이터 로드 실패:', err);
@@ -68,10 +80,6 @@ const GroupBuyWritePage = () => {
         });
     }
   }, [isEdit, id]);
-
-
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,6 +107,12 @@ const GroupBuyWritePage = () => {
     setDeletedImageIds(prev => [...prev, imageId]);
     setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
+
+  const handleExistingDetailImageRemove = (imageId, index) => {
+    // 기존 상세 이미지 삭제
+    setDeletedDetailImageIds(prev => [...prev, imageId]);
+    setExistingDetailImages(prev => prev.filter((_, i) => i !== index));
+  }
 
   const handleNewImageRemove = (index) => {
     // 새로 추가된 이미지 삭제
@@ -137,11 +151,23 @@ const GroupBuyWritePage = () => {
     });
 
     // 수정 모드에서 삭제할 이미지 ID들 추가
-    if (isEdit && deletedImageIds.length > 0) {
-      deletedImageIds.forEach(id => {
-        data.append('deleteImageIds', id);
-      });
+    if (isEdit) {
+      if (deletedImageIds.length > 0) {
+        deletedImageIds.forEach(id => {
+          data.append('deleteImageIds', id);
+        });
+      }
+
+      if (deletedDetailImageIds.length > 0) {
+        deletedDetailImageIds.forEach(id => {
+          data.append('deleteContentImageIds', id);
+        })
+      }
     }
+
+    detailImages.forEach(file => {
+      data.append('contentImage', file);
+    });
 
     const url = isEdit
       ? `/api/groupBuy/admin/edit/${id}`
@@ -240,13 +266,34 @@ const GroupBuyWritePage = () => {
               onChange={handleChange}
             />
 
-            <label>내용</label>
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleChange}
-              required
+            <label>상세 정보 사진</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                const files = Array.from(e.target.files);
+                setDetailImages(files); // useState로 따로 선언해줘야 함
+              }}
             />
+
+            {existingDetailImages.length > 0 && (
+              <div className='image-priview-area'>
+                <h4>기존 상세 이미지</h4>
+                {existingDetailImages.map((img, idx) => (
+                  <div key={`existing-detail-${img.id}`} className="image-preview-wrapper">
+                    <img src={img.url} alt={`상세 이미지 ${idx + 1}`} />
+                    <button
+                      type='button'
+                      className='remove-image-btn'
+                      onClick={() => handleExistingDetailImageRemove(img.id, idx)}>
+                      x
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
 
             <label>상품 설명</label>
             <input

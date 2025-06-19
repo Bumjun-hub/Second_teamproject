@@ -17,6 +17,8 @@
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  width: 1200px;
+  margin: 0 auto;
 }
 
 /* 댓글 입력창 */

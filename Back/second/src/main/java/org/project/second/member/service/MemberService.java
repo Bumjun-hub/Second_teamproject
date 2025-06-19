@@ -38,7 +38,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final GradeService gradeService;
 
     @Value("${file.profile-images-dir}")
     private String profileImagesDir;
@@ -74,6 +73,7 @@ public class MemberService {
                 .password(enPass) // 요청 데이터 자체가 아닌 암호화 후 설정
                 .username(signupRequest.getUsername())
                 .address(signupRequest.getAddress())
+                .dongName(signupRequest.getDongName())
                 .phone(signupRequest.getPhone())
                 .role(userRole)
                 .build();
@@ -140,6 +140,7 @@ public class MemberService {
             m.setUsername(editProfileRequest.getName());
             m.setEmail(editProfileRequest.getEmail());
             m.setAddress(editProfileRequest.getAddress());
+            m.setDongName(editProfileRequest.getDongName());
             m.setPhone(editProfileRequest.getPhone());
 
             return memberRepository.save(m);

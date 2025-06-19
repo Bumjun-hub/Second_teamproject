@@ -40,6 +40,7 @@ public class NotificationController {
                             .recipeId(notifications.getRecipe() != null ? notifications.getRecipe().getId() : null)
                             .isRead(notifications.getIsRead())
                             .createdAt(notifications.getCreatedAt())
+                            .url(notifications.getUrl())
                             .build())
                 .collect(Collectors.toList());
 

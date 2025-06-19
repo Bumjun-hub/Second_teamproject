@@ -64,4 +64,7 @@ public class Notification {
     @Column(updatable = false)
     private LocalDateTime createdAt; // 생성일
 
+    @Column(columnDefinition = "TEXT")
+    private String url;
+
 }

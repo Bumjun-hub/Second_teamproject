@@ -6,6 +6,8 @@ import org.project.second.member.domain.Member;
 import org.project.second.priceAlert.dto.PriceAlertRequest;
 import org.project.second.priceAlert.dto.PriceAlertResponse;
 import org.project.second.priceAlert.service.PriceAlertService;
+import org.project.second.product.dto.MessageResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -20,24 +22,26 @@ public class PriceAlertController {
     private final PriceAlertService priceAlertService;
 
     @PostMapping("/create")
-    public Mono<PriceAlertResponse> createPriceAlert(@RequestBody PriceAlertRequest request
+    public ResponseEntity<PriceAlertResponse> createPriceAlert(@RequestBody PriceAlertRequest request
                                                     , @AuthenticationPrincipal CustomUserDetails userDetails) {
             Member m = userDetails.getMember();
-            return Mono.just(priceAlertService.createPriceAlert(m, request));
+            PriceAlertResponse response = priceAlertService.createPriceAlert(m, request);
+            return ResponseEntity.ok(response);
     }
 
     @GetMapping("/list")
-    public Mono<List<PriceAlertResponse>> getMemberPriceAlerts(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<List<PriceAlertResponse>> getMemberPriceAlerts(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Member m = userDetails.getMember();
         List<PriceAlertResponse> result = priceAlertService.getMemberPriceAlerts(m);
-        return Mono.just(result);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/remove/{id}")
-    public Mono<Void> deletePriceAlert(@PathVariable Long id,
+    public ResponseEntity<MessageResponse> deletePriceAlert(@PathVariable Long id,
                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
         Member m = userDetails.getMember();
-        return Mono.fromRunnable(() -> priceAlertService.deletePriceAlert(id, m));
+        priceAlertService.deletePriceAlert(id, m);
+        return ResponseEntity.ok().body(new MessageResponse("Successfully deleted"));
     }
 
 }

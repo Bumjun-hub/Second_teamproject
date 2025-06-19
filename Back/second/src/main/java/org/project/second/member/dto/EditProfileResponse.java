@@ -13,4 +13,5 @@ public class EditProfileResponse {
     String email;
     String phone;
     String address;
+    String dongName;
 }

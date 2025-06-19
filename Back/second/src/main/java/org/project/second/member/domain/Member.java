@@ -45,6 +45,8 @@ public class Member extends BaseEntity {
 
     private String address; // 주소
 
+    private String dongName; // 거주 동
+
     private String phone; // 휴대폰번호
 
     @Enumerated(EnumType.STRING)
