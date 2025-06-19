@@ -20,4 +20,5 @@ public class NotificationResponse {
     private String category;
     private Boolean isRead;
     private LocalDateTime createdAt;
+    private String url;
 }
