@@ -131,9 +131,11 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
         return;
       }
 
-      if (!formData.title || !formData.content || !formData.region.province || 
-          !formData.region.city || !formData.region.district) {
-        alert('모든 필드를 입력해주세요.');
+      // 필수 필드 검증 - 지역 선택 4개 모두 포함
+      if (!formData.title || !formData.content || 
+          !formData.region.province || !formData.region.city || 
+          !formData.region.district || !formData.region.neighborhood) {
+        alert('모든 필드를 입력해주세요. (시/도, 시/구, 동, 상세동 모두 선택해야 합니다)');
         return;
       }
       
@@ -286,7 +288,7 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
           {/* 지역 선택 */}
           <div className="form-row-d">
             <div className="form-group-d">
-              <label>시/도</label>
+              <label>시/도 *</label>
               <select
                 value={formData.region.province}
                 onChange={(e) => setFormData({
@@ -305,7 +307,7 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
 
             {formData.region.province && (
               <div className="form-group-d">
-                <label>시/구</label>
+                <label>시/구 *</label>
                 <select
                   value={formData.region.city}
                   onChange={(e) => setFormData({
@@ -325,7 +327,7 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
 
             {formData.region.city && (
               <div className="form-group-d">
-                <label>동</label>
+                <label>동 *</label>
                 <select
                   value={formData.region.district}
                   onChange={(e) => setFormData({
@@ -345,7 +347,7 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
 
             {formData.region.district && (
               <div className="form-group-d">
-                <label>상세동 (선택사항)</label>
+                <label>상세동 *</label>
                 <select
                   value={formData.region.neighborhood}
                   onChange={(e) => setFormData({
@@ -353,6 +355,7 @@ const WriteModal = ({ editingPost, regionData = {}, onSubmit, onClose }) => {
                     region: { ...formData.region, neighborhood: e.target.value }
                   })}
                   className="form-input-d"
+                  required
                 >
                   <option value="">선택하세요</option>
                   {getNeighborhoods(formData.region.province, formData.region.city, formData.region.district).map(neighborhood => (

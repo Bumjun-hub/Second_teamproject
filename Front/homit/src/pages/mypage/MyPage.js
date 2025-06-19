@@ -8,8 +8,6 @@ import WishList  from './WishList';
 import RecipeFavorite  from './RecipeFavorite';
 import RecipeInfoPage from '../recipepage/RecipeInfoPage'; 
 import MyPosts from './MyPosts';
-import AccountBook from './accountbook/AccountBook';
-import MyGroupBuy from './MyGroupBuy';
 import { PiFinnTheHumanBold } from "react-icons/pi";
 import { authenticatedFetch } from '../../utils/authUtils';
 import { useAuth } from '../../utils/AuthProvider';
@@ -164,16 +162,6 @@ const MyPage = () => {
         navigate('/mypage?view=myPosts');
     };
 
-    const handleGoToaccountbook = () => {
-        setCurrentView('accountbook');
-        navigate('/mypage?view=accountbook');
-    };
-
-    const handleGoToGroupBuy = () => {
-        setCurrentView('mygroupbuy');
-        navigate('/mypage?view=mygroupbuy');
-    };
-
     // URL 파라미터에 따라 뷰 설정
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -230,14 +218,6 @@ const MyPage = () => {
         return <MyPosts />;
     }
 
-    if (currentView === 'accountbook') {
-        return <AccountBook />;
-    }
-
-    if (currentView === 'mygroupbuy') {
-        return <MyGroupBuy />;
-    }
-
     return (
         <div className="mypage-container">
             <div className="profile-section">
@@ -291,16 +271,6 @@ const MyPage = () => {
                         icon="📝" 
                         text="내가 쓴 글" 
                         onClick={handleGoToMyPost}
-                    />
-                    <MenuItem 
-                        icon="📒" 
-                        text="가계부" 
-                        onClick={handleGoToaccountbook}
-                    />
-                    <MenuItem 
-                        icon="🛒" 
-                        text="공동구매" 
-                        onClick={handleGoToGroupBuy}
                     />
                 </div>
             </div>
